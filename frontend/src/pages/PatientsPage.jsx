@@ -166,7 +166,6 @@ export default function PatientsPage() {
             </div>
             <div>
               <h1 className="text-base font-bold text-slate-800">Gestão de Pacientes</h1>
-              <p className="text-xs text-slate-500">Módulo de Atendimento & Recepção (RF02)</p>
             </div>
           </div>
         </div>
