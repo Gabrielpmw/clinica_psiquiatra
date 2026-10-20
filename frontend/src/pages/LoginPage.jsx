@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Stethoscope, Lock, Mail, Activity, CheckCircle, AlertCircle, ShieldCheck } from 'lucide-react';
-import { checkHealth } from '../services/api';
+import { Stethoscope, Lock, Mail, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
@@ -12,27 +11,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [apiStatus, setApiStatus] = useState({ checking: true, connected: false });
 
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    checkHealth()
-      .then((data) => {
-        if (data.status === 'ok') {
-          setApiStatus({ checking: false, connected: true });
-        } else {
-          setApiStatus({ checking: false, connected: false });
-        }
-      })
-      .catch(() => {
-        setApiStatus({ checking: false, connected: false });
-      });
-  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -61,54 +45,92 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
-      {/* Indicador de Status da API no topo */}
-      <div className="absolute top-4 right-4 flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-slate-200 text-xs shadow-sm">
-        <Activity className="w-3.5 h-3.5 text-slate-400" />
-        <span className="text-slate-500">API Back-end:</span>
-        {apiStatus.checking ? (
-          <span className="text-amber-500 font-medium">Verificando...</span>
-        ) : apiStatus.connected ? (
-          <span className="text-emerald-600 font-medium flex items-center gap-1">
-            <CheckCircle className="w-3 h-3" /> Conectado
-          </span>
-        ) : (
-          <span className="text-rose-500 font-medium flex items-center gap-1">
-            <AlertCircle className="w-3 h-3" /> Desconectado
-          </span>
-        )}
-      </div>
-
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <div className="w-14 h-14 bg-teal-600 rounded-2xl flex items-center justify-center shadow-md">
-            <Stethoscope className="w-8 h-8 text-white" />
-          </div>
+    <div className="min-h-screen flex" style={{ backgroundColor: '#F2F5EF' }}>
+      {/* Lado esquerdo — verde escuro */}
+      <div
+        className="hidden lg:flex w-1/2 flex-col items-center justify-center p-12 text-center"
+        style={{ backgroundColor: '#17382A' }}
+      >
+        <div
+          className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg mb-6"
+          style={{ backgroundColor: '#2B6A4F' }}
+        >
+          <Stethoscope className="w-11 h-11" style={{ color: '#F9FAF6' }} />
         </div>
-        <h2 className="mt-4 text-center text-2xl font-bold tracking-tight text-slate-800">
+        <h1
+          className="text-3xl font-semibold tracking-tight mb-3"
+          style={{ color: '#F9FAF6' }}
+        >
           Sistema de Apoio à Clínica
-        </h2>
-        <p className="mt-1 text-center text-sm text-slate-500">
-          Acesso seguro e controle por perfis
+        </h1>
+        <p className="text-base leading-relaxed max-w-xs" style={{ color: '#CFE5D8' }}>
+          Psiquiatria Infantojuvenil — acesso seguro, controlado por perfil de usuário.
         </p>
+        <div
+          className="mt-10 px-5 py-3 rounded-xl text-sm"
+          style={{ backgroundColor: '#1F4D3A', color: '#CFE5D8' }}
+        >
+          Seus dados clínicos protegidos com conformidade LGPD.
+        </div>
       </div>
 
-      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-sm rounded-xl border border-slate-100 sm:px-10">
+      {/* Lado direito — branco esverdeado */}
+      <div
+        className="flex-1 flex flex-col justify-center items-center px-6 sm:px-8"
+        style={{ backgroundColor: '#F2F5EF' }}
+      >
+        {/* Logo mobile */}
+        <div className="lg:hidden flex flex-col items-center mb-8">
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-md mb-3"
+            style={{ backgroundColor: '#2B6A4F' }}
+          >
+            <Stethoscope className="w-8 h-8" style={{ color: '#F9FAF6' }} />
+          </div>
+          <h2 className="text-xl font-semibold text-center" style={{ color: '#1E2A24' }}>
+            Sistema de Apoio à Clínica
+          </h2>
+        </div>
+
+        {/* Cartão de login */}
+        <div
+          className="w-full max-w-md rounded-xl shadow-sm border p-8"
+          style={{ backgroundColor: '#F9FAF6', borderColor: '#D5DED0' }}
+        >
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold" style={{ color: '#1E2A24' }}>
+              Entrar no sistema
+            </h2>
+            <p className="text-sm mt-1" style={{ color: '#4A5A52' }}>
+              Acesso restrito a profissionais cadastrados.
+            </p>
+          </div>
+
           {errorMessage && (
-            <div className="mb-5 flex items-center gap-2 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <div
+              className="mb-5 flex items-center gap-2 p-3 rounded-lg text-xs border"
+              style={{ backgroundColor: '#fff0ee', borderColor: '#f5c6c2', color: '#9b3028' }}
+            >
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
 
-          <form className="space-y-4" onSubmit={handleLogin}>
+          <form className="space-y-5" onSubmit={handleLogin}>
+            {/* Campo E-mail */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium mb-1.5"
+                style={{ color: '#4A5A52' }}
+              >
                 Endereço de E-mail
               </label>
-              <div className="mt-1 relative rounded-md">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <div className="relative">
+                <div
+                  className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                  style={{ color: '#7C8B83' }}
+                >
                   <Mail className="h-4 w-4" />
                 </div>
                 <input
@@ -120,17 +142,32 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="exemplo@clinica.com"
-                  className="block w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 transition-colors"
+                  className="block w-full pl-9 pr-3 py-2.5 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2"
+                  style={{
+                    backgroundColor: '#F9FAF6',
+                    borderColor: '#D5DED0',
+                    color: '#1E2A24',
+                  }}
+                  onFocus={(e) => { e.target.style.borderColor = '#4A9E7A'; e.target.style.boxShadow = '0 0 0 2px #4A9E7A33'; }}
+                  onBlur={(e) => { e.target.style.borderColor = '#D5DED0'; e.target.style.boxShadow = 'none'; }}
                 />
               </div>
             </div>
 
+            {/* Campo Senha */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium mb-1.5"
+                style={{ color: '#4A5A52' }}
+              >
                 Senha de Acesso
               </label>
-              <div className="mt-1 relative rounded-md">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <div className="relative">
+                <div
+                  className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                  style={{ color: '#7C8B83' }}
+                >
                   <Lock className="h-4 w-4" />
                 </div>
                 <input
@@ -142,45 +179,65 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="block w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 transition-colors"
+                  className="block w-full pl-9 pr-3 py-2.5 border rounded-lg text-sm transition-colors focus:outline-none"
+                  style={{
+                    backgroundColor: '#F9FAF6',
+                    borderColor: '#D5DED0',
+                    color: '#1E2A24',
+                  }}
+                  onFocus={(e) => { e.target.style.borderColor = '#4A9E7A'; e.target.style.boxShadow = '0 0 0 2px #4A9E7A33'; }}
+                  onBlur={(e) => { e.target.style.borderColor = '#D5DED0'; e.target.style.boxShadow = 'none'; }}
                 />
               </div>
             </div>
 
-            <div className="pt-2">
+            {/* Botão Entrar */}
+            <div className="pt-1">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-600 transition-colors disabled:opacity-50"
+                className="w-full flex justify-center items-center py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 min-h-[40px]"
+                style={{ backgroundColor: '#2B6A4F', color: '#F9FAF6' }}
+                onMouseEnter={(e) => { if (!loading) e.target.style.backgroundColor = '#368262'; }}
+                onMouseLeave={(e) => { if (!loading) e.target.style.backgroundColor = '#2B6A4F'; }}
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
-                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    <span
+                      className="inline-block w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"
+                      style={{ borderColor: '#F9FAF6', borderTopColor: 'transparent' }}
+                    ></span>
                     Autenticando...
                   </span>
                 ) : (
-                  'Entrar no Sistema'
+                  'Entrar'
                 )}
               </button>
             </div>
           </form>
 
-          {/* Dica para acesso rápido de desenvolvimento com admin pré-configurado */}
-          <div className="mt-6 p-3 bg-teal-50/60 border border-teal-100 rounded-lg text-xs text-slate-600">
+          {/* Dica acesso rápido admin */}
+          <div
+            className="mt-6 p-3 rounded-lg text-xs"
+            style={{ backgroundColor: '#E3F0E8', borderColor: '#CFE5D8', border: '1px solid #CFE5D8' }}
+          >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 font-medium text-teal-800">
-                <ShieldCheck className="w-4 h-4 text-teal-600" />
+              <div className="flex items-center gap-1.5 font-medium" style={{ color: '#2B6A4F' }}>
+                <ShieldCheck className="w-4 h-4" style={{ color: '#4A9E7A' }} />
                 <span>Administrador Pré-criado</span>
               </div>
               <button
                 type="button"
                 onClick={fillAdminCredentials}
-                className="text-xs text-teal-700 hover:text-teal-900 font-semibold underline"
+                className="text-xs font-semibold underline"
+                style={{ color: '#2B6A4F' }}
+                onMouseEnter={(e) => { e.target.style.color = '#1F4D3A'; }}
+                onMouseLeave={(e) => { e.target.style.color = '#2B6A4F'; }}
               >
                 Preencher
               </button>
             </div>
-            <p className="mt-1 text-slate-500">
+            <p className="mt-1" style={{ color: '#4A5A52' }}>
               admin@clinica.com • admin123456
             </p>
           </div>

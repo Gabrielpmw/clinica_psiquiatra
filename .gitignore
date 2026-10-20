@@ -53,7 +53,9 @@ Thumbs.db
 # Docker
 postgres_data/
 
-# OpenSpec & Agent context (ignorar contextoSistema conforme solicitado)
+# OpenSpec & Agent context (ignorar contextoSistema e contexto conforme solicitado)
 contextoSistema/
+contexto/
+.claude/
 .agents/
 .gemini/

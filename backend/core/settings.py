@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     # Módulos da aplicação (MVC)
     'apps.usuarios',
     'apps.pacientes',
+    'apps.agenda',
+    'apps.prontuario',
 ]
 
 MIDDLEWARE = [
@@ -80,17 +82,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# Database - PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'clinica_db'),
-        'USER': os.getenv('POSTGRES_USER', 'clinica_user'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'clinica_pass_dev_change_me'),
-        'HOST': os.getenv('POSTGRES_HOST', 'db'),
-        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+# Database - PostgreSQL (ou SQLite para testes locais)
+if 'test' in sys.argv or os.getenv('DJANGO_DB_ENGINE') == 'sqlite3':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB', 'clinica_db'),
+            'USER': os.getenv('POSTGRES_USER', 'clinica_user'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'clinica_pass_dev_change_me'),
+            'HOST': os.getenv('POSTGRES_HOST', 'db'),
+            'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        }
+    }
 
 # Modelo de Usuário Customizado com UUID (RNF05)
 AUTH_USER_MODEL = 'usuarios.Usuario'

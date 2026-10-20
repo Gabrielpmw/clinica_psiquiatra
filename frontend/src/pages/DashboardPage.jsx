@@ -12,10 +12,35 @@ import {
   UserX,
   AlertCircle,
   CheckCircle,
-  RefreshCw
+  RefreshCw,
+  Shield
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getUsuariosApi, createUsuarioApi, toggleUsuarioStatusApi } from '../services/api';
+
+// ── helpers de estilo ───────────────────────────────────────────────────────
+const C = {
+  // superfícies
+  paper50:  '#F9FAF6',
+  paper100: '#F2F5EF',
+  paper200: '#E6ECE2',
+  paper300: '#D5DED0',
+  // verde
+  leaf100:  '#E3F0E8',
+  leaf200:  '#CFE5D8',
+  leaf500:  '#4A9E7A',
+  leaf600:  '#368262',
+  leaf700:  '#2B6A4F',
+  leaf800:  '#1F4D3A',
+  leaf900:  '#17382A',
+  // tinta
+  ink400:   '#7C8B83',
+  ink600:   '#4A5A52',
+  ink900:   '#1E2A24',
+  // status
+  cancelledBg: '#F6E3E1',
+  cancelled:   '#B5645C',
+};
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -94,330 +119,630 @@ export default function DashboardPage() {
     }
   };
 
-  const getRoleBadge = () => {
-    if (isAdmin) return { title: 'Administração', color: 'bg-purple-100 text-purple-800 border-purple-200' };
-    if (isDoutora) return { title: 'Doutora / Psiquiatra', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
-    if (isSecretaria) return { title: 'Secretária / Recepção', color: 'bg-blue-100 text-blue-800 border-blue-200' };
-    return { title: user?.role || 'Usuário', color: 'bg-slate-100 text-slate-800 border-slate-200' };
+  const getRoleLabel = () => {
+    if (isAdmin) return 'Administração';
+    if (isDoutora) return 'Doutora / Psiquiatra';
+    if (isSecretaria) return 'Secretária / Recepção';
+    return user?.role || 'Usuário';
   };
 
-  const roleInfo = getRoleBadge();
+  // ── nav items ──────────────────────────────────────────────────────────────
+  const navItems = isAdmin
+    ? [{ icon: Shield, label: 'Usuários', path: 'admin', active: true }]
+    : [
+        { icon: Calendar, label: 'Agenda', path: '/agenda', active: false },
+        { icon: Users,    label: 'Pacientes', path: '/pacientes', active: false },
+        ...(isDoutora
+          ? [
+              { icon: FileText, label: 'Prontuário', path: '/prontuario', active: false },
+              { icon: Sparkles, label: 'Pareceres',  path: '/pareceres',  active: false },
+            ]
+          : []),
+      ];
+
+  // ── input style helpers ────────────────────────────────────────────────────
+  const inputCls = {
+    style: {
+      backgroundColor: C.paper50,
+      borderColor:     C.paper300,
+      color:           C.ink900,
+    },
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Header Comum */}
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center text-white font-bold shadow-sm">
+    <div className="min-h-screen flex" style={{ backgroundColor: C.paper100, color: C.ink900 }}>
+
+      {/* ── MENU LATERAL ─────────────────────────────────────────────────── */}
+      <aside
+        className="w-60 shrink-0 flex flex-col h-screen sticky top-0"
+        style={{ backgroundColor: C.leaf900 }}
+      >
+        {/* Logo */}
+        <div className="flex items-center gap-3 px-5 py-5 border-b" style={{ borderColor: C.leaf800 }}>
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
+            style={{ backgroundColor: C.leaf700, color: C.paper50 }}
+          >
             SC
           </div>
           <div>
-            <h1 className="text-base font-bold text-slate-800">Sistema de Apoio à Clínica</h1>
-            <p className="text-xs text-slate-500">Psiquiatria Infantojuvenil</p>
+            <p className="text-xs font-bold leading-tight" style={{ color: C.paper50 }}>
+              Sistema de Apoio
+            </p>
+            <p className="text-[10px]" style={{ color: C.leaf200 }}>
+              Psiquiatria Infantojuvenil
+            </p>
           </div>
         </div>
 
-        {/* Informações do Usuário e Sair */}
-        <div className="flex items-center gap-4">
-          <div className="text-right hidden sm:block">
-            <p className="text-xs font-semibold text-slate-800">{user?.nome || 'Usuário'}</p>
-            <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium border ${roleInfo.color}`}>
-              {roleInfo.title}
-            </span>
-          </div>
+        {/* Nav */}
+        <nav className="flex-1 py-4 px-3 space-y-1">
+          {navItems.map(({ icon: Icon, label, path, active }) => (
+            <button
+              key={label}
+              onClick={() => path !== 'admin' && navigate(path)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left"
+              style={{
+                backgroundColor: active ? C.leaf700 : 'transparent',
+                color: active ? C.paper50 : C.leaf200,
+                borderLeft: active ? `4px solid ${C.paper50}` : '4px solid transparent',
+              }}
+              onMouseEnter={(e) => {
+                if (!active) e.currentTarget.style.backgroundColor = C.leaf800;
+              }}
+              onMouseLeave={(e) => {
+                if (!active) e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              <Icon className="w-4 h-4 shrink-0" />
+              <span className={active ? 'font-bold' : ''}>{label}</span>
+            </button>
+          ))}
+        </nav>
 
-          <div className="h-5 w-px bg-slate-200"></div>
-
+        {/* Rodapé do menu */}
+        <div className="px-4 py-4 border-t space-y-2" style={{ borderColor: C.leaf800 }}>
+          <p className="text-xs font-semibold truncate" style={{ color: C.paper50 }}>
+            {user?.nome || 'Usuário'}
+          </p>
+          <p className="text-[10px]" style={{ color: C.leaf200 }}>
+            {getRoleLabel()}
+          </p>
           <button
             onClick={logout}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-rose-600 hover:bg-slate-100 rounded-lg transition-colors"
+            className="mt-1 flex items-center gap-1.5 text-xs font-medium transition-colors"
+            style={{ color: C.leaf200 }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = C.paper50; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = C.leaf200; }}
           >
-            <LogOut className="w-4 h-4" />
-            <span className="hidden sm:inline">Sair</span>
+            <LogOut className="w-3.5 h-3.5" />
+            Sair
           </button>
         </div>
-      </header>
+      </aside>
 
-      {/* Conteúdo Principal */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 sm:p-8">
-        {/* VISÃO 1: PERFIL ADMINISTRADOR (Apenas Gestão de Usuários) */}
-        {isAdmin ? (
-          <div>
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-slate-800">Gestão de Usuários</h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Cadastro e controle de acesso de profissionais da clínica
-              </p>
-            </div>
+      {/* ── ÁREA PRINCIPAL ───────────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col min-h-screen">
 
-            {/* Mensagens de Sucesso ou Erro */}
-            {userError && (
-              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{userError}</span>
-              </div>
+        {/* Barra superior */}
+        <header
+          className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 shadow-sm border-b"
+          style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
+        >
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-1.5 text-xs" style={{ color: C.ink400 }}>
+            <span style={{ color: C.ink600 }}>Início</span>
+            {isAdmin && (
+              <>
+                <span>›</span>
+                <span style={{ color: C.ink900, fontWeight: 600 }}>Usuários</span>
+              </>
             )}
-            {userSuccess && (
-              <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-lg flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 shrink-0" />
-                <span>{userSuccess}</span>
-              </div>
+            {!isAdmin && (
+              <>
+                <span>›</span>
+                <span style={{ color: C.ink900, fontWeight: 600 }}>Painel Principal</span>
+              </>
             )}
+          </nav>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Formulário de Criação com APENAS UM BOTÃO */}
-              <div className="lg:col-span-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <h3 className="font-semibold text-slate-800 text-sm mb-4">
-                  Cadastrar Nova Profissional
-                </h3>
+          {/* Usuário logado */}
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-semibold" style={{ color: C.ink900 }}>
+              {user?.nome || 'Usuário'}
+            </span>
+            <span
+              className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
+              style={{
+                backgroundColor: isAdmin ? '#f3e8ff' : isDoutora ? C.leaf100 : '#E4EEF6',
+                color: isAdmin ? '#7e22ce' : isDoutora ? C.leaf800 : '#4A86B5',
+                borderColor: isAdmin ? '#d8b4fe' : isDoutora ? C.leaf200 : '#bfdbfe',
+              }}
+            >
+              {getRoleLabel()}
+            </span>
+          </div>
+        </header>
 
-                <form onSubmit={handleCreateUser} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">
-                      Nome Completo
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Nome da profissional"
-                      value={nome}
-                      onChange={(e) => setNome(e.target.value)}
-                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-600 focus:outline-none"
-                    />
-                  </div>
+        {/* Conteúdo */}
+        <main className="flex-1 p-6 sm:p-8">
 
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">
-                      E-mail de Acesso
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="email@clinica.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-600 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">
-                      Perfil de Acesso
-                    </label>
-                    <select
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-600 focus:outline-none bg-white"
-                    >
-                      <option value="DOUTORA">Doutora / Psiquiatra</option>
-                      <option value="SECRETARIA">Secretária / Funcionária</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">
-                      Senha de Acesso (mínimo 8 dígitos)
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      minLength={8}
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-600 focus:outline-none"
-                    />
-                  </div>
-
-                  {/* Único botão de cadastro */}
-                  <button
-                    type="submit"
-                    disabled={submittingUser}
-                    className="w-full py-2.5 px-4 bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 mt-2"
-                  >
-                    {submittingUser ? (
-                      <>
-                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                        Cadastrando...
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="w-3.5 h-3.5" />
-                        Cadastrar Profissional
-                      </>
-                    )}
-                  </button>
-                </form>
+          {/* ══ VISÃO ADMIN ══════════════════════════════════════════════ */}
+          {isAdmin ? (
+            <div>
+              {/* Cabeçalho de página */}
+              <div className="mb-2">
+                <h1 className="text-[26px] font-semibold" style={{ color: C.ink900 }}>
+                  Gestão de Usuários
+                </h1>
+                <p className="text-sm mt-1" style={{ color: C.ink600 }}>
+                  Cadastre e gerencie os profissionais com acesso ao sistema.
+                </p>
               </div>
 
-              {/* Tabela de Usuários Registrados */}
-              <div className="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-slate-800 text-sm">
-                    Profissionais Cadastrados ({usuarios.length})
-                  </h3>
-                  <button
-                    onClick={fetchUsuarios}
-                    className="text-xs text-slate-500 hover:text-teal-600 flex items-center gap-1"
+              {/* Barra de ações */}
+              <div
+                className="flex items-center gap-3 px-4 py-3 rounded-lg mb-6 mt-4"
+                style={{ backgroundColor: C.paper200, border: `1px solid ${C.paper300}` }}
+              >
+                <button
+                  form="create-user-form"
+                  type="submit"
+                  disabled={submittingUser}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm disabled:opacity-50 min-h-[40px]"
+                  style={{ backgroundColor: C.leaf700, color: C.paper50 }}
+                  onMouseEnter={(e) => { if (!submittingUser) e.currentTarget.style.backgroundColor = C.leaf600; }}
+                  onMouseLeave={(e) => { if (!submittingUser) e.currentTarget.style.backgroundColor = C.leaf700; }}
+                >
+                  {submittingUser ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Cadastrando...
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="w-4 h-4" />
+                      Cadastrar Profissional
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={fetchUsuarios}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border transition-colors min-h-[40px]"
+                  style={{ backgroundColor: C.paper50, borderColor: C.leaf700, color: C.leaf700 }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = C.leaf100; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = C.paper50; }}
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loadingUsuarios ? 'animate-spin' : ''}`} />
+                  Atualizar
+                </button>
+              </div>
+
+              {/* Mensagens */}
+              {userError && (
+                <div
+                  className="mb-4 p-3 rounded-lg text-xs flex items-center gap-2 border"
+                  style={{ backgroundColor: C.cancelledBg, borderColor: `${C.cancelled}44`, color: C.cancelled }}
+                >
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{userError}</span>
+                </div>
+              )}
+              {userSuccess && (
+                <div
+                  className="mb-4 p-3 rounded-lg text-xs flex items-center gap-2 border"
+                  style={{ backgroundColor: C.leaf100, borderColor: C.leaf200, color: C.leaf800 }}
+                >
+                  <CheckCircle className="w-4 h-4 shrink-0" />
+                  <span>{userSuccess}</span>
+                </div>
+              )}
+
+              {/* Grid: formulário + tabela */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                {/* Formulário */}
+                <div
+                  className="lg:col-span-5 rounded-xl border overflow-hidden shadow-sm"
+                  style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
+                >
+                  {/* Header do cartão */}
+                  <div
+                    className="px-5 py-3 border-b"
+                    style={{ backgroundColor: C.paper200, borderColor: C.paper300 }}
                   >
-                    <RefreshCw className={`w-3 h-3 ${loadingUsuarios ? 'animate-spin' : ''}`} />
-                    Atualizar
-                  </button>
+                    <h3 className="text-sm font-semibold" style={{ color: C.ink900 }}>
+                      Cadastrar Nova Profissional
+                    </h3>
+                  </div>
+
+                  <form id="create-user-form" onSubmit={handleCreateUser} className="p-5 space-y-4">
+                    <div>
+                      <label className="block text-xs font-medium mb-1" style={{ color: C.ink600 }}>
+                        Nome Completo
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Nome da profissional"
+                        value={nome}
+                        onChange={(e) => setNome(e.target.value)}
+                        className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none transition-colors"
+                        style={inputCls.style}
+                        onFocus={(e) => { e.target.style.borderColor = C.leaf500; }}
+                        onBlur={(e) => { e.target.style.borderColor = C.paper300; }}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium mb-1" style={{ color: C.ink600 }}>
+                        E-mail de Acesso
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        placeholder="email@clinica.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none transition-colors"
+                        style={inputCls.style}
+                        onFocus={(e) => { e.target.style.borderColor = C.leaf500; }}
+                        onBlur={(e) => { e.target.style.borderColor = C.paper300; }}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium mb-1" style={{ color: C.ink600 }}>
+                        Perfil de Acesso *
+                      </label>
+                      <select
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none transition-colors"
+                        style={{ ...inputCls.style, backgroundColor: C.paper50 }}
+                        onFocus={(e) => { e.target.style.borderColor = C.leaf500; }}
+                        onBlur={(e) => { e.target.style.borderColor = C.paper300; }}
+                      >
+                        <option value="DOUTORA">Doutora / Psiquiatra</option>
+                        <option value="SECRETARIA">Secretária / Funcionária</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium mb-1" style={{ color: C.ink600 }}>
+                        Senha de Acesso (mínimo 8 dígitos)
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        minLength={8}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none transition-colors"
+                        style={inputCls.style}
+                        onFocus={(e) => { e.target.style.borderColor = C.leaf500; }}
+                        onBlur={(e) => { e.target.style.borderColor = C.paper300; }}
+                      />
+                    </div>
+                  </form>
                 </div>
 
-                <div className="border border-slate-100 rounded-lg overflow-x-auto flex-1">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
-                      <tr>
-                        <th className="px-3.5 py-2.5">Nome / E-mail</th>
-                        <th className="px-3.5 py-2.5">Perfil</th>
-                        <th className="px-3.5 py-2.5">Status</th>
-                        <th className="px-3.5 py-2.5 text-right">Ação</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {usuarios.length === 0 ? (
+                {/* Tabela de usuários */}
+                <div
+                  className="lg:col-span-7 rounded-xl border overflow-hidden shadow-sm flex flex-col"
+                  style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
+                >
+                  {/* Header do cartão */}
+                  <div
+                    className="px-5 py-3 border-b flex items-center justify-between"
+                    style={{ backgroundColor: C.paper200, borderColor: C.paper300 }}
+                  >
+                    <h3 className="text-sm font-semibold" style={{ color: C.ink900 }}>
+                      Profissionais Cadastrados ({usuarios.length})
+                    </h3>
+                  </div>
+
+                  <div className="overflow-x-auto flex-1">
+                    <table className="w-full text-left text-xs">
+                      <thead style={{ backgroundColor: C.paper200, color: C.ink600 }}>
                         <tr>
-                          <td colSpan={4} className="px-4 py-8 text-center text-slate-400">
-                            Nenhum usuário cadastrado.
-                          </td>
+                          <th className="px-4 py-2.5 font-semibold">Nome / E-mail</th>
+                          <th className="px-4 py-2.5 font-semibold">Perfil</th>
+                          <th className="px-4 py-2.5 font-semibold">Status</th>
+                          <th className="px-4 py-2.5 font-semibold text-right">Ação</th>
                         </tr>
-                      ) : (
-                        usuarios.map((u) => (
-                          <tr key={u.id} className="hover:bg-slate-50/50">
-                            <td className="px-3.5 py-2.5">
-                              <p className="font-medium text-slate-800">{u.nome}</p>
-                              <p className="text-[11px] text-slate-400">{u.email}</p>
-                            </td>
-                            <td className="px-3.5 py-2.5">
-                              {u.role === 'ADMINISTRACAO' && (
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-50 text-purple-700 border border-purple-200">
-                                  Admin
-                                </span>
-                              )}
-                              {u.role === 'DOUTORA' && (
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                  Psiquiatra
-                                </span>
-                              )}
-                              {u.role === 'SECRETARIA' && (
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                                  Secretária
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-3.5 py-2.5">
-                              {u.status ? (
-                                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ativo
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 text-[11px] text-rose-500 font-medium">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Inativo
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-3.5 py-2.5 text-right">
-                              {u.id !== user?.id && (
-                                <button
-                                  onClick={() => handleToggleStatus(u.id, u.status)}
-                                  title={u.status ? 'Inativar acesso' : 'Reativar acesso'}
-                                  className={`p-1.5 rounded-md border text-xs font-medium transition-colors ${
-                                    u.status
-                                      ? 'border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50'
-                                      : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'
-                                  }`}
-                                >
-                                  {u.status ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
-                                </button>
-                              )}
+                      </thead>
+                      <tbody>
+                        {usuarios.length === 0 ? (
+                          <tr>
+                            <td
+                              colSpan={4}
+                              className="px-4 py-8 text-center text-sm"
+                              style={{ color: C.ink400 }}
+                            >
+                              Nenhum usuário cadastrado ainda.
                             </td>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+                        ) : (
+                          usuarios.map((u) => (
+                            <tr
+                              key={u.id}
+                              className="border-t transition-colors"
+                              style={{ borderColor: C.paper300 }}
+                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = C.leaf100; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                            >
+                              <td className="px-4 py-2.5">
+                                <p className="font-medium" style={{ color: C.ink900 }}>{u.nome}</p>
+                                <p className="text-[11px]" style={{ color: C.ink400 }}>{u.email}</p>
+                              </td>
+                              <td className="px-4 py-2.5">
+                                {u.role === 'ADMINISTRACAO' && (
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-50 text-purple-700 border border-purple-200">
+                                    Admin
+                                  </span>
+                                )}
+                                {u.role === 'DOUTORA' && (
+                                  <span
+                                    className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
+                                    style={{ backgroundColor: C.leaf100, color: C.leaf800, borderColor: C.leaf200 }}
+                                  >
+                                    Psiquiatra
+                                  </span>
+                                )}
+                                {u.role === 'SECRETARIA' && (
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
+                                    style={{ backgroundColor: '#E4EEF6', color: '#4A86B5', borderColor: '#c0d8ed' }}
+                                  >
+                                    Secretária
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-4 py-2.5">
+                                {u.status ? (
+                                  <span
+                                    className="inline-flex items-center gap-1 text-[11px] font-medium"
+                                    style={{ color: C.leaf700 }}
+                                  >
+                                    <span
+                                      className="w-1.5 h-1.5 rounded-full"
+                                      style={{ backgroundColor: C.leaf700 }}
+                                    ></span>
+                                    Ativo
+                                  </span>
+                                ) : (
+                                  <span
+                                    className="inline-flex items-center gap-1 text-[11px] font-medium"
+                                    style={{ color: C.ink400 }}
+                                  >
+                                    <span
+                                      className="w-1.5 h-1.5 rounded-full"
+                                      style={{ backgroundColor: C.ink400 }}
+                                    ></span>
+                                    Inativo
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-4 py-2.5 text-right">
+                                {u.id !== user?.id && (
+                                  <button
+                                    onClick={() => handleToggleStatus(u.id, u.status)}
+                                    title={u.status ? 'Inativar acesso' : 'Reativar acesso'}
+                                    className="p-1.5 rounded-md border text-xs font-medium transition-colors"
+                                    style={
+                                      u.status
+                                        ? { borderColor: `${C.cancelled}55`, color: C.cancelled }
+                                        : { borderColor: C.leaf200, color: C.leaf700 }
+                                    }
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.backgroundColor = u.status ? C.cancelledBg : C.leaf100;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
+                                  >
+                                    {u.status ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ) : (
-          /* VISÃO 2: OPERACIONAL (Secretária ou Doutora) */
-          <div>
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-slate-800">Painel Principal</h2>
-            </div>
 
-            {/* Grid dinâmico por perfil */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Card 1: Gestão de Pacientes (Visível para Secretária e Doutora) */}
-              <div
-                onClick={() => navigate('/pacientes')}
-                className="group cursor-pointer bg-white p-6 rounded-xl border border-teal-200 shadow-sm hover:shadow-md hover:border-teal-500 transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="w-12 h-12 bg-teal-50 text-teal-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-                    <Users className="w-6 h-6" />
-                  </div>
-                  <h3 className="font-bold text-slate-800 text-base group-hover:text-teal-600 transition-colors">
-                    1. Gestão de Pacientes
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                    Cadastro de pacientes, endereços e responsáveis legais, busca e inativação lógica.
-                  </p>
-                </div>
-                <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-teal-600">
-                  <span>Abrir Módulo</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
+          ) : (
+            /* ══ VISÃO OPERACIONAL ═══════════════════════════════════════ */
+            <div>
+              <div className="mb-6">
+                <h1 className="text-[26px] font-semibold" style={{ color: C.ink900 }}>
+                  Painel Principal
+                </h1>
+                <p className="text-sm mt-1" style={{ color: C.ink600 }}>
+                  Selecione um módulo para começar.
+                </p>
               </div>
 
-              {/* Card 2: Agenda (Visível para Secretária e Doutora) */}
-              <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm opacity-80 flex flex-col justify-between">
-                <div>
-                  <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mb-4">
-                    <Calendar className="w-6 h-6" />
-                  </div>
-                  <h3 className="font-semibold text-slate-800">2. Agenda & Sessões</h3>
-                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                    Visões diárias e semanais, alteração de status e agendamentos de sessões.
-                  </p>
-                </div>
-              </div>
-
-              {/* Card 3: Prontuário Clínico (RESTRITO APENAS À DOUTORA) */}
-              {isDoutora && (
-                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm opacity-80 flex flex-col justify-between">
-                  <div>
-                    <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center mb-4">
-                      <FileText className="w-6 h-6" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Card Pacientes — clicável */}
+                <div
+                  onClick={() => navigate('/pacientes')}
+                  className="group cursor-pointer rounded-xl border shadow-sm transition-all flex flex-col justify-between overflow-hidden"
+                  style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = C.leaf500;
+                    e.currentTarget.style.backgroundColor = C.leaf100;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = C.paper300;
+                    e.currentTarget.style.backgroundColor = C.paper50;
+                  }}
+                >
+                  {/* header cartão */}
+                  <div
+                    className="px-5 py-3 border-b"
+                    style={{ backgroundColor: C.paper200, borderColor: C.paper300 }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: C.leaf100, color: C.leaf700 }}
+                      >
+                        <Users className="w-4 h-4" />
+                      </div>
+                      <h3 className="text-sm font-semibold" style={{ color: C.ink900 }}>
+                        Gestão de Pacientes
+                      </h3>
                     </div>
-                    <h3 className="font-semibold text-slate-800">3. Prontuário Clínico</h3>
-                    <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                      Anamnese inicial estruturada e linha do tempo de anotações por sessão.
+                  </div>
+                  <div className="p-5 flex-1">
+                    <p className="text-xs leading-relaxed" style={{ color: C.ink600 }}>
+                      Cadastro de pacientes, endereços e responsáveis legais, busca e inativação lógica.
                     </p>
                   </div>
-                </div>
-              )}
-
-              {/* Card 4: Apoio de IA & Laudos (RESTRITO APENAS À DOUTORA) */}
-              {isDoutora && (
-                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm opacity-80 flex flex-col justify-between">
-                  <div>
-                    <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center mb-4">
-                      <Sparkles className="w-6 h-6" />
-                    </div>
-                    <h3 className="font-semibold text-slate-800">4. Apoio de IA & Laudos</h3>
-                    <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                      Sanitização prévia, integração com IA e Parecer Conclusivo em PDF.
-                    </p>
+                  <div
+                    className="px-5 py-3 border-t flex items-center justify-between text-xs font-semibold"
+                    style={{ borderColor: C.paper300, color: C.leaf700 }}
+                  >
+                    <span>Abrir módulo</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
-              )}
+
+                {/* Card Agenda — ativo */}
+                <div
+                  onClick={() => navigate('/agenda')}
+                  className="group cursor-pointer rounded-xl border shadow-sm transition-all flex flex-col justify-between overflow-hidden"
+                  style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = C.leaf500;
+                    e.currentTarget.style.backgroundColor = C.leaf100;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = C.paper300;
+                    e.currentTarget.style.backgroundColor = C.paper50;
+                  }}
+                >
+                  <div
+                    className="px-5 py-3 border-b"
+                    style={{ backgroundColor: C.paper200, borderColor: C.paper300 }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: '#E4EEF6', color: '#4A86B5' }}
+                      >
+                        <Calendar className="w-4 h-4" />
+                      </div>
+                      <h3 className="text-sm font-semibold" style={{ color: C.ink900 }}>
+                        Agenda &amp; Sessões
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="p-5 flex-1">
+                    <p className="text-xs leading-relaxed" style={{ color: C.ink600 }}>
+                      Visões diárias e semanais, alteração de status e agendamentos de sessões.
+                    </p>
+                  </div>
+                  <div
+                    className="px-5 py-3 border-t flex items-center justify-between text-xs font-semibold"
+                    style={{ borderColor: C.paper300, color: C.leaf700 }}
+                  >
+                    <span>Abrir agenda</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+
+                {/* Cards exclusivos da Doutora — Prontuário ativo */}
+                {isDoutora && (
+                  <div
+                    onClick={() => navigate('/pacientes')}
+                    className="group cursor-pointer rounded-xl border shadow-sm transition-all flex flex-col justify-between overflow-hidden"
+                    style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = C.leaf500;
+                      e.currentTarget.style.backgroundColor = C.leaf100;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = C.paper300;
+                      e.currentTarget.style.backgroundColor = C.paper50;
+                    }}
+                  >
+                    <div
+                      className="px-5 py-3 border-b"
+                      style={{ backgroundColor: C.paper200, borderColor: C.paper300 }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-7 h-7 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: C.leaf100, color: C.leaf700 }}
+                        >
+                          <FileText className="w-4 h-4" />
+                        </div>
+                        <h3 className="text-sm font-semibold" style={{ color: C.ink900 }}>
+                          Prontuário Clínico
+                        </h3>
+                      </div>
+                    </div>
+                    <div className="p-5 flex-1">
+                      <p className="text-xs leading-relaxed" style={{ color: C.ink600 }}>
+                        Anamnese inicial estruturada, texto livre e linha do tempo de anotações por sessão.
+                      </p>
+                    </div>
+                    <div
+                      className="px-5 py-3 border-t flex items-center justify-between text-xs font-semibold"
+                      style={{ borderColor: C.paper300, color: C.leaf700 }}
+                    >
+                      <span>Selecionar paciente</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                )}
+
+                {isDoutora && (
+                  <div
+                    className="rounded-xl border shadow-sm flex flex-col justify-between overflow-hidden opacity-70"
+                    style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
+                  >
+                    <div
+                      className="px-5 py-3 border-b"
+                      style={{ backgroundColor: C.paper200, borderColor: C.paper300 }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-7 h-7 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: '#EAF1EC', color: C.leaf700 }}
+                        >
+                          <Sparkles className="w-4 h-4" />
+                        </div>
+                        <h3 className="text-sm font-semibold" style={{ color: C.ink900 }}>
+                          Apoio de IA &amp; Laudos
+                        </h3>
+                      </div>
+                    </div>
+                    <div className="p-5 flex-1">
+                      <p className="text-xs leading-relaxed" style={{ color: C.ink600 }}>
+                        Sanitização prévia, integração com IA e Parecer Conclusivo em PDF.
+                      </p>
+                      <span
+                        className="mt-3 inline-block text-[10px] px-2 py-0.5 rounded-full font-medium"
+                        style={{ backgroundColor: C.paper200, color: C.ink400 }}
+                      >
+                        Em breve
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-      </main>
+          )}
+        </main>
+      </div>
     </div>
   );
 }

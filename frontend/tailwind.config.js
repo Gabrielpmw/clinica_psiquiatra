@@ -6,29 +6,21 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: { sans: ['Inter', 'Roboto', 'sans-serif'] },
       colors: {
-        brand: {
-          primary: '#0d9488',    // teal-600
-          hover: '#0f766e',      // teal-700
-          accent: '#0284c7',     // sky-600
+        paper: { 50: '#F9FAF6', 100: '#F2F5EF', 200: '#E6ECE2', 300: '#D5DED0' },
+        leaf: {
+          100: '#E3F0E8', 200: '#CFE5D8', 500: '#4A9E7A',
+          600: '#368262', 700: '#2B6A4F', 800: '#1F4D3A', 900: '#17382A',
         },
-        surface: {
-          background: '#f8fafc', // slate-50
-          card: '#ffffff',
-        },
+        ink: { 400: '#7C8B83', 600: '#4A5A52', 900: '#1E2A24' },
         status: {
-          done: '#10b981',       // emerald-500
-          scheduled: '#3b82f6',  // blue-500
-          pending: '#f59e0b',    // amber-500
-          cancelled: '#f43f5e',  // rose-500
+          scheduled: '#4A86B5', scheduledBg: '#E4EEF6',
+          done: '#2B6A4F',      doneBg: '#CFE5D8',
+          missed: '#C98A1B',    missedBg: '#FBEFD9',
+          cancelled: '#B5645C', cancelledBg: '#F6E3E1',
         },
-        ai: {
-          bg: '#eff6ff',         // blue-50
-          border: '#bfdbfe',     // blue-200
-        },
-      },
-      fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        ai: { bg: '#EAF1EC', border: '#4A9E7A' },
       },
     },
   },

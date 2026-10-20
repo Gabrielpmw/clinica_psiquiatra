@@ -2,6 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { X, UserPlus, Shield, UserCheck, UserX, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import { getUsuariosApi, createUsuarioApi, toggleUsuarioStatusApi } from '../services/api';
 
+// ── Paleta de cores ──────────────────────────────────────────────────────────
+const C = {
+  paper50:  '#F9FAF6',
+  paper100: '#F2F5EF',
+  paper200: '#E6ECE2',
+  paper300: '#D5DED0',
+  leaf100:  '#E3F0E8',
+  leaf200:  '#CFE5D8',
+  leaf500:  '#4A9E7A',
+  leaf600:  '#368262',
+  leaf700:  '#2B6A4F',
+  leaf800:  '#1F4D3A',
+  leaf900:  '#17382A',
+  ink400:   '#7C8B83',
+  ink600:   '#4A5A52',
+  ink900:   '#1E2A24',
+  cancelled:   '#B5645C',
+  cancelledBg: '#F6E3E1',
+};
+
 export default function UserManagementModal({ isOpen, onClose }) {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -81,23 +101,54 @@ export default function UserManagementModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
+  // helpers de input
+  const inputStyle = {
+    backgroundColor: C.paper50,
+    borderColor:     C.paper300,
+    color:           C.ink900,
+  };
+  const inputEvents = {
+    onFocus: (e) => { e.target.style.borderColor = C.leaf500; e.target.style.boxShadow = `0 0 0 2px ${C.leaf500}33`; },
+    onBlur:  (e) => { e.target.style.borderColor = C.paper300; e.target.style.boxShadow = 'none'; },
+  };
+  const baseInput = 'w-full px-3 py-2 text-xs border rounded-lg focus:outline-none transition-colors';
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-4xl my-8 overflow-hidden flex flex-col max-h-[90vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+      style={{ backgroundColor: 'rgba(23,56,42,0.45)', backdropFilter: 'blur(2px)' }}
+    >
+      <div
+        className="rounded-2xl shadow-xl border w-full max-w-4xl my-8 overflow-hidden flex flex-col max-h-[90vh]"
+        style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
+      >
         {/* Header */}
-        <div className="px-6 py-4 bg-slate-800 text-white flex items-center justify-between">
+        <div
+          className="px-6 py-4 flex items-center justify-between border-b"
+          style={{ backgroundColor: C.leaf900, borderColor: C.leaf800 }}
+        >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: `${C.leaf700}66`, color: C.leaf200 }}
+            >
               <Shield className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-semibold">Gestão de Usuários & Acessos (RBAC)</h2>
-              <p className="text-xs text-slate-400">Apenas administradores podem criar e gerenciar profissionais</p>
+              <h2 className="text-base font-semibold" style={{ color: C.paper50 }}>
+                Gestão de Usuários &amp; Acessos (RBAC)
+              </h2>
+              <p className="text-xs" style={{ color: C.leaf200 }}>
+                Apenas administradores podem criar e gerenciar profissionais
+              </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-700 transition-colors"
+            className="p-1 rounded-lg transition-colors"
+            style={{ color: C.leaf200 }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = C.paper50; e.currentTarget.style.backgroundColor = C.leaf800; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = C.leaf200; e.currentTarget.style.backgroundColor = 'transparent'; }}
           >
             <X className="w-5 h-5" />
           </button>
@@ -106,13 +157,19 @@ export default function UserManagementModal({ isOpen, onClose }) {
         {/* Feedback Messages */}
         <div className="px-6 pt-4">
           {error && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs flex items-center gap-2 mb-3">
+            <div
+              className="p-3 rounded-lg text-xs flex items-center gap-2 mb-3 border"
+              style={{ backgroundColor: C.cancelledBg, borderColor: `${C.cancelled}44`, color: C.cancelled }}
+            >
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
           {success && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-xs flex items-center gap-2 mb-3">
+            <div
+              className="p-3 rounded-lg text-xs flex items-center gap-2 mb-3 border"
+              style={{ backgroundColor: C.leaf100, borderColor: C.leaf200, color: C.leaf800 }}
+            >
               <CheckCircle className="w-4 h-4 shrink-0" />
               <span>{success}</span>
             </div>
@@ -122,15 +179,24 @@ export default function UserManagementModal({ isOpen, onClose }) {
         {/* Content */}
         <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto">
           {/* Formulário de Criação (Coluna Esquerda) */}
-          <div className="lg:col-span-5 bg-slate-50 p-5 rounded-xl border border-slate-200/80">
-            <div className="flex items-center gap-2 mb-4 text-slate-800 font-semibold text-sm">
-              <UserPlus className="w-4 h-4 text-teal-600" />
-              Cadastrar Nova Profissional
+          <div
+            className="lg:col-span-5 rounded-xl border overflow-hidden"
+            style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
+          >
+            {/* Header do cartão */}
+            <div
+              className="px-5 py-3 border-b"
+              style={{ backgroundColor: C.paper200, borderColor: C.paper300 }}
+            >
+              <div className="flex items-center gap-2" style={{ color: C.ink900 }}>
+                <UserPlus className="w-4 h-4" style={{ color: C.leaf700 }} />
+                <span className="text-sm font-semibold">Cadastrar Nova Profissional</span>
+              </div>
             </div>
 
-            <form onSubmit={handleCreateUser} className="space-y-3.5">
+            <form onSubmit={handleCreateUser} className="p-5 space-y-3.5">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink600 }}>
                   Nome Completo
                 </label>
                 <input
@@ -139,12 +205,14 @@ export default function UserManagementModal({ isOpen, onClose }) {
                   placeholder="Dra. Ana Paula ou Marina Secretária"
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-600 focus:outline-none"
+                  className={baseInput}
+                  style={inputStyle}
+                  {...inputEvents}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink600 }}>
                   E-mail de Acesso
                 </label>
                 <input
@@ -153,18 +221,22 @@ export default function UserManagementModal({ isOpen, onClose }) {
                   placeholder="profissional@clinica.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-600 focus:outline-none"
+                  className={baseInput}
+                  style={inputStyle}
+                  {...inputEvents}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Perfil de Acesso (Papel / Cargo)
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink600 }}>
+                  Perfil de Acesso (Papel / Cargo) *
                 </label>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-600 focus:outline-none bg-white"
+                  className={baseInput}
+                  style={{ ...inputStyle, backgroundColor: C.paper50 }}
+                  {...inputEvents}
                 >
                   <option value="DOUTORA">Doutora / Psiquiatra (Acesso Clínico)</option>
                   <option value="SECRETARIA">Secretária / Funcionária (Recepção)</option>
@@ -173,7 +245,7 @@ export default function UserManagementModal({ isOpen, onClose }) {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink600 }}>
                   Senha Provisória (Mín. 8 dígitos)
                 </label>
                 <input
@@ -183,14 +255,19 @@ export default function UserManagementModal({ isOpen, onClose }) {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-600 focus:outline-none"
+                  className={baseInput}
+                  style={inputStyle}
+                  {...inputEvents}
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={formSubmitting}
-                className="w-full mt-2 py-2 px-4 bg-teal-600 hover:bg-teal-700 text-white font-medium text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
+                className="w-full mt-2 py-2 px-4 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 min-h-[36px]"
+                style={{ backgroundColor: C.leaf700, color: C.paper50 }}
+                onMouseEnter={(e) => { if (!formSubmitting) e.currentTarget.style.backgroundColor = C.leaf600; }}
+                onMouseLeave={(e) => { if (!formSubmitting) e.currentTarget.style.backgroundColor = C.leaf700; }}
               >
                 {formSubmitting ? (
                   <>
@@ -210,41 +287,53 @@ export default function UserManagementModal({ isOpen, onClose }) {
           {/* Tabela de Usuários Existentes (Coluna Direita) */}
           <div className="lg:col-span-7 flex flex-col">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: C.ink600 }}>
                 Usuários Registrados ({usuarios.length})
               </span>
               <button
                 onClick={fetchUsuarios}
-                className="text-xs text-slate-500 hover:text-teal-600 flex items-center gap-1"
+                className="text-xs flex items-center gap-1 transition-colors"
+                style={{ color: C.ink400 }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = C.leaf700; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = C.ink400; }}
               >
                 <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
                 Atualizar
               </button>
             </div>
 
-            <div className="flex-1 border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white overflow-x-auto">
+            <div
+              className="flex-1 rounded-xl border overflow-hidden shadow-sm bg-white overflow-x-auto"
+              style={{ borderColor: C.paper300 }}
+            >
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-100/75 border-b border-slate-200 text-slate-600 font-semibold">
+                <thead style={{ backgroundColor: C.paper200, color: C.ink600 }}>
                   <tr>
-                    <th className="px-3 py-2.5">Nome / E-mail</th>
-                    <th className="px-3 py-2.5">Perfil</th>
-                    <th className="px-3 py-2.5">Status</th>
-                    <th className="px-3 py-2.5 text-right">Ação</th>
+                    <th className="px-3 py-2.5 font-semibold">Nome / E-mail</th>
+                    <th className="px-3 py-2.5 font-semibold">Perfil</th>
+                    <th className="px-3 py-2.5 font-semibold">Status</th>
+                    <th className="px-3 py-2.5 font-semibold text-right">Ação</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody>
                   {usuarios.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-slate-400">
+                      <td colSpan={4} className="px-4 py-8 text-center" style={{ color: C.ink400 }}>
                         Nenhum usuário localizado.
                       </td>
                     </tr>
                   ) : (
                     usuarios.map((u) => (
-                      <tr key={u.id} className="hover:bg-slate-50/50">
+                      <tr
+                        key={u.id}
+                        className="border-t transition-colors"
+                        style={{ borderColor: C.paper300 }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = C.leaf100; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
                         <td className="px-3 py-2.5">
-                          <p className="font-medium text-slate-800">{u.nome}</p>
-                          <p className="text-[11px] text-slate-400">{u.email}</p>
+                          <p className="font-medium" style={{ color: C.ink900 }}>{u.nome}</p>
+                          <p className="text-[11px]" style={{ color: C.ink400 }}>{u.email}</p>
                         </td>
                         <td className="px-3 py-2.5">
                           {u.role === 'ADMINISTRACAO' && (
@@ -253,37 +342,51 @@ export default function UserManagementModal({ isOpen, onClose }) {
                             </span>
                           )}
                           {u.role === 'DOUTORA' && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span
+                              className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
+                              style={{ backgroundColor: C.leaf100, color: C.leaf800, borderColor: C.leaf200 }}
+                            >
                               Psiquiatra
                             </span>
                           )}
                           {u.role === 'SECRETARIA' && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                            <span
+                              className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
+                              style={{ backgroundColor: '#E4EEF6', color: '#4A86B5', borderColor: '#c0d8ed' }}
+                            >
                               Secretária
                             </span>
                           )}
                         </td>
                         <td className="px-3 py-2.5">
                           {u.status ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ativo
+                            <span className="inline-flex items-center gap-1 text-[11px] font-medium" style={{ color: C.leaf700 }}>
+                              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: C.leaf700 }}></span>
+                              Ativo
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-rose-500 font-medium">
-                              <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Inativo
+                            <span className="inline-flex items-center gap-1 text-[11px] font-medium" style={{ color: C.ink400 }}>
+                              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: C.ink400 }}></span>
+                              Inativo
                             </span>
                           )}
                         </td>
                         <td className="px-3 py-2.5 text-right">
-                          {/* Não permite inativar o próprio admin que está logado se for o único */}
                           <button
                             onClick={() => handleToggleStatus(u.id, u.nome, u.status)}
                             title={u.status ? 'Inativar usuário' : 'Reativar usuário'}
-                            className={`p-1.5 rounded-md border text-xs font-medium transition-colors ${
+                            className="p-1.5 rounded-md border text-xs font-medium transition-colors"
+                            style={
                               u.status
-                                ? 'border-rose-200 text-rose-600 hover:bg-rose-50'
-                                : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'
-                            }`}
+                                ? { borderColor: `${C.cancelled}55`, color: C.cancelled }
+                                : { borderColor: C.leaf200, color: C.leaf700 }
+                            }
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = u.status ? C.cancelledBg : C.leaf100;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
                           >
                             {u.status ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
                           </button>
@@ -298,10 +401,16 @@ export default function UserManagementModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <div
+          className="px-6 py-3 border-t flex justify-end"
+          style={{ backgroundColor: C.paper100, borderColor: C.paper300 }}
+        >
           <button
             onClick={onClose}
-            className="px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 rounded-lg transition-colors"
+            className="px-4 py-1.5 text-xs font-medium rounded-lg border transition-colors"
+            style={{ borderColor: C.paper300, color: C.ink600, backgroundColor: C.paper50 }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = C.paper200; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = C.paper50; }}
           >
             Fechar
           </button>
