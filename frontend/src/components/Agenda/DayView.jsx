@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Plus, Lock, FileText, CheckCircle2, XCircle, AlertTriangle, Calendar as CalendarIcon } from 'lucide-react';
+import { Clock, Plus, Lock, FileText, CheckCircle2, XCircle, AlertTriangle, Calendar as CalendarIcon, Trash2 } from 'lucide-react';
 
 export default function DayView({
   sessoes = [],
@@ -8,6 +8,8 @@ export default function DayView({
   dataSelecionada,
   onOpenAgendar,
   onStatusChange,
+  onDeletarBloqueio,
+  isSecretaria = false,
 }) {
   const navigate = useNavigate();
 
@@ -15,6 +17,18 @@ export default function DayView({
     if (!dataStr) return '';
     const date = new Date(dataStr);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  /**
+   * Retorna a hora de exibição de um bloqueio para o dia dataSelecionada.
+   * Se o bloqueio começa antes do dia: exibe "00:00"; se termina depois: exibe "23:59".
+   */
+  const getHorarioBloqueioNoDia = (b) => {
+    const diaInicio = b.dataHoraInicio.substring(0, 10);
+    const diaFim = b.dataHoraFim.substring(0, 10);
+    const horaInicio = diaInicio < dataSelecionada ? '00:00' : formatHora(b.dataHoraInicio);
+    const horaFim = diaFim > dataSelecionada ? '23:59' : formatHora(b.dataHoraFim);
+    return { horaInicio, horaFim };
   };
 
   const getStatusInfo = (status) => {
@@ -47,6 +61,12 @@ export default function DayView({
           icon: <CalendarIcon className="w-4 h-4 text-blue-600" />,
           label: 'Agendada',
         };
+    }
+  };
+
+  const handleRemoverBloqueio = (bloqueioId) => {
+    if (window.confirm('Deseja realmente remover este bloqueio de horário?')) {
+      if (onDeletarBloqueio) onDeletarBloqueio(bloqueioId);
     }
   };
 
@@ -85,23 +105,37 @@ export default function DayView({
               <Lock className="w-3.5 h-3.5 text-amber-700" />
               Horários Bloqueados
             </h4>
-            {bloqueios.map((b) => (
-              <div
-                key={b.id}
-                className="flex items-center justify-between p-3.5 rounded-xl border-l-4 border-l-amber-600 border border-paper-300 bg-amber-50/70 text-xs shadow-2xs"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-semibold text-amber-900">
-                    {formatHora(b.dataHoraInicio)} – {formatHora(b.dataHoraFim)}
-                  </span>
-                  <span className="text-ink-600">• Motivo:</span>
-                  <span className="font-medium text-ink-900">{b.motivo}</span>
+            {bloqueios.map((b) => {
+              const { horaInicio, horaFim } = getHorarioBloqueioNoDia(b);
+              return (
+                <div
+                  key={b.id}
+                  className="flex items-center justify-between p-3.5 rounded-xl border-l-4 border-l-amber-600 border border-paper-300 bg-amber-50/70 text-xs shadow-2xs"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-semibold text-amber-900">
+                      {horaInicio} – {horaFim}
+                    </span>
+                    <span className="text-ink-600">• Motivo:</span>
+                    <span className="font-medium text-ink-900">{b.motivo}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 font-medium text-[11px]">
+                      Indisponível
+                    </span>
+                    {onDeletarBloqueio && (
+                      <button
+                        onClick={() => handleRemoverBloqueio(b.id)}
+                        className="p-1 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 transition"
+                        title="Remover bloqueio"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 font-medium text-[11px]">
-                  Indisponível
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
@@ -167,14 +201,16 @@ export default function DayView({
                     </select>
                   </div>
 
-                  <button
-                    onClick={() => navigate(`/prontuario/${sessao.paciente_id || sessao.paciente}`)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-leaf-100 hover:bg-leaf-200 text-leaf-800 text-xs font-semibold transition"
-                    title="Acessar prontuário"
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>Prontuário</span>
-                  </button>
+                  {!isSecretaria && (
+                    <button
+                      onClick={() => navigate(`/prontuario/${sessao.paciente_id || sessao.paciente}`)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-leaf-100 hover:bg-leaf-200 text-leaf-800 text-xs font-semibold transition"
+                      title="Acessar prontuário"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Prontuário</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );

@@ -8,8 +8,11 @@ import {
   CheckCircle2,
   AlertCircle,
   FileText,
+  Pencil,
+  X,
+  Save,
 } from 'lucide-react';
-import { criarAnotacao } from '../../services/prontuarioService';
+import { criarAnotacao, atualizarAnotacao } from '../../services/prontuarioService';
 import { useNotification } from '../../context/NotificationContext';
 
 export default function SessionNotesTimeline({
@@ -27,6 +30,11 @@ export default function SessionNotesTimeline({
     sessao: '',
     textoLivre: '',
   });
+
+  // Estado de edição inline por anotação
+  const [editandoId, setEditandoId] = useState(null);
+  const [textoEditando, setTextoEditando] = useState('');
+  const [salvandoEdicao, setSalvandoEdicao] = useState(false);
 
   const formatDataHora = (dataStr) => {
     if (!dataStr) return '';
@@ -78,6 +86,48 @@ export default function SessionNotesTimeline({
     }
   };
 
+  const handleIniciarEdicao = (anotacao) => {
+    setEditandoId(anotacao.id);
+    setTextoEditando(anotacao.textoLivre);
+  };
+
+  const handleCancelarEdicao = () => {
+    setEditandoId(null);
+    setTextoEditando('');
+  };
+
+  const handleSalvarEdicao = async (anotacaoId) => {
+    if (!textoEditando.trim()) {
+      notifyError('O texto da anotação não pode estar vazio.');
+      return;
+    }
+    try {
+      setSalvandoEdicao(true);
+      const atualizada = await atualizarAnotacao(anotacaoId, {
+        textoLivre: textoEditando,
+      });
+      notifySuccess('Anotação atualizada com sucesso!');
+      // Notificar o pai para recarregar as anotações
+      if (onNovaAnotacao) onNovaAnotacao(atualizada);
+      setEditandoId(null);
+      setTextoEditando('');
+    } catch (err) {
+      console.error('Erro ao atualizar anotação:', err);
+      const msg =
+        err.response?.data?.detail ||
+        'Erro ao atualizar anotação da sessão.';
+      notifyError(msg);
+    } finally {
+      setSalvandoEdicao(false);
+    }
+  };
+
+  // IDs das sessões que já possuem anotação
+  const sessaoIdsComAnotacao = new Set(anotacoes.map((a) => a.sessao));
+
+  // Sessões que ainda não têm anotação vinculada
+  const sessoesSemAnotacao = sessoes.filter((s) => !sessaoIdsComAnotacao.has(s.id));
+
   return (
     <div className="bg-paper-50 rounded-2xl border border-paper-300 shadow-xs overflow-hidden">
       {/* Cabeçalho */}
@@ -128,7 +178,7 @@ export default function SessionNotesTimeline({
                 required
               >
                 <option value="">Selecione a sessão...</option>
-                {sessoes.map((s) => (
+                {sessoesSemAnotacao.map((s) => (
                   <option key={s.id} value={s.id}>
                     {new Date(s.dataHoraInicio).toLocaleDateString('pt-BR')} às{' '}
                     {new Date(s.dataHoraInicio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}{' '}
@@ -187,6 +237,7 @@ export default function SessionNotesTimeline({
           <div className="relative border-l-2 border-leaf-200 ml-4 pl-6 space-y-6">
             {anotacoes.map((anotacao) => {
               const isAvaliativa = anotacao.sessao_tipo === 'AVALIATIVA';
+              const isEditando = editandoId === anotacao.id;
               return (
                 <div key={anotacao.id} className="relative group">
                   {/* Ponto na linha */}
@@ -212,16 +263,59 @@ export default function SessionNotesTimeline({
                         </span>
                       </div>
 
-                      {anotacao.sessao_status && (
-                        <span className="text-[11px] font-medium text-ink-400">
-                          Status: {anotacao.sessao_status}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {anotacao.sessao_status && (
+                          <span className="text-[11px] font-medium text-ink-400">
+                            Status: {anotacao.sessao_status}
+                          </span>
+                        )}
+                        {!isEditando && (
+                          <button
+                            onClick={() => handleIniciarEdicao(anotacao)}
+                            className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-ink-500 hover:text-leaf-700 hover:bg-leaf-50 border border-transparent hover:border-leaf-200 transition"
+                            title="Editar anotação"
+                          >
+                            <Pencil className="w-3 h-3" />
+                            <span>Editar</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="text-ink-900 text-sm leading-relaxed whitespace-pre-wrap">
-                      {anotacao.textoLivre}
-                    </div>
+                    {isEditando ? (
+                      <div className="space-y-3">
+                        <textarea
+                          rows={5}
+                          value={textoEditando}
+                          onChange={(e) => setTextoEditando(e.target.value)}
+                          className="w-full p-3 rounded-xl bg-paper-50 border border-leaf-300 text-ink-900 focus:outline-none focus:ring-2 focus:ring-leaf-500 text-sm resize-none"
+                          autoFocus
+                        />
+                        <div className="flex justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={handleCancelarEdicao}
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-paper-300 text-ink-600 hover:bg-paper-200 text-xs font-medium transition"
+                          >
+                            <X className="w-3 h-3" />
+                            Cancelar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSalvarEdicao(anotacao.id)}
+                            disabled={salvandoEdicao}
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-leaf-700 hover:bg-leaf-600 text-paper-50 text-xs font-semibold transition disabled:opacity-50"
+                          >
+                            <Save className="w-3 h-3" />
+                            {salvandoEdicao ? 'Salvando...' : 'Salvar'}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-ink-900 text-sm leading-relaxed whitespace-pre-wrap">
+                        {anotacao.textoLivre}
+                      </div>
+                    )}
                   </div>
                 </div>
               );

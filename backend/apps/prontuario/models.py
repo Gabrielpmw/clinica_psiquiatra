@@ -121,6 +121,12 @@ class AnotacaoSessao(models.Model):
         auto_now_add=True,
         verbose_name='Data de Registro'
     )
+    dataUltimaAtualizacao = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Última Atualização',
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         verbose_name = 'Anotação de Sessão'

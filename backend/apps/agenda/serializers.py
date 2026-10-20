@@ -62,6 +62,17 @@ class SessaoSerializer(serializers.ModelSerializer):
                     'Já existe uma sessão agendada para este paciente neste intervalo de horário.'
                 )
 
+        # Verificar se o horário está bloqueado
+        if inicio and fim:
+            bloqueios_qs = Bloqueio.objects.filter(
+                dataHoraInicio__lt=fim,
+                dataHoraFim__gt=inicio,
+            )
+            if bloqueios_qs.exists():
+                raise serializers.ValidationError(
+                    'Não é possível agendar uma sessão em um horário bloqueado.'
+                )
+
         return data
 
 

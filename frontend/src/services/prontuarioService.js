@@ -23,3 +23,8 @@ export const criarAnotacao = async (pacienteId, dadosAnotacao) => {
   const response = await api.post(`/prontuario/anotacoes/${pacienteId}/`, dadosAnotacao);
   return response.data;
 };
+
+export const atualizarAnotacao = async (anotacaoId, dados) => {
+  const response = await api.put(`/prontuario/anotacoes/detalhe/${anotacaoId}/`, dados);
+  return response.data;
+};

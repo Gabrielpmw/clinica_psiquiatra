@@ -5,7 +5,7 @@ import DashboardPage from '../pages/DashboardPage';
 import PatientsPage from '../pages/PatientsPage';
 import AgendaPage from '../pages/AgendaPage';
 import ProntuarioPage from '../pages/ProntuarioPage';
-import { ProtectedRoute } from '../components/ProtectedRoute';
+import { ProtectedRoute, DoctorRoute } from '../components/ProtectedRoute';
 
 export default function AppRoutes() {
   return (
@@ -38,9 +38,9 @@ export default function AppRoutes() {
       <Route
         path="/prontuario/:pacienteId"
         element={
-          <ProtectedRoute>
+          <DoctorRoute>
             <ProntuarioPage />
-          </ProtectedRoute>
+          </DoctorRoute>
         }
       />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

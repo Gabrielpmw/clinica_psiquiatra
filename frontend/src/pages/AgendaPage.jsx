@@ -20,6 +20,7 @@ import {
   getSessoesSemanais,
   getBloqueios,
   atualizarStatusSessao,
+  deletarBloqueio,
 } from '../services/agendaService';
 import DayView from '../components/Agenda/DayView';
 import WeekView from '../components/Agenda/WeekView';
@@ -28,7 +29,7 @@ import SessionFormModal from '../components/Agenda/SessionFormModal';
 import BloqueioModal from '../components/Agenda/BloqueioModal';
 
 export default function AgendaPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, isSecretaria } = useAuth();
   const navigate = useNavigate();
   const { notifySuccess, notifyError, notifyInfo } = useNotification();
 
@@ -124,6 +125,18 @@ export default function AgendaPage() {
   const handleAbrirAgendar = (dataPrevia = '') => {
     setAgendarDataInicial(dataPrevia || dataSelecionada);
     setModalAgendarOpen(true);
+  };
+
+  const handleDeletarBloqueio = async (bloqueioId) => {
+    try {
+      await deletarBloqueio(bloqueioId);
+      notifySuccess('Bloqueio removido com sucesso!');
+      // Remover o bloqueio localmente sem recarregar tudo
+      setBloqueios((prev) => prev.filter((b) => b.id !== bloqueioId));
+    } catch (err) {
+      console.error('Erro ao remover bloqueio:', err);
+      notifyError('Não foi possível remover o bloqueio.');
+    }
   };
 
   return (
@@ -307,6 +320,8 @@ export default function AgendaPage() {
                   dataSelecionada={dataSelecionada}
                   onOpenAgendar={handleAbrirAgendar}
                   onStatusChange={handleStatusChange}
+                  onDeletarBloqueio={handleDeletarBloqueio}
+                  isSecretaria={isSecretaria}
                 />
               </div>
 
@@ -327,6 +342,8 @@ export default function AgendaPage() {
                 inicioSemana={inicioSemana}
                 onOpenAgendar={handleAbrirAgendar}
                 onStatusChange={handleStatusChange}
+                onDeletarBloqueio={handleDeletarBloqueio}
+                isSecretaria={isSecretaria}
               />
             </div>
           )}

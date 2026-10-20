@@ -62,3 +62,8 @@ export const criarBloqueio = async (dadosBloqueio) => {
   const response = await api.post('/agenda/bloqueios/', dadosBloqueio);
   return response.data;
 };
+
+export const deletarBloqueio = async (bloqueioId) => {
+  const response = await api.delete(`/agenda/bloqueios/${bloqueioId}/`);
+  return response.data;
+};

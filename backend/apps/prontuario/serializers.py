@@ -87,5 +87,6 @@ class AnotacaoSessaoSerializer(serializers.ModelSerializer):
             'sessao_status',
             'textoLivre',
             'dataRegistro',
+            'dataUltimaAtualizacao',
         ]
-        read_only_fields = ['id', 'dataRegistro']
+        read_only_fields = ['id', 'dataRegistro', 'dataUltimaAtualizacao']

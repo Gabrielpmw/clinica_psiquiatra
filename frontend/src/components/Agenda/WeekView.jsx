@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Clock, FileText, CheckCircle2, XCircle, AlertTriangle, Calendar as CalendarIcon } from 'lucide-react';
+import { Plus, Clock, FileText, CheckCircle2, XCircle, AlertTriangle, Calendar as CalendarIcon, Trash2 } from 'lucide-react';
 
 export default function WeekView({
   sessoes = [],
@@ -8,6 +8,8 @@ export default function WeekView({
   inicioSemana,
   onOpenAgendar,
   onStatusChange,
+  onDeletarBloqueio,
+  isSecretaria = false,
 }) {
   const navigate = useNavigate();
 
@@ -31,6 +33,18 @@ export default function WeekView({
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  /**
+   * Retorna a hora de exibição de um bloqueio para o dia dia (string YYYY-MM-DD).
+   * Se o bloqueio começa antes do dia: exibe "00:00"; se termina depois: exibe "23:59".
+   */
+  const getHorarioBloqueioNoDia = (b, diaData) => {
+    const diaInicio = b.dataHoraInicio.substring(0, 10);
+    const diaFim = b.dataHoraFim.substring(0, 10);
+    const horaInicio = diaInicio < diaData ? '00:00' : formatHora(b.dataHoraInicio);
+    const horaFim = diaFim > diaData ? '23:59' : formatHora(b.dataHoraFim);
+    return { horaInicio, horaFim };
+  };
+
   const getStatusBorder = (status) => {
     switch (status) {
       case 'REALIZADA':
@@ -41,6 +55,12 @@ export default function WeekView({
         return 'border-l-[#C98A1B] bg-[#FBEFD9]/70';
       default:
         return 'border-l-[#4A86B5] bg-[#E4EEF6]/70';
+    }
+  };
+
+  const handleRemoverBloqueio = (bloqueioId) => {
+    if (window.confirm('Deseja realmente remover este bloqueio de horário?')) {
+      if (onDeletarBloqueio) onDeletarBloqueio(bloqueioId);
     }
   };
 
@@ -75,7 +95,7 @@ export default function WeekView({
           const sessoesDia = sessoes.filter(
             (s) => s.dataHoraInicio && s.dataHoraInicio.startsWith(dia.data)
           );
-          // Filtrar bloqueios do dia
+          // Filtrar bloqueios que intersectam com o dia
           const bloqueiosDia = bloqueios.filter(
             (b) =>
               b.dataHoraInicio &&
@@ -102,20 +122,34 @@ export default function WeekView({
               </button>
 
               {/* Bloqueios */}
-              {bloqueiosDia.map((b) => (
-                <div
-                  key={b.id}
-                  className="p-2 rounded-lg border border-amber-300 bg-amber-50 text-[11px] text-amber-900 border-l-4 border-l-amber-600 shadow-2xs"
-                >
-                  <p className="font-semibold flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {formatHora(b.dataHoraInicio)} – {formatHora(b.dataHoraFim)}
-                  </p>
-                  <p className="text-[10px] mt-0.5 truncate" title={b.motivo}>
-                    {b.motivo}
-                  </p>
-                </div>
-              ))}
+              {bloqueiosDia.map((b) => {
+                const { horaInicio, horaFim } = getHorarioBloqueioNoDia(b, dia.data);
+                return (
+                  <div
+                    key={b.id}
+                    className="p-2 rounded-lg border border-amber-300 bg-amber-50 text-[11px] text-amber-900 border-l-4 border-l-amber-600 shadow-2xs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {horaInicio} – {horaFim}
+                      </p>
+                      {onDeletarBloqueio && (
+                        <button
+                          onClick={() => handleRemoverBloqueio(b.id)}
+                          className="p-0.5 rounded text-red-400 hover:text-red-600 hover:bg-red-50 transition"
+                          title="Remover bloqueio"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[10px] mt-0.5 truncate" title={b.motivo}>
+                      {b.motivo}
+                    </p>
+                  </div>
+                );
+              })}
 
               {/* Sessões */}
               {sessoesDia.map((sessao) => {
@@ -150,13 +184,15 @@ export default function WeekView({
                         <option value="CANCELADA">Cancelada</option>
                       </select>
 
-                      <button
-                        onClick={() => navigate(`/prontuario/${sessao.paciente_id || sessao.paciente}`)}
-                        className="text-leaf-700 hover:text-leaf-900 p-0.5"
-                        title="Ver Prontuário"
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                      </button>
+                      {!isSecretaria && (
+                        <button
+                          onClick={() => navigate(`/prontuario/${sessao.paciente_id || sessao.paciente}`)}
+                          className="text-leaf-700 hover:text-leaf-900 p-0.5"
+                          title="Ver Prontuário"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

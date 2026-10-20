@@ -4,6 +4,7 @@ from .views import (
     AnamneseDetailView,
     AnotacaoSessaoListCreateView,
     AnotacaoSessaoViewSet,
+    AnotacaoSessaoDetailView,
 )
 
 router = DefaultRouter()
@@ -12,5 +13,6 @@ router.register(r'anotacoes-geral', AnotacaoSessaoViewSet, basename='anotacao-ge
 urlpatterns = [
     path('anamnese/<uuid:paciente_id>/', AnamneseDetailView.as_view(), name='prontuario-anamnese'),
     path('anotacoes/<uuid:paciente_id>/', AnotacaoSessaoListCreateView.as_view(), name='prontuario-anotacoes-paciente'),
+    path('anotacoes/detalhe/<uuid:pk>/', AnotacaoSessaoDetailView.as_view(), name='prontuario-anotacao-detalhe'),
     path('', include(router.urls)),
 ]

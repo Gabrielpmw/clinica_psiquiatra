@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound
 from apps.pacientes.models import Paciente
+from apps.usuarios.permissions import IsDoctorOrAdmin
 from .models import Anamnese, AnotacaoSessao
 from .serializers import AnamneseSerializer, AnotacaoSessaoSerializer
 
@@ -14,7 +15,7 @@ class AnamneseDetailView(generics.RetrieveUpdateAPIView):
     Caso a Anamnese ainda não exista para o paciente, ela é criada automaticamente ao consultar.
     """
     serializer_class = AnamneseSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsDoctorOrAdmin]
 
     def get_object(self):
         paciente_id = self.kwargs.get('paciente_id')
@@ -33,7 +34,7 @@ class AnotacaoSessaoListCreateView(generics.ListCreateAPIView):
     Rota: /api/prontuario/anotacoes/<paciente_id>/
     """
     serializer_class = AnotacaoSessaoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsDoctorOrAdmin]
 
     def get_queryset(self):
         paciente_id = self.kwargs.get('paciente_id')
@@ -56,7 +57,7 @@ class AnotacaoSessaoViewSet(viewsets.ModelViewSet):
     """
     queryset = AnotacaoSessao.objects.all().select_related('sessao', 'sessao__paciente').order_by('dataRegistro')
     serializer_class = AnotacaoSessaoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsDoctorOrAdmin]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -67,3 +68,14 @@ class AnotacaoSessaoViewSet(viewsets.ModelViewSet):
         if sessao_id:
             queryset = queryset.filter(sessao_id=sessao_id)
         return queryset
+
+
+class AnotacaoSessaoDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Obtém, atualiza ou remove uma Anotação de Sessão pelo seu UUID (RF09).
+    Rota: /api/prontuario/anotacoes/detalhe/<pk>/
+    Permite edição (PUT/PATCH) e exclusão de anotações existentes.
+    """
+    queryset = AnotacaoSessao.objects.all().select_related('sessao', 'sessao__paciente')
+    serializer_class = AnotacaoSessaoSerializer
+    permission_classes = [IsDoctorOrAdmin]
