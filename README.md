@@ -50,12 +50,14 @@ Sistema completo para gestão de pacientes, anamnese estruturada, prontuário cl
    docker exec clinica_backend python manage.py migrate
    ```
 
-5. **Popular Banco com Dados Simulados (Demonstração Completa):**
-   Para limpar registros anteriores e carregar dados realistas (Doutor, Secretária, 12 pacientes, prontuários, anamneses e agenda):
+5. **Popular Banco com Dados Simulados (Doutor, Secretária, Pacientes e Agenda):**
+   > [!IMPORTANT]
+   > Obrigatório para liberar o login do **Dr. Gabriel**, da **Secretária Milena**, além dos 12 pacientes infantojuvenis, prontuários, anamneses e agenda pré-preenchida:
    ```bash
    docker exec clinica_backend python manage.py popular_dados
    ```
-   *(Ou localmente com Python: `python manage.py popular_dados`)*
+   *(Ou através do atalho: `docker exec clinica_backend python manage.py seed_db`)*  
+   *(Caso esteja executando localmente sem Docker: `python manage.py popular_dados`)*
 
 ---
 
