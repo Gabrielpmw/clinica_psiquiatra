@@ -83,11 +83,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 # Database - PostgreSQL (ou SQLite para testes locais)
-if 'test' in sys.argv or os.getenv('DJANGO_DB_ENGINE') == 'sqlite3':
+if 'test' in sys.argv:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': ':memory:',
+        }
+    }
+elif os.getenv('DJANGO_DB_ENGINE') == 'sqlite3':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 else:

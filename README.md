@@ -50,6 +50,13 @@ Sistema completo para gestão de pacientes, anamnese estruturada, prontuário cl
    docker exec clinica_backend python manage.py migrate
    ```
 
+5. **Popular Banco com Dados Simulados (Demonstração Completa):**
+   Para limpar registros anteriores e carregar dados realistas (Doutor, Secretária, 12 pacientes, prontuários, anamneses e agenda):
+   ```bash
+   docker exec clinica_backend python manage.py popular_dados
+   ```
+   *(Ou localmente com Python: `python manage.py popular_dados`)*
+
 ---
 
 ## 🌐 Endereços de Acesso
@@ -63,9 +70,15 @@ Sistema completo para gestão de pacientes, anamnese estruturada, prontuário cl
 ## 🔑 Credenciais Padrão de Acesso
 
 ### Acesso ao Sistema Web:
-- **E-mail Administrador:** `admin@clinica.com`
-- **Senha:** `admin123456`
-*(Logado como Admin, você pode criar os perfis da Psiquiatra e da Secretária pelo painel).*
+- **Administrador:**
+  - **E-mail:** `admin@clinica.com`
+  - **Senha:** `admin123456`
+- **Secretária (Milena Almeida Alves Vieira):**
+  - **E-mail:** `milena@gmail.com`
+  - **Senha:** `Milena@123`
+- **Doutor (Gabriel Vieira Ribeiro):**
+  - **E-mail:** `gabriel@gmail.com`
+  - **Senha:** `Gabriel@123`
 
 ### Acesso ao Banco de Dados (pgAdmin / DBeaver / Terminal):
 - **Host:** `localhost` (ou `127.0.0.1`)
