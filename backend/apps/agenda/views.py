@@ -2,6 +2,7 @@ from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from apps.usuarios.permissions import IsNonAdminRole
 from .models import Sessao, Disponibilidade, Bloqueio
 from .serializers import SessaoSerializer, DisponibilidadeSerializer, BloqueioSerializer
 
@@ -13,7 +14,7 @@ class SessaoViewSet(viewsets.ModelViewSet):
     """
     queryset = Sessao.objects.all().select_related('paciente', 'usuario').order_by('dataHoraInicio')
     serializer_class = SessaoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsNonAdminRole]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['paciente__nomeCompleto']
     ordering_fields = ['dataHoraInicio', 'dataHoraFim', 'status', 'tipo']
@@ -89,7 +90,7 @@ class DisponibilidadeViewSet(viewsets.ModelViewSet):
     """
     queryset = Disponibilidade.objects.all().select_related('usuario').order_by('diaSemana', 'horaInicio')
     serializer_class = DisponibilidadeSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsNonAdminRole]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -111,7 +112,7 @@ class BloqueioViewSet(viewsets.ModelViewSet):
     """
     queryset = Bloqueio.objects.all().select_related('usuario').order_by('dataHoraInicio')
     serializer_class = BloqueioSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsNonAdminRole]
 
     def get_queryset(self):
         queryset = super().get_queryset()

@@ -11,6 +11,8 @@ import {
   ArrowLeft,
   Calendar as CalendarIcon,
   Sparkles,
+  ClipboardList,
+  FileCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
@@ -19,6 +21,9 @@ import { getAnamnese, getAnotacoes } from '../services/prontuarioService';
 import { getSessoes } from '../services/agendaService';
 import AnamneseBlock from '../components/Prontuario/AnamneseBlock';
 import SessionNotesTimeline from '../components/Prontuario/SessionNotesTimeline';
+import AiAssistantSection from '../components/Prontuario/AiAssistantSection';
+import ParecerConclusivoSection from '../components/Prontuario/ParecerConclusivoSection';
+import Sidebar from '../components/Sidebar';
 
 export default function ProntuarioPage() {
   const { pacienteId } = useParams();
@@ -32,6 +37,10 @@ export default function ProntuarioPage() {
   const [sessoes, setSessoes] = useState([]);
   const [outrosPacientes, setOutrosPacientes] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Controle de Abas
+  const [abaAtiva, setAbaAtiva] = useState('prontuario'); // 'prontuario' | 'ia' | 'parecer'
+  const [rascunhoIaReferencia, setRascunhoIaReferencia] = useState(null);
 
   // Calcular idade a partir da data de nascimento
   const calcularIdade = (dataNasc) => {
@@ -87,64 +96,16 @@ export default function ProntuarioPage() {
     carregarDadosProntuario();
   }, [carregarDadosProntuario]);
 
+  // Transição do prompt 4 ("Estruturação para Parecer") para o Parecer Conclusivo com referência
+  const handleIrParaParecer = (conteudoIa) => {
+    setRascunhoIaReferencia(conteudoIa);
+    setAbaAtiva('parecer');
+  };
+
   return (
     <div className="flex h-screen bg-paper-100 font-sans text-ink-900">
       {/* Menu Lateral */}
-      <aside className="w-64 bg-leaf-900 text-paper-100 flex flex-col flex-shrink-0 shadow-lg">
-        <div className="p-6 border-b border-leaf-800">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-leaf-700 rounded-xl">
-              <Activity className="w-6 h-6 text-paper-50" />
-            </div>
-            <div>
-              <h1 className="font-bold text-base leading-tight text-paper-50">Clínica Apoio</h1>
-              <p className="text-xs text-leaf-200">Prontuário Eletrônico</p>
-            </div>
-          </div>
-        </div>
-
-        <nav className="flex-1 p-4 space-y-1.5">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-paper-100 hover:bg-leaf-800 transition"
-          >
-            <Activity className="w-4 h-4 text-leaf-500" />
-            <span>Início</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/agenda')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-paper-100 hover:bg-leaf-800 transition"
-          >
-            <CalendarIcon className="w-4 h-4 text-leaf-500" />
-            <span>Agenda</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/pacientes')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-paper-100 hover:bg-leaf-800 transition"
-          >
-            <Users className="w-4 h-4 text-leaf-500" />
-            <span>Pacientes</span>
-          </button>
-        </nav>
-
-        <div className="p-4 border-t border-leaf-800 bg-leaf-900/60">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-paper-50 truncate">{user?.nome}</p>
-              <p className="text-xs text-leaf-200 uppercase tracking-wider">{user?.role}</p>
-            </div>
-            <button
-              onClick={logout}
-              className="p-2 rounded-lg text-leaf-200 hover:text-paper-50 hover:bg-leaf-800 transition"
-              title="Sair"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </aside>
+      <Sidebar activePage="prontuario" />
 
       {/* Conteúdo Principal */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -226,26 +187,88 @@ export default function ProntuarioPage() {
             </button>
           </div>
 
+          {/* Barra de Navegação por Abas */}
+          <div className="flex items-center gap-2 border-b border-paper-300 pb-1">
+            <button
+              onClick={() => setAbaAtiva('prontuario')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition ${
+                abaAtiva === 'prontuario'
+                  ? 'bg-leaf-700 text-white shadow-xs'
+                  : 'text-ink-600 hover:bg-paper-200 hover:text-ink-900'
+              }`}
+            >
+              <ClipboardList className="w-4 h-4" />
+              <span>Anamnese & Sessões</span>
+            </button>
+
+            <button
+              onClick={() => setAbaAtiva('ia')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition ${
+                abaAtiva === 'ia'
+                  ? 'bg-leaf-700 text-white shadow-xs'
+                  : 'text-ink-600 hover:bg-paper-200 hover:text-ink-900'
+              }`}
+            >
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span>Apoio de IA</span>
+            </button>
+
+            <button
+              onClick={() => setAbaAtiva('parecer')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition ${
+                abaAtiva === 'parecer'
+                  ? 'bg-leaf-700 text-white shadow-xs'
+                  : 'text-ink-600 hover:bg-paper-200 hover:text-ink-900'
+              }`}
+            >
+              <FileCheck className="w-4 h-4" />
+              <span>Parecer Conclusivo</span>
+              {rascunhoIaReferencia && (
+                <span className="w-2 h-2 rounded-full bg-amber-400" title="Rascunho de IA ativo" />
+              )}
+            </button>
+          </div>
+
           {loading ? (
             <div className="p-12 text-center text-ink-400 text-sm">
               Carregando dados do prontuário...
             </div>
           ) : (
-            <div className="space-y-6">
-              {/* Bloco 1: Anamnese Clínica (RF07) */}
-              <AnamneseBlock
-                pacienteId={pacienteId}
-                anamneseInicial={anamnese}
-                onUpdate={(novaAnamnese) => setAnamnese(novaAnamnese)}
-              />
+            <div>
+              {/* Aba 1: Anamnese e Sessões */}
+              {abaAtiva === 'prontuario' && (
+                <div className="space-y-6">
+                  <AnamneseBlock
+                    pacienteId={pacienteId}
+                    anamneseInicial={anamnese}
+                    onUpdate={(novaAnamnese) => setAnamnese(novaAnamnese)}
+                  />
 
-              {/* Bloco 2: Linha do Tempo de Sessões (RF09) */}
-              <SessionNotesTimeline
-                pacienteId={pacienteId}
-                anotacoes={anotacoes}
-                sessoes={sessoes}
-                onNovaAnotacao={(nova) => setAnotacoes((prev) => [...prev, nova])}
-              />
+                  <SessionNotesTimeline
+                    pacienteId={pacienteId}
+                    anotacoes={anotacoes}
+                    sessoes={sessoes}
+                    onNovaAnotacao={(nova) => setAnotacoes((prev) => [...prev, nova])}
+                  />
+                </div>
+              )}
+
+              {/* Aba 2: Módulo de IA (Desafios 8 e 9) */}
+              {abaAtiva === 'ia' && (
+                <AiAssistantSection
+                  pacienteId={pacienteId}
+                  onIrParaParecer={handleIrParaParecer}
+                />
+              )}
+
+              {/* Aba 3: Parecer Conclusivo & PDF & E-mail */}
+              {abaAtiva === 'parecer' && (
+                <ParecerConclusivoSection
+                  paciente={paciente}
+                  rascunhoIaInicial={rascunhoIaReferencia}
+                  onLimparRascunhoIa={() => setRascunhoIaReferencia(null)}
+                />
+              )}
             </div>
           )}
         </div>

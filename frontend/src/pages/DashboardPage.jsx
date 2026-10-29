@@ -13,10 +13,24 @@ import {
   AlertCircle,
   CheckCircle,
   RefreshCw,
-  Shield
+  Shield,
+  KeyRound,
+  Clock,
+  Bell,
+  X,
+  Lock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getUsuariosApi, createUsuarioApi, toggleUsuarioStatusApi } from '../services/api';
+import {
+  getUsuariosApi,
+  createUsuarioApi,
+  toggleUsuarioStatusApi,
+  resetUsuarioPasswordApi,
+  getSolicitacoesResetApi,
+  resolverSolicitacaoResetApi,
+  cancelarSolicitacaoResetApi
+} from '../services/api';
+import Sidebar from '../components/Sidebar';
 
 // ── helpers de estilo ───────────────────────────────────────────────────────
 const C = {
@@ -57,6 +71,15 @@ export default function DashboardPage() {
   const [userSuccess, setUserSuccess] = useState('');
   const [userError, setUserError] = useState('');
 
+  // Solicitações e gestão de redefinição de senha
+  const [solicitacoes, setSolicitacoes] = useState([]);
+  const [loadingSolicitacoes, setLoadingSolicitacoes] = useState(false);
+  const [solicitacaoModal, setSolicitacaoModal] = useState(null);
+  const [userResetModal, setUserResetModal] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [resetSubmitting, setResetSubmitting] = useState(false);
+  const [resetError, setResetError] = useState('');
+
   const fetchUsuarios = async () => {
     if (!isAdmin) return;
     setLoadingUsuarios(true);
@@ -71,9 +94,23 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchSolicitacoes = async () => {
+    if (!isAdmin) return;
+    setLoadingSolicitacoes(true);
+    try {
+      const data = await getSolicitacoesResetApi({ status: 'PENDENTE' });
+      setSolicitacoes(Array.isArray(data) ? data : data.results || []);
+    } catch {
+      // ignore
+    } finally {
+      setLoadingSolicitacoes(false);
+    }
+  };
+
   useEffect(() => {
     if (isAdmin) {
       fetchUsuarios();
+      fetchSolicitacoes();
     }
   }, [isAdmin]);
 
@@ -90,7 +127,7 @@ export default function DashboardPage() {
         password,
         role,
       });
-      setUserSuccess(`${role === 'DOUTORA' ? 'Psiquiatra' : 'Funcionária'} cadastrada com sucesso!`);
+      setUserSuccess(`${role === 'DOUTORA' ? 'Médico(a) Psiquiatra' : 'Secretário(a)'} cadastrado(a) com sucesso!`);
       setNome('');
       setEmail('');
       setPassword('');
@@ -119,23 +156,75 @@ export default function DashboardPage() {
     }
   };
 
+  const handleResolverSolicitacao = async (e) => {
+    e.preventDefault();
+    if (!solicitacaoModal || !newPassword) return;
+    setResetSubmitting(true);
+    setResetError('');
+    try {
+      await resolverSolicitacaoResetApi(solicitacaoModal.id, newPassword);
+      setUserSuccess(`Senha de ${solicitacaoModal.usuario_nome || solicitacaoModal.email} redefinida com sucesso!`);
+      setSolicitacaoModal(null);
+      setNewPassword('');
+      fetchSolicitacoes();
+      fetchUsuarios();
+    } catch (err) {
+      setResetError(err.response?.data?.error || 'Erro ao redefinir senha.');
+    } finally {
+      setResetSubmitting(false);
+    }
+  };
+
+  const handleCancelarSolicitacao = async (id) => {
+    try {
+      await cancelarSolicitacaoResetApi(id);
+      fetchSolicitacoes();
+    } catch {
+      setUserError('Erro ao descartar solicitação.');
+    }
+  };
+
+  const handleResetDirectUser = async (e) => {
+    e.preventDefault();
+    if (!userResetModal || !newPassword) return;
+    setResetSubmitting(true);
+    setResetError('');
+    try {
+      await resetUsuarioPasswordApi(userResetModal.id, newPassword);
+      setUserSuccess(`Senha de ${userResetModal.nome} alterada com sucesso!`);
+      setUserResetModal(null);
+      setNewPassword('');
+      fetchSolicitacoes();
+      fetchUsuarios();
+    } catch (err) {
+      setResetError(err.response?.data?.error || err.response?.data?.password?.[0] || 'Erro ao redefinir senha.');
+    } finally {
+      setResetSubmitting(false);
+    }
+  };
+
   const getRoleLabel = () => {
     if (isAdmin) return 'Administração';
-    if (isDoutora) return 'Doutora / Psiquiatra';
-    if (isSecretaria) return 'Secretária / Recepção';
+    if (isDoutora) return 'Médico(a) / Psiquiatra';
+    if (isSecretaria) return 'Secretaria / Atendimento';
     return user?.role || 'Usuário';
   };
 
   // ── nav items ──────────────────────────────────────────────────────────────
+  const canAccessProntuario = isDoutora || isAdmin;
   const navItems = isAdmin
-    ? [{ icon: Shield, label: 'Usuários', path: 'admin', active: true }]
+    ? [
+        { icon: Shield, label: 'Usuários', path: 'admin', active: true },
+        { icon: Calendar, label: 'Agenda', path: '/agenda', active: false },
+        { icon: Users,    label: 'Pacientes', path: '/pacientes', active: false },
+        { icon: FileText, label: 'Prontuário & IA', path: '/prontuario', active: false },
+      ]
     : [
         { icon: Calendar, label: 'Agenda', path: '/agenda', active: false },
         { icon: Users,    label: 'Pacientes', path: '/pacientes', active: false },
         ...(isDoutora
           ? [
-              { icon: FileText, label: 'Prontuário', path: '/prontuario', active: false },
-              { icon: Sparkles, label: 'Pareceres',  path: '/pareceres',  active: false },
+              { icon: FileText, label: 'Prontuário & IA', path: '/prontuario', active: false },
             ]
           : []),
       ];
@@ -153,73 +242,7 @@ export default function DashboardPage() {
     <div className="min-h-screen flex" style={{ backgroundColor: C.paper100, color: C.ink900 }}>
 
       {/* ── MENU LATERAL ─────────────────────────────────────────────────── */}
-      <aside
-        className="w-60 shrink-0 flex flex-col h-screen sticky top-0"
-        style={{ backgroundColor: C.leaf900 }}
-      >
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-5 border-b" style={{ borderColor: C.leaf800 }}>
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
-            style={{ backgroundColor: C.leaf700, color: C.paper50 }}
-          >
-            SC
-          </div>
-          <div>
-            <p className="text-xs font-bold leading-tight" style={{ color: C.paper50 }}>
-              Sistema de Apoio
-            </p>
-            <p className="text-[10px]" style={{ color: C.leaf200 }}>
-              Psiquiatria Infantojuvenil
-            </p>
-          </div>
-        </div>
-
-        {/* Nav */}
-        <nav className="flex-1 py-4 px-3 space-y-1">
-          {navItems.map(({ icon: Icon, label, path, active }) => (
-            <button
-              key={label}
-              onClick={() => path !== 'admin' && navigate(path)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left"
-              style={{
-                backgroundColor: active ? C.leaf700 : 'transparent',
-                color: active ? C.paper50 : C.leaf200,
-                borderLeft: active ? `4px solid ${C.paper50}` : '4px solid transparent',
-              }}
-              onMouseEnter={(e) => {
-                if (!active) e.currentTarget.style.backgroundColor = C.leaf800;
-              }}
-              onMouseLeave={(e) => {
-                if (!active) e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
-              <Icon className="w-4 h-4 shrink-0" />
-              <span className={active ? 'font-bold' : ''}>{label}</span>
-            </button>
-          ))}
-        </nav>
-
-        {/* Rodapé do menu */}
-        <div className="px-4 py-4 border-t space-y-2" style={{ borderColor: C.leaf800 }}>
-          <p className="text-xs font-semibold truncate" style={{ color: C.paper50 }}>
-            {user?.nome || 'Usuário'}
-          </p>
-          <p className="text-[10px]" style={{ color: C.leaf200 }}>
-            {getRoleLabel()}
-          </p>
-          <button
-            onClick={logout}
-            className="mt-1 flex items-center gap-1.5 text-xs font-medium transition-colors"
-            style={{ color: C.leaf200 }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = C.paper50; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = C.leaf200; }}
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            Sair
-          </button>
-        </div>
-      </aside>
+      <Sidebar activePage="inicio" />
 
       {/* ── ÁREA PRINCIPAL ───────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-h-screen">
@@ -307,16 +330,109 @@ export default function DashboardPage() {
                   )}
                 </button>
                 <button
-                  onClick={fetchUsuarios}
+                  onClick={() => {
+                    fetchUsuarios();
+                    fetchSolicitacoes();
+                  }}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border transition-colors min-h-[40px]"
                   style={{ backgroundColor: C.paper50, borderColor: C.leaf700, color: C.leaf700 }}
                   onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = C.leaf100; }}
                   onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = C.paper50; }}
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${loadingUsuarios ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-3.5 h-3.5 ${loadingUsuarios || loadingSolicitacoes ? 'animate-spin' : ''}`} />
                   Atualizar
                 </button>
               </div>
+
+              {/* Notificação de Solicitações Pendentes de Senha */}
+              {solicitacoes.length > 0 && (
+                <div className="mb-6 p-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 shadow-xs flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-amber-200 text-amber-800 flex items-center justify-center shrink-0">
+                      <Bell className="w-5 h-5 animate-bounce" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-sm">
+                        {solicitacoes.length === 1
+                          ? '1 solicitação de redefinição de senha pendente'
+                          : `${solicitacoes.length} solicitações de redefinição de senha pendentes`}
+                      </h4>
+                      <p className="text-xs text-amber-700 mt-0.5">
+                        Profissionais solicitaram nova senha na tela de login. Atenda a solicitação definindo uma nova credencial.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Card de Solicitações Pendentes */}
+              {solicitacoes.length > 0 && (
+                <div
+                  className="mb-6 rounded-xl border shadow-sm overflow-hidden"
+                  style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
+                >
+                  <div
+                    className="px-5 py-3 border-b flex items-center justify-between"
+                    style={{ backgroundColor: '#FEF3C7', borderColor: '#FDE68A' }}
+                  >
+                    <div className="flex items-center gap-2 text-amber-900 font-semibold text-sm">
+                      <KeyRound className="w-4 h-4 text-amber-700" />
+                      <span>Solicitações de Redefinição de Senha ({solicitacoes.length})</span>
+                    </div>
+                  </div>
+                  <div className="divide-y divide-paper-300">
+                    {solicitacoes.map((s) => (
+                      <div
+                        key={s.id}
+                        className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-amber-50/50 transition"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-sm text-ink-900">
+                              {s.usuario_nome || s.email}
+                            </span>
+                            <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                              {s.usuario_role === 'DOUTORA'
+                                ? 'Médico(a) Psiquiatra'
+                                : s.usuario_role === 'SECRETARIA'
+                                ? 'Secretaria / Atendimento'
+                                : 'Usuário'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-ink-600 flex items-center gap-3">
+                            <span>E-mail: <strong>{s.email}</strong></span>
+                            <span className="flex items-center gap-1 text-ink-400">
+                              <Clock className="w-3 h-3" />
+                              {new Date(s.dataSolicitacao).toLocaleString('pt-BR')}
+                            </span>
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 self-end sm:self-center">
+                          <button
+                            onClick={() => {
+                              setSolicitacaoModal(s);
+                              setUserResetModal(null);
+                              setNewPassword('');
+                              setResetError('');
+                            }}
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-leaf-700 hover:bg-leaf-800 text-white flex items-center gap-1.5 shadow-xs transition"
+                          >
+                            <KeyRound className="w-3.5 h-3.5" />
+                            Redefinir Senha
+                          </button>
+                          <button
+                            onClick={() => handleCancelarSolicitacao(s.id)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-paper-300 text-ink-600 hover:bg-paper-200 transition"
+                            title="Descartar solicitação"
+                          >
+                            Descartar
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Mensagens */}
               {userError && (
@@ -403,8 +519,8 @@ export default function DashboardPage() {
                         onFocus={(e) => { e.target.style.borderColor = C.leaf500; }}
                         onBlur={(e) => { e.target.style.borderColor = C.paper300; }}
                       >
-                        <option value="DOUTORA">Doutora / Psiquiatra</option>
-                        <option value="SECRETARIA">Secretária / Funcionária</option>
+                        <option value="DOUTORA">Médico(a) / Psiquiatra</option>
+                        <option value="SECRETARIA">Secretário(a) / Atendimento</option>
                       </select>
                     </div>
 
@@ -474,7 +590,14 @@ export default function DashboardPage() {
                               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                             >
                               <td className="px-4 py-2.5">
-                                <p className="font-medium" style={{ color: C.ink900 }}>{u.nome}</p>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="font-medium" style={{ color: C.ink900 }}>{u.nome}</p>
+                                  {u.tem_reset_pendente && (
+                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
+                                      ⚠️ Solicitou nova senha
+                                    </span>
+                                  )}
+                                </div>
                                 <p className="text-[11px]" style={{ color: C.ink400 }}>{u.email}</p>
                               </td>
                               <td className="px-4 py-2.5">
@@ -488,14 +611,14 @@ export default function DashboardPage() {
                                     className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
                                     style={{ backgroundColor: C.leaf100, color: C.leaf800, borderColor: C.leaf200 }}
                                   >
-                                    Psiquiatra
+                                    Médico(a) Psiquiatra
                                   </span>
                                 )}
                                 {u.role === 'SECRETARIA' && (
                                   <span className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
                                     style={{ backgroundColor: '#E4EEF6', color: '#4A86B5', borderColor: '#c0d8ed' }}
                                   >
-                                    Secretária
+                                    Secretaria / Atendimento
                                   </span>
                                 )}
                               </td>
@@ -525,26 +648,49 @@ export default function DashboardPage() {
                                 )}
                               </td>
                               <td className="px-4 py-2.5 text-right">
-                                {u.id !== user?.id && (
-                                  <button
-                                    onClick={() => handleToggleStatus(u.id, u.status)}
-                                    title={u.status ? 'Inativar acesso' : 'Reativar acesso'}
-                                    className="p-1.5 rounded-md border text-xs font-medium transition-colors"
-                                    style={
-                                      u.status
-                                        ? { borderColor: `${C.cancelled}55`, color: C.cancelled }
-                                        : { borderColor: C.leaf200, color: C.leaf700 }
-                                    }
-                                    onMouseEnter={(e) => {
-                                      e.currentTarget.style.backgroundColor = u.status ? C.cancelledBg : C.leaf100;
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.currentTarget.style.backgroundColor = 'transparent';
-                                    }}
-                                  >
-                                    {u.status ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
-                                  </button>
-                                )}
+                                <div className="flex items-center justify-end gap-1.5">
+                                  {u.id !== user?.id && (
+                                    <button
+                                      onClick={() => {
+                                        setUserResetModal(u);
+                                        setSolicitacaoModal(null);
+                                        setNewPassword('');
+                                        setResetError('');
+                                      }}
+                                      title="Redefinir senha deste usuário"
+                                      className="p-1.5 rounded-md border text-xs font-medium transition-colors"
+                                      style={{ borderColor: C.leaf200, color: C.leaf700 }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = C.leaf100;
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                      }}
+                                    >
+                                      <KeyRound className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
+                                  {u.id !== user?.id && (
+                                    <button
+                                      onClick={() => handleToggleStatus(u.id, u.status)}
+                                      title={u.status ? 'Inativar acesso' : 'Reativar acesso'}
+                                      className="p-1.5 rounded-md border text-xs font-medium transition-colors"
+                                      style={
+                                        u.status
+                                          ? { borderColor: `${C.cancelled}55`, color: C.cancelled }
+                                          : { borderColor: C.leaf200, color: C.leaf700 }
+                                      }
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = u.status ? C.cancelledBg : C.leaf100;
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                      }}
+                                    >
+                                      {u.status ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
+                                    </button>
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           ))
@@ -563,9 +709,6 @@ export default function DashboardPage() {
                 <h1 className="text-[26px] font-semibold" style={{ color: C.ink900 }}>
                   Painel Principal
                 </h1>
-                <p className="text-sm mt-1" style={{ color: C.ink600 }}>
-                  Selecione um módulo para começar.
-                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -706,11 +849,12 @@ export default function DashboardPage() {
 
                 {isDoutora && (
                   <div
-                    className="rounded-xl border shadow-sm flex flex-col justify-between overflow-hidden opacity-70"
+                    onClick={() => navigate('/prontuario')}
+                    className="rounded-xl border shadow-sm flex flex-col justify-between overflow-hidden cursor-pointer hover:border-leaf-600 hover:shadow-md transition-all group"
                     style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
                   >
                     <div
-                      className="px-5 py-3 border-b"
+                      className="px-5 py-3 border-b group-hover:bg-leaf-100 transition-colors"
                       style={{ backgroundColor: C.paper200, borderColor: C.paper300 }}
                     >
                       <div className="flex items-center gap-2">
@@ -730,10 +874,9 @@ export default function DashboardPage() {
                         Sanitização prévia, integração com IA e Parecer Conclusivo em PDF.
                       </p>
                       <span
-                        className="mt-3 inline-block text-[10px] px-2 py-0.5 rounded-full font-medium"
-                        style={{ backgroundColor: C.paper200, color: C.ink400 }}
+                        className="mt-3 inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full font-semibold bg-leaf-100 text-leaf-800 border border-leaf-300 group-hover:bg-leaf-200 transition"
                       >
-                        Em breve
+                        Acessar Módulo &rarr;
                       </span>
                     </div>
                   </div>
@@ -743,6 +886,91 @@ export default function DashboardPage() {
           )}
         </main>
       </div>
+
+      {/* Modal de Redefinição de Senha pelo Admin */}
+      {(solicitacaoModal || userResetModal) && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-paper-50 w-full max-w-md rounded-2xl border border-paper-300 shadow-2xl p-6 space-y-4 animate-scaleUp">
+            <div className="flex items-center justify-between pb-3 border-b border-paper-300">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-leaf-100 text-leaf-800 rounded-xl">
+                  <KeyRound className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-ink-900">
+                    Redefinir Senha do Usuário
+                  </h3>
+                  <p className="text-xs text-ink-600">
+                    {solicitacaoModal
+                      ? (solicitacaoModal.usuario_nome || solicitacaoModal.email)
+                      : `${userResetModal.nome} (${userResetModal.email})`}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setSolicitacaoModal(null);
+                  setUserResetModal(null);
+                }}
+                className="p-1.5 rounded-lg text-ink-400 hover:text-ink-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {resetError && (
+              <div className="p-3 rounded-lg text-xs flex items-center gap-2 border bg-rose-50 border-rose-200 text-rose-700">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{resetError}</span>
+              </div>
+            )}
+
+            <form
+              onSubmit={solicitacaoModal ? handleResolverSolicitacao : handleResetDirectUser}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-xs font-bold text-ink-700 mb-1">
+                  Nova Senha (mínimo 8 caracteres):
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Digite a nova senha..."
+                  className="w-full py-2 px-3 rounded-xl border border-paper-300 text-xs text-ink-900 font-medium focus:ring-1 focus:ring-leaf-500 focus:outline-none"
+                />
+              </div>
+
+              <p className="text-[11px] text-ink-500 leading-relaxed">
+                Ao salvar, a senha do usuário será atualizada imediatamente e ele poderá acessar a plataforma com esta nova credencial.
+              </p>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-paper-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSolicitacaoModal(null);
+                    setUserResetModal(null);
+                  }}
+                  className="px-4 py-2 text-xs font-bold text-ink-600 hover:bg-paper-200 rounded-xl transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={resetSubmitting}
+                  className="px-5 py-2 bg-leaf-700 hover:bg-leaf-800 text-white font-bold text-xs rounded-xl transition shadow-xs disabled:opacity-50"
+                >
+                  {resetSubmitting ? 'Salvando...' : 'Confirmar e Atualizar Senha'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

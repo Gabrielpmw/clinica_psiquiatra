@@ -99,3 +99,56 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.nome} ({self.get_role_display()})"
+
+
+class SolicitacaoResetSenha(models.Model):
+    """
+    Registra pedidos de redefinição de senha feitos por usuários na tela de login.
+    Permite que a Administração visualize a notificação e redefina a senha com segurança.
+    """
+    class Status(models.TextChoices):
+        PENDENTE = 'PENDENTE', 'Pendente'
+        CONCLUIDO = 'CONCLUIDO', 'Concluído'
+        CANCELADO = 'CANCELADO', 'Cancelado'
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name='solicitacoes_reset'
+    )
+    email = models.EmailField(
+        max_length=255
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDENTE
+    )
+    dataSolicitacao = models.DateTimeField(
+        default=timezone.now
+    )
+    dataResolucao = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+    resolvidoPor = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='resets_resolvidos'
+    )
+
+    class Meta:
+        verbose_name = 'Solicitação de Redefinição de Senha'
+        verbose_name_plural = 'Solicitações de Redefinição de Senha'
+        db_table = 'solicitacoes_reset_senha'
+        ordering = ['-dataSolicitacao']
+
+    def __str__(self):
+        return f"{self.email} ({self.status})"

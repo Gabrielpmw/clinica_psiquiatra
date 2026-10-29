@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Stethoscope, Lock, Mail, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Stethoscope, Lock, Mail, AlertCircle, ShieldCheck, HelpCircle, X, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { forgotPasswordApi } from '../services/api';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -11,6 +12,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [forgotModalOpen, setForgotModalOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSent, setForgotSent] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotError, setForgotError] = useState('');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -39,6 +45,20 @@ export default function LoginPage() {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    setForgotError('');
+    try {
+      await forgotPasswordApi(forgotEmail);
+      setForgotSent(true);
+    } catch (err) {
+      setForgotError(err.response?.data?.error || 'Erro ao processar solicitação. Tente novamente.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   const fillAdminCredentials = () => {
     setEmail('admin@clinica.com');
     setPassword('admin123456');
@@ -64,14 +84,8 @@ export default function LoginPage() {
           Sistema de Apoio à Clínica
         </h1>
         <p className="text-base leading-relaxed max-w-xs" style={{ color: '#CFE5D8' }}>
-          Psiquiatria Infantojuvenil — acesso seguro, controlado por perfil de usuário.
+          Psiquiatria Infantojuvenil
         </p>
-        <div
-          className="mt-10 px-5 py-3 rounded-xl text-sm"
-          style={{ backgroundColor: '#1F4D3A', color: '#CFE5D8' }}
-        >
-          Seus dados clínicos protegidos com conformidade LGPD.
-        </div>
       </div>
 
       {/* Lado direito — branco esverdeado */}
@@ -191,6 +205,22 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Esqueci minha senha */}
+            <div className="flex justify-end -mt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setForgotSent(false);
+                  setForgotError('');
+                  setForgotEmail(email);
+                  setForgotModalOpen(true);
+                }}
+                className="text-xs font-semibold text-leaf-700 hover:text-leaf-800 hover:underline transition"
+              >
+                Esqueci minha senha
+              </button>
+            </div>
+
             {/* Botão Entrar */}
             <div className="pt-1">
               <button
@@ -243,6 +273,94 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal Esqueci Minha Senha */}
+      {forgotModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-paper-50 w-full max-w-md rounded-2xl border border-paper-300 shadow-2xl p-6 space-y-4 animate-scaleUp">
+            <div className="flex items-center justify-between pb-3 border-b border-paper-300">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-leaf-100 text-leaf-800 rounded-xl">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-ink-900">Recuperação de Acesso</h3>
+                </div>
+              </div>
+              <button
+                onClick={() => setForgotModalOpen(false)}
+                className="p-1.5 rounded-lg text-ink-400 hover:text-ink-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {forgotSent ? (
+              <div className="space-y-4 text-center py-4">
+                <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm text-ink-900">Instruções Encaminhadas</h4>
+                  <p className="text-xs text-ink-600 mt-1 leading-relaxed">
+                    Se o e-mail informado estiver registrado no sistema clínico, o administrador da clínica foi notificado para redefinir sua senha no painel administrativo.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setForgotModalOpen(false)}
+                  className="w-full py-2.5 bg-leaf-700 hover:bg-leaf-800 text-white font-bold text-xs rounded-xl transition"
+                >
+                  Entendido
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                {forgotError && (
+                  <div className="p-3 rounded-lg text-xs flex items-center gap-2 border bg-rose-50 border-rose-200 text-rose-700">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{forgotError}</span>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-bold text-ink-700 mb-1">E-mail Cadastrado:</label>
+                  <input
+                    type="email"
+                    required
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="seu_email@clinica.com"
+                    className="w-full py-2 px-3 rounded-xl border border-paper-300 text-xs text-ink-900 font-medium focus:ring-1 focus:ring-leaf-500 focus:outline-none"
+                  />
+                </div>
+
+                <div className="p-3 rounded-xl bg-leaf-50 border border-leaf-200 text-xs text-leaf-800 space-y-1">
+                  <p className="font-semibold">Contato da Administração:</p>
+                  <p>E-mail: <strong>admin@clinica.com</strong></p>
+                  <p>Ou solicite diretamente ao responsável administrativo da clínica.</p>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setForgotModalOpen(false)}
+                    className="px-4 py-2 text-xs font-bold text-ink-600 hover:bg-paper-200 rounded-xl transition"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={forgotLoading}
+                    className="px-5 py-2 bg-leaf-700 hover:bg-leaf-800 text-white font-bold text-xs rounded-xl transition shadow-xs disabled:opacity-50"
+                  >
+                    {forgotLoading ? 'Enviando solicitação...' : 'Solicitar Redefinição'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -27,9 +27,11 @@ import WeekView from '../components/Agenda/WeekView';
 import PatientDayList from '../components/Agenda/PatientDayList';
 import SessionFormModal from '../components/Agenda/SessionFormModal';
 import BloqueioModal from '../components/Agenda/BloqueioModal';
+import Sidebar from '../components/Sidebar';
 
 export default function AgendaPage() {
-  const { user, logout, isSecretaria } = useAuth();
+  const { user, logout, isSecretaria, isDoutora, isAdmin } = useAuth();
+  const canAccessProntuario = isDoutora || isAdmin;
   const navigate = useNavigate();
   const { notifySuccess, notifyError, notifyInfo } = useNotification();
 
@@ -142,64 +144,7 @@ export default function AgendaPage() {
   return (
     <div className="flex h-screen bg-paper-100 font-sans text-ink-900">
       {/* Menu Lateral Fixo */}
-      <aside className="w-64 bg-leaf-900 text-paper-100 flex flex-col flex-shrink-0 shadow-lg">
-        {/* Logo / Título */}
-        <div className="p-6 border-b border-leaf-800">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-leaf-700 rounded-xl">
-              <Activity className="w-6 h-6 text-paper-50" />
-            </div>
-            <div>
-              <h1 className="font-bold text-base leading-tight text-paper-50">Clínica Apoio</h1>
-              <p className="text-xs text-leaf-200">Psiquiatria & Desenvolvimento</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Itens do Menu */}
-        <nav className="flex-1 p-4 space-y-1.5">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-paper-100 hover:bg-leaf-800 transition"
-          >
-            <Activity className="w-4 h-4 text-leaf-500" />
-            <span>Início</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/agenda')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold bg-leaf-700 text-paper-50 shadow-xs border-l-4 border-leaf-200 transition"
-          >
-            <CalendarIcon className="w-4 h-4 text-paper-50" />
-            <span>Agenda</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/pacientes')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-paper-100 hover:bg-leaf-800 transition"
-          >
-            <Users className="w-4 h-4 text-leaf-500" />
-            <span>Pacientes</span>
-          </button>
-        </nav>
-
-        {/* Rodapé Usuário */}
-        <div className="p-4 border-t border-leaf-800 bg-leaf-900/60">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-paper-50 truncate">{user?.nome}</p>
-              <p className="text-xs text-leaf-200 uppercase tracking-wider">{user?.role}</p>
-            </div>
-            <button
-              onClick={logout}
-              className="p-2 rounded-lg text-leaf-200 hover:text-paper-50 hover:bg-leaf-800 transition"
-              title="Sair do sistema"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </aside>
+      <Sidebar activePage="agenda" />
 
       {/* Conteúdo Principal */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -223,9 +168,6 @@ export default function AgendaPage() {
           {/* Título da Página e Descrição */}
           <div>
             <h2 className="text-2xl font-bold text-ink-900">Agenda Clínica</h2>
-            <p className="text-sm text-ink-600 mt-1">
-              Visualize sessões agendadas por dia ou semana, marque novas consultas e defina disponibilidades.
-            </p>
           </div>
 
           {/* Barra de Ações Agrupadas (RF03, RF04, RF05) */}

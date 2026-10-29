@@ -83,9 +83,6 @@ export default function DayView({
               year: 'numeric',
             })}
           </h3>
-          <p className="text-xs text-ink-600 mt-0.5">
-            Visão detalhada por horário das consultas e bloqueios do dia selecionado.
-          </p>
         </div>
         <button
           onClick={() => onOpenAgendar(dataSelecionada)}

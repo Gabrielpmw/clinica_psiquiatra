@@ -82,6 +82,36 @@ export const getMeApi = async () => {
   return response.data;
 };
 
+export const updateProfileApi = async (profileData) => {
+  const response = await api.patch('/auth/me/', profileData);
+  return response.data;
+};
+
+export const changePasswordApi = async (passwordData) => {
+  const response = await api.post('/auth/change-password/', passwordData);
+  return response.data;
+};
+
+export const forgotPasswordApi = async (email) => {
+  const response = await api.post('/auth/forgot-password/', { email });
+  return response.data;
+};
+
+export const getSolicitacoesResetApi = async (params = {}) => {
+  const response = await api.get('/solicitacoes-reset/', { params });
+  return response.data;
+};
+
+export const resolverSolicitacaoResetApi = async (id, newPassword) => {
+  const response = await api.post(`/solicitacoes-reset/${id}/resolver/`, { new_password: newPassword });
+  return response.data;
+};
+
+export const cancelarSolicitacaoResetApi = async (id) => {
+  const response = await api.post(`/solicitacoes-reset/${id}/cancelar/`);
+  return response.data;
+};
+
 // --- Serviços de Usuários / Gestão de Contas (Restrito à Administração) ---
 export const getUsuariosApi = async () => {
   const response = await api.get('/usuarios/');

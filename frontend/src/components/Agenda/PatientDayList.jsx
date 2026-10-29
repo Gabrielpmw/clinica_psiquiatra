@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 
 export default function PatientDayList({ sessoes = [], onStatusChange, selectedDate }) {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isSecretaria } = useAuth();
   const isDoctor = user?.role === 'DOUTORA';
 
   const formatHora = (dataStr) => {
@@ -116,15 +116,17 @@ export default function PatientDayList({ sessoes = [], onStatusChange, selectedD
                     </select>
                   </div>
 
-                  {/* Botão Ver Prontuário */}
-                  <button
-                    onClick={() => navigate(`/prontuario/${sessao.paciente_id || sessao.paciente}`)}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-leaf-700 bg-leaf-100 hover:bg-leaf-200 font-medium transition text-xs"
-                    title="Abrir Prontuário do Paciente"
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>Prontuário</span>
-                  </button>
+                  {/* Botão Ver Prontuário (Oculto para Secretária) */}
+                  {!isSecretaria && (
+                    <button
+                      onClick={() => navigate(`/prontuario/${sessao.paciente_id || sessao.paciente}`)}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-leaf-700 bg-leaf-100 hover:bg-leaf-200 font-medium transition text-xs"
+                      title="Abrir Prontuário do Paciente"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Prontuário</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );

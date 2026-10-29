@@ -172,3 +172,74 @@ class UsuarioAuthAndRBACTestCase(APITestCase):
             'password': 'BrandNewPassword999!'
         })
         self.assertEqual(login_res.status_code, status.HTTP_200_OK)
+
+    def test_usuario_pode_atualizar_proprio_perfil(self):
+        self.client.force_authenticate(user=self.doutora)
+        data = {
+            'nome': 'Dra. Psiquiatra Atualizada',
+            'email': 'doutora_novo_email@clinica.com'
+        }
+        res = self.client.patch(self.me_url, data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.doutora.refresh_from_db()
+        self.assertEqual(self.doutora.nome, 'Dra. Psiquiatra Atualizada')
+        self.assertEqual(self.doutora.email, 'doutora_novo_email@clinica.com')
+
+    def test_usuario_pode_alterar_propria_senha(self):
+        self.client.force_authenticate(user=self.secretaria)
+        change_url = reverse('change-password')
+        data = {
+            'current_password': 'Password123!',
+            'new_password': 'NewPassword123@#$'
+        }
+        res = self.client.post(change_url, data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.secretaria.refresh_from_db()
+        self.assertTrue(self.secretaria.check_password('NewPassword123@#$'))
+
+    def test_solicitar_esqueci_senha_cria_solicitacao_pendente(self):
+        url = reverse('forgot-password')
+        res = self.client.post(url, {'email': 'secretaria_test@clinica.com'})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        from apps.usuarios.models import SolicitacaoResetSenha
+        self.assertTrue(
+            SolicitacaoResetSenha.objects.filter(
+                email='secretaria_test@clinica.com',
+                status=SolicitacaoResetSenha.Status.PENDENTE
+            ).exists()
+        )
+
+    def test_administrador_pode_listar_e_resolver_solicitacao(self):
+        from apps.usuarios.models import SolicitacaoResetSenha
+        solicitacao = SolicitacaoResetSenha.objects.create(
+            usuario=self.secretaria,
+            email=self.secretaria.email,
+            status=SolicitacaoResetSenha.Status.PENDENTE
+        )
+        self.client.force_authenticate(user=self.admin)
+        res_list = self.client.get(reverse('solicitacao-reset-list'))
+        self.assertEqual(res_list.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res_list.data), 1)
+
+        resolver_url = reverse('solicitacao-reset-resolver', kwargs={'pk': solicitacao.id})
+        res_resolve = self.client.post(resolver_url, {'new_password': 'ResolvedSecretariaPass123!'})
+        self.assertEqual(res_resolve.status_code, status.HTTP_200_OK)
+
+        solicitacao.refresh_from_db()
+        self.assertEqual(solicitacao.status, SolicitacaoResetSenha.Status.CONCLUIDO)
+        self.assertEqual(solicitacao.resolvidoPor, self.admin)
+
+        self.client.logout()
+        res_login = self.client.post(self.login_url, {
+            'email': self.secretaria.email,
+            'password': 'ResolvedSecretariaPass123!'
+        })
+        self.assertEqual(res_login.status_code, status.HTTP_200_OK)
+
+    def test_administrador_bloqueado_de_acessar_pacientes_e_agenda(self):
+        self.client.force_authenticate(user=self.admin)
+        res_pacientes = self.client.get(reverse('paciente-list'))
+        self.assertEqual(res_pacientes.status_code, status.HTTP_403_FORBIDDEN)
+
+        res_agenda = self.client.get(reverse('sessao-list'))
+        self.assertEqual(res_agenda.status_code, status.HTTP_403_FORBIDDEN)

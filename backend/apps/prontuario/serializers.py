@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Anamnese, AnotacaoSessao
+from .models import Anamnese, AnotacaoSessao, ResumoIa, ParecerConclusivo
 
 
 class AnamneseSerializer(serializers.ModelSerializer):
@@ -90,3 +90,51 @@ class AnotacaoSessaoSerializer(serializers.ModelSerializer):
             'dataUltimaAtualizacao',
         ]
         read_only_fields = ['id', 'dataRegistro', 'dataUltimaAtualizacao']
+
+
+class ResumoIaSerializer(serializers.ModelSerializer):
+    """
+    Serializer para Resumos de IA (RF10, RF11, RF12).
+    Permite salvar múltiplos resumos gerados com título personalizado.
+    """
+    paciente_nome = serializers.CharField(
+        source='paciente.nomeCompleto',
+        read_only=True
+    )
+
+    class Meta:
+        model = ResumoIa
+        fields = [
+            'id',
+            'paciente',
+            'paciente_nome',
+            'titulo',
+            'promptTipo',
+            'conteudoGerado',
+            'dataGeracao',
+        ]
+        read_only_fields = ['id', 'paciente', 'paciente_nome', 'dataGeracao']
+
+
+class ParecerConclusivoSerializer(serializers.ModelSerializer):
+    """
+    Serializer para Parecer Conclusivo (RF13, RF14).
+    Redação em texto livre e controle de atualização.
+    """
+    paciente_nome = serializers.CharField(
+        source='paciente.nomeCompleto',
+        read_only=True
+    )
+
+    class Meta:
+        model = ParecerConclusivo
+        fields = [
+            'id',
+            'paciente',
+            'paciente_nome',
+            'titulo',
+            'corpoTexto',
+            'dataEmissao',
+            'dataUltimaAtualizacao',
+        ]
+        read_only_fields = ['id', 'paciente', 'paciente_nome', 'dataEmissao', 'dataUltimaAtualizacao']

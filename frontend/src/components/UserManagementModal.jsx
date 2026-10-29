@@ -69,7 +69,7 @@ export default function UserManagementModal({ isOpen, onClose }) {
         password,
         role,
       });
-      setSuccess(`Profissional (${role === 'DOUTORA' ? 'Psiquiatra' : 'Funcionária'}) cadastrada com sucesso!`);
+      setSuccess(`Profissional (${role === 'DOUTORA' ? 'Médico(a) Psiquiatra' : 'Secretaria / Atendimento'}) cadastrado(a) com sucesso!`);
       setNome('');
       setEmail('');
       setPassword('');
@@ -202,7 +202,7 @@ export default function UserManagementModal({ isOpen, onClose }) {
                 <input
                   type="text"
                   required
-                  placeholder="Dra. Ana Paula ou Marina Secretária"
+                  placeholder="Ex: Dr(a). Santos ou Atendimento Recepção"
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
                   className={baseInput}
@@ -238,8 +238,8 @@ export default function UserManagementModal({ isOpen, onClose }) {
                   style={{ ...inputStyle, backgroundColor: C.paper50 }}
                   {...inputEvents}
                 >
-                  <option value="DOUTORA">Doutora / Psiquiatra (Acesso Clínico)</option>
-                  <option value="SECRETARIA">Secretária / Funcionária (Recepção)</option>
+                  <option value="DOUTORA">Médico(a) / Psiquiatra (Acesso Clínico)</option>
+                  <option value="SECRETARIA">Secretaria / Atendimento (Recepção)</option>
                   <option value="ADMINISTRACAO">Administração (Gestão Completa)</option>
                 </select>
               </div>
@@ -346,7 +346,7 @@ export default function UserManagementModal({ isOpen, onClose }) {
                               className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
                               style={{ backgroundColor: C.leaf100, color: C.leaf800, borderColor: C.leaf200 }}
                             >
-                              Psiquiatra
+                              Médico(a) Psiquiatra
                             </span>
                           )}
                           {u.role === 'SECRETARIA' && (
@@ -354,7 +354,7 @@ export default function UserManagementModal({ isOpen, onClose }) {
                               className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
                               style={{ backgroundColor: '#E4EEF6', color: '#4A86B5', borderColor: '#c0d8ed' }}
                             >
-                              Secretária
+                              Secretaria / Atendimento
                             </span>
                           )}
                         </td>

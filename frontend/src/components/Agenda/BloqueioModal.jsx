@@ -67,9 +67,6 @@ export default function BloqueioModal({ isOpen, onClose, onSuccess, initialDate 
               <Lock className="w-5 h-5 text-amber-700" />
               Bloquear Horário na Agenda
             </h2>
-            <p className="text-xs text-ink-600 mt-0.5">
-              Bloqueie intervalos para reuniões, congressos ou folgas.
-            </p>
           </div>
           <button
             onClick={onClose}

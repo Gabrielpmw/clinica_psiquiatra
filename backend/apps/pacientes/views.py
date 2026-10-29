@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
-from apps.usuarios.permissions import IsSecretariaOrAdmin
+from apps.usuarios.permissions import IsSecretariaOrAdmin, IsNonAdminRole
 from .models import Paciente
 from .serializers import PacienteSerializer
 
@@ -31,7 +31,7 @@ class PacienteViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy', 'toggle_status']:
             return [IsSecretariaOrAdmin()]
-        return [IsAuthenticated()]
+        return [IsAuthenticated(), IsNonAdminRole()]
 
     def get_queryset(self):
         queryset = super().get_queryset()

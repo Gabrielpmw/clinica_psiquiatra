@@ -20,6 +20,7 @@ import {
 import { getPacientesApi, togglePacienteStatusApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import PatientFormModal from '../components/PatientFormModal';
+import Sidebar from '../components/Sidebar';
 
 // ── Paleta de cores ──────────────────────────────────────────────────────────
 const C = {
@@ -45,6 +46,7 @@ export default function PatientsPage() {
   const navigate = useNavigate();
   const { user, isSecretaria, isAdmin, isDoutora } = useAuth();
   const canEdit = isSecretaria || isAdmin;
+  const canAccessProntuario = isDoutora || isAdmin;
 
   const [pacientes, setPacientes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -152,77 +154,65 @@ export default function PatientsPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: C.paper100, color: C.ink900 }}>
+    <div className="flex h-screen bg-paper-100 font-sans text-ink-900 overflow-hidden">
+      {/* Menu Lateral Fixo */}
+      <Sidebar activePage="pacientes" />
 
-      {/* Notificação Toast */}
-      {notification && (
-        <div
-          className="fixed top-4 right-4 z-50 px-4 py-2.5 rounded-lg text-xs font-medium shadow-md flex items-center gap-2 border"
-          style={
-            notification.type === 'success'
-              ? { backgroundColor: C.leaf700, color: C.paper50, borderColor: C.leaf800 }
-              : { backgroundColor: C.cancelled, color: '#fff', borderColor: '#8e3d35' }
-          }
+      {/* Conteúdo Principal */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Barra superior */}
+        <header
+          className="h-16 px-8 flex items-center justify-between border-b flex-shrink-0"
+          style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
         >
-          {notification.type === 'success' ? (
-            <CheckCircle className="w-3.5 h-3.5 shrink-0" />
-          ) : (
-            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-          )}
-          <span>{notification.message}</span>
-        </div>
-      )}
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-1.5 text-xs" style={{ color: C.ink400 }}>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="transition-colors"
+              style={{ color: C.ink600 }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = C.leaf700; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = C.ink600; }}
+            >
+              Início
+            </button>
+            <ChevronRight className="w-3 h-3" />
+            <span style={{ color: C.leaf700, fontWeight: 600 }}>Pacientes</span>
+          </nav>
 
-      {/* Barra superior */}
-      <header
-        className="sticky top-0 z-10 px-6 py-3 flex items-center justify-between shadow-sm border-b"
-        style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
-      >
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-1.5 text-xs" style={{ color: C.ink400 }}>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="transition-colors"
-            style={{ color: C.ink600 }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = C.leaf700; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = C.ink600; }}
+          <div className="text-xs text-ink-600 flex items-center gap-2">
+            <span>Logado como</span>
+            <span className="font-semibold text-ink-900">{user?.nome}</span>
+          </div>
+        </header>
+
+        {/* Notificação Toast */}
+        {notification && (
+          <div
+            className="fixed top-4 right-4 z-50 px-4 py-2.5 rounded-lg text-xs font-medium shadow-md flex items-center gap-2 border"
+            style={
+              notification.type === 'success'
+                ? { backgroundColor: C.leaf700, color: C.paper50, borderColor: C.leaf800 }
+                : { backgroundColor: C.cancelled, color: '#fff', borderColor: '#8e3d35' }
+            }
           >
-            Início
-          </button>
-          <ChevronRight className="w-3 h-3" />
-          <span style={{ color: C.ink900, fontWeight: 600 }}>Pacientes</span>
-        </nav>
+            {notification.type === 'success' ? (
+              <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+            ) : (
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+            )}
+            <span>{notification.message}</span>
+          </div>
+        )}
 
-        {/* Usuário e Link Agenda */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/agenda')}
-            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition"
-            style={{ backgroundColor: C.paper50, borderColor: C.paper300, color: C.leaf700 }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = C.leaf100; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = C.paper50; }}
-          >
-            <Calendar className="w-3.5 h-3.5" />
-            <span>Ver Agenda</span>
-          </button>
-          <span className="text-xs font-semibold" style={{ color: C.ink900 }}>
-            {user?.nome || 'Usuário'}
-          </span>
-        </div>
-      </header>
-
-      {/* Conteúdo principal */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 sm:p-8">
-
-        {/* Cabeçalho de página */}
-        <div className="mb-2">
-          <h1 className="text-[26px] font-semibold" style={{ color: C.ink900 }}>
-            Pacientes
-          </h1>
-          <p className="text-sm mt-1" style={{ color: C.ink600 }}>
-            Cadastre e consulte os pacientes da clínica.
-          </p>
-        </div>
+        {/* Área Central Rolável */}
+        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+          {/* Cabeçalho de página */}
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: C.ink900 }}>
+              Pacientes
+            </h1>
+          </div>
 
         {/* Barra de ações */}
         <div
@@ -445,10 +435,10 @@ export default function PatientsPage() {
                           )}
                         </td>
 
-                        {(canEdit || isDoutora) && (
+                        {(canEdit || canAccessProntuario) && (
                           <td className="px-5 py-3.5 text-right">
                             <div className="flex items-center justify-end gap-1.5">
-                              {isDoutora && (
+                              {canAccessProntuario && (
                                 <button
                                   onClick={() => navigate(`/prontuario/${p.id}`)}
                                   title="Abrir prontuário clínico"
@@ -525,6 +515,7 @@ export default function PatientsPage() {
               Total listado: <strong style={{ color: C.ink600 }}>{pacientes.length}</strong> paciente(s)
             </span>
           </div>
+        </div>
         </div>
       </main>
 

@@ -19,30 +19,46 @@ class IsAdminUserRole(BasePermission):
 
 class IsSecretariaOrAdmin(BasePermission):
     """
-    Permissão para rotas administrativas/recepção, permitindo Secretária e Administração (RF02).
+    Permissão para rotas da recepção/secretária (RF02).
+    Bloqueia administração (que gerencia apenas usuários).
     """
-    message = "Acesso restrito à Recepção/Secretaria ou Administração."
+    message = "Acesso restrito à Recepção/Secretaria."
 
     def has_permission(self, request, view):
         return bool(
             request.user and
             request.user.is_authenticated and
             request.user.status and
-            request.user.role in [Usuario.Role.ADMINISTRACAO, Usuario.Role.SECRETARIA]
+            request.user.role == Usuario.Role.SECRETARIA
         )
 
 
 class IsDoctorOrAdmin(BasePermission):
     """
-    Permissão para rotas clínicas (Doutora ou Administração) (RNF03).
-    Bloqueia estritamente o perfil SECRETARIA.
+    Permissão para rotas clínicas exclusivas da Medicina/Psiquiatria (RNF03).
+    Bloqueia estritamente os perfis SECRETARIA e ADMINISTRACAO.
     """
-    message = "Acesso restrito ao perfil clínico (Doutora) ou Administração."
+    message = "Acesso restrito ao perfil clínico (Médico(a) Psiquiatra)."
 
     def has_permission(self, request, view):
         return bool(
             request.user and
             request.user.is_authenticated and
             request.user.status and
-            request.user.role in [Usuario.Role.ADMINISTRACAO, Usuario.Role.DOUTORA]
+            request.user.role == Usuario.Role.DOUTORA
+        )
+
+
+class IsNonAdminRole(BasePermission):
+    """
+    Bloqueia estritamente o perfil ADMINISTRACAO de rotas operacionais (agenda, pacientes, prontuário).
+    """
+    message = "Acesso restrito à equipe operacional e clínica. Administrador gerencia apenas usuários."
+
+    def has_permission(self, request, view):
+        return bool(
+            request.user and
+            request.user.is_authenticated and
+            request.user.status and
+            request.user.role != Usuario.Role.ADMINISTRACAO
         )

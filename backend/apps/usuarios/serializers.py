@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import Usuario
+from .models import Usuario, SolicitacaoResetSenha
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -35,6 +35,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class UsuarioSerializer(serializers.ModelSerializer):
     """Serializer para exibição e listagem de usuários."""
+    tem_reset_pendente = serializers.SerializerMethodField()
 
     class Meta:
         model = Usuario
@@ -44,9 +45,44 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'email',
             'role',
             'status',
-            'dataCriacao'
+            'dataCriacao',
+            'tem_reset_pendente',
         ]
-        read_only_fields = ['id', 'dataCriacao']
+        read_only_fields = ['id', 'dataCriacao', 'tem_reset_pendente']
+
+    def get_tem_reset_pendente(self, obj):
+        return obj.solicitacoes_reset.filter(status=SolicitacaoResetSenha.Status.PENDENTE).exists()
+
+
+class SolicitacaoResetSenhaSerializer(serializers.ModelSerializer):
+    usuario_nome = serializers.CharField(source='usuario.nome', read_only=True)
+    usuario_role = serializers.CharField(source='usuario.role', read_only=True)
+    resolvido_por_nome = serializers.CharField(source='resolvidoPor.nome', read_only=True)
+
+    class Meta:
+        model = SolicitacaoResetSenha
+        fields = [
+            'id',
+            'usuario',
+            'usuario_nome',
+            'usuario_role',
+            'email',
+            'status',
+            'dataSolicitacao',
+            'dataResolucao',
+            'resolvidoPor',
+            'resolvido_por_nome',
+        ]
+        read_only_fields = [
+            'id',
+            'usuario',
+            'usuario_nome',
+            'usuario_role',
+            'dataSolicitacao',
+            'dataResolucao',
+            'resolvidoPor',
+            'resolvido_por_nome',
+        ]
 
 
 class UsuarioCreateSerializer(serializers.ModelSerializer):
@@ -93,3 +129,40 @@ class ResetPasswordSerializer(serializers.Serializer):
         instance.set_password(validated_data['password'])
         instance.save()
         return instance
+
+
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    """Serializer para auto-edição de perfil (nome e email) pelo próprio usuário logado."""
+    class Meta:
+        model = Usuario
+        fields = ['id', 'nome', 'email', 'role']
+        read_only_fields = ['id', 'role']
+
+    def validate_email(self, value):
+        user = self.instance
+        if Usuario.objects.exclude(pk=user.pk).filter(email__iexact=value).exists():
+            raise serializers.ValidationError("Este e-mail já está em uso por outro usuário.")
+        return value.lower()
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """Serializer para alteração de senha pelo próprio usuário autenticado."""
+    current_password = serializers.CharField(write_only=True, required=True)
+    new_password = serializers.CharField(write_only=True, required=True, min_length=8)
+
+    def validate_current_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("A senha atual informada está incorreta.")
+        return value
+
+    def validate(self, attrs):
+        if attrs['current_password'] == attrs['new_password']:
+            raise serializers.ValidationError({"new_password": "A nova senha deve ser diferente da senha atual."})
+        return attrs
+
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        return user

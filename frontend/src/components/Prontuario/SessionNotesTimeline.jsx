@@ -137,9 +137,6 @@ export default function SessionNotesTimeline({
             <Clock className="w-5 h-5 text-leaf-700" />
             Linha do Tempo de Sessões (Evolução Clínica)
           </h3>
-          <p className="text-xs text-ink-600 mt-0.5">
-            Histórico cronológico das sessões avaliativas e interventivas realizadas.
-          </p>
         </div>
 
         <button
@@ -229,9 +226,6 @@ export default function SessionNotesTimeline({
           <div className="text-center py-12 text-ink-400">
             <Clock className="w-10 h-10 mx-auto mb-2 text-paper-300 stroke-[1.5]" />
             <p className="text-sm font-medium text-ink-600">Nenhuma anotação de sessão registrada ainda.</p>
-            <p className="text-xs text-ink-400 mt-1">
-              Conforme as sessões forem realizadas, registre as anotações para construir a linha do tempo.
-            </p>
           </div>
         ) : (
           <div className="relative border-l-2 border-leaf-200 ml-4 pl-6 space-y-6">

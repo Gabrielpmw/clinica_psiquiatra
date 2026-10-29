@@ -138,3 +138,93 @@ class AnotacaoSessao(models.Model):
             f"Anotação — {self.sessao.paciente.nomeCompleto} "
             f"em {self.dataRegistro.strftime('%d/%m/%Y %H:%M')}"
         )
+
+
+class ResumoIa(models.Model):
+    """
+    Resumo clínico gerado por IA (RF10, RF11, RF12).
+    Relação N:1 com Paciente (permite múltiplos resumos com título personalizado).
+    Utiliza UUID v4 como chave primária (RNF05).
+    """
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='Identificador único universal (UUID v4)'
+    )
+    paciente = models.ForeignKey(
+        'pacientes.Paciente',
+        on_delete=models.CASCADE,
+        related_name='resumos_ia',
+        verbose_name='Paciente'
+    )
+    titulo = models.CharField(
+        max_length=200,
+        verbose_name='Título do Resumo',
+        help_text='Nome identificador atribuído pela doutora ao salvar'
+    )
+    promptTipo = models.PositiveSmallIntegerField(
+        verbose_name='Tipo de Prompt',
+        help_text='Identificador numérico do prompt (1 a 4)'
+    )
+    conteudoGerado = models.TextField(
+        verbose_name='Conteúdo Gerado pela IA'
+    )
+    dataGeracao = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Data de Geração'
+    )
+
+    class Meta:
+        verbose_name = 'Resumo de IA'
+        verbose_name_plural = 'Resumos de IA'
+        ordering = ['-dataGeracao']
+
+    def __str__(self):
+        return f"{self.titulo} - {self.paciente.nomeCompleto} ({self.dataGeracao.strftime('%d/%m/%Y')})"
+
+
+class ParecerConclusivo(models.Model):
+    """
+    Parecer Conclusivo / Laudo Final da clínica (RF13, RF14).
+    Relação N:1 com Paciente (permite laudos emitidos em diferentes períodos).
+    Editável em texto livre pela doutora e exportável em PDF.
+    Utiliza UUID v4 como chave primária (RNF05).
+    """
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='Identificador único universal (UUID v4)'
+    )
+    paciente = models.ForeignKey(
+        'pacientes.Paciente',
+        on_delete=models.CASCADE,
+        related_name='pareceres_conclusivos',
+        verbose_name='Paciente'
+    )
+    titulo = models.CharField(
+        max_length=200,
+        default='Parecer Conclusivo',
+        verbose_name='Título / Identificação do Parecer'
+    )
+    corpoTexto = models.TextField(
+        verbose_name='Corpo do Parecer Conclusivo',
+        help_text='Texto livre formal redigido pela doutora'
+    )
+    dataEmissao = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Data de Emissão'
+    )
+    dataUltimaAtualizacao = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Última Atualização'
+    )
+
+    class Meta:
+        verbose_name = 'Parecer Conclusivo'
+        verbose_name_plural = 'Pareceres Conclusivos'
+        ordering = ['-dataEmissao']
+
+    def __str__(self):
+        return f"{self.titulo} - {self.paciente.nomeCompleto} ({self.dataEmissao.strftime('%d/%m/%Y')})"

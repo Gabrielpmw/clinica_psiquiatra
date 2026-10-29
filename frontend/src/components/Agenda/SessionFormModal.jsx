@@ -100,9 +100,6 @@ export default function SessionFormModal({ isOpen, onClose, onSuccess, initialDa
               <Calendar className="w-5 h-5 text-leaf-700" />
               Agendar Nova Sessão
             </h2>
-            <p className="text-xs text-ink-600 mt-0.5">
-              Defina o paciente, horário e se a sessão é avaliativa ou interventiva.
-            </p>
           </div>
           <button
             onClick={onClose}

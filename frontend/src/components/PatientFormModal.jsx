@@ -287,9 +287,6 @@ export default function PatientFormModal({ isOpen, onClose, onSaved, pacienteToE
             <h2 className="text-base font-semibold" style={{ color: C.paper50 }}>
               {pacienteToEdit ? 'Editar Paciente' : 'Novo Cadastro de Paciente'}
             </h2>
-            <p className="text-xs" style={{ color: C.leaf200 }}>
-              Preencha as informações do paciente, responsável e endereço
-            </p>
           </div>
           <button
             onClick={onClose}

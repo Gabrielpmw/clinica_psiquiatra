@@ -54,6 +54,14 @@ export function AuthProvider({ children }) {
     window.location.href = '/login';
   };
 
+  const updateUser = (newUserData) => {
+    setUser((prev) => {
+      const updated = { ...prev, ...newUserData };
+      localStorage.setItem('user', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const isAdmin = user?.role === 'ADMINISTRACAO';
   const isSecretaria = user?.role === 'SECRETARIA';
   const isDoutora = user?.role === 'DOUTORA';
@@ -69,6 +77,7 @@ export function AuthProvider({ children }) {
         isDoutora,
         login,
         logout,
+        updateUser,
       }}
     >
       {children}

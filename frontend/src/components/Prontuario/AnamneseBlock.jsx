@@ -67,9 +67,6 @@ export default function AnamneseBlock({ pacienteId, anamneseInicial, onUpdate })
             <FileCheck className="w-5 h-5 text-leaf-700" />
             Anamnese Clínica Inicial
           </h3>
-          <p className="text-xs text-ink-600 mt-0.5">
-            Critérios estruturados de neurodesenvolvimento e histórico familiar do paciente.
-          </p>
         </div>
         {anamneseInicial?.dataUltimaAtualizacao && (
           <span className="text-[11px] text-ink-400 font-mono">
@@ -199,12 +196,9 @@ export default function AnamneseBlock({ pacienteId, anamneseInicial, onUpdate })
           <div className="flex items-center gap-2 mb-1.5">
             <Sparkles className="w-4 h-4 text-leaf-700" />
             <label className="text-xs font-bold text-leaf-800 uppercase tracking-wider">
-              Observações Gerais e Texto Livre da Anamnese
+              Observações gerais
             </label>
           </div>
-          <p className="text-xs text-ink-600 mb-2">
-            Espaço livre para a doutora anotar qualquer percepção, detalhe clínico ou histórico adicional que desejar.
-          </p>
           <textarea
             rows={4}
             value={formData.observacoesGerais}
