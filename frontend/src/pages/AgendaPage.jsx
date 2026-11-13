@@ -20,6 +20,7 @@ import {
   getSessoesSemanais,
   getBloqueios,
   atualizarStatusSessao,
+  atualizarPagamentoSessao,
   deletarBloqueio,
 } from '../services/agendaService';
 import DayView from '../components/Agenda/DayView';
@@ -128,6 +129,22 @@ export default function AgendaPage() {
     } catch (err) {
       console.error('Erro ao atualizar status:', err);
       notifyError('Não foi possível alterar o status da sessão.');
+    }
+  };
+
+  const handlePagamentoChange = async (sessaoId, novoPago) => {
+    try {
+      await atualizarPagamentoSessao(sessaoId, novoPago);
+      notifySuccess(
+        novoPago ? 'Sessão marcada como paga!' : 'Pagamento da sessão desmarcado!'
+      );
+      // Atualiza localmente o estado sem recarregar toda a agenda
+      setSessoes((prev) =>
+        prev.map((s) => (s.id === sessaoId ? { ...s, pago: novoPago } : s))
+      );
+    } catch (err) {
+      console.error('Erro ao atualizar pagamento:', err);
+      notifyError('Não foi possível alterar o status de pagamento.');
     }
   };
 
@@ -270,6 +287,7 @@ export default function AgendaPage() {
                   dataSelecionada={dataSelecionada}
                   onOpenAgendar={handleAbrirAgendar}
                   onStatusChange={handleStatusChange}
+                  onPagamentoChange={handlePagamentoChange}
                   onDeletarBloqueio={handleDeletarBloqueio}
                   isSecretaria={isSecretaria}
                 />
@@ -281,6 +299,7 @@ export default function AgendaPage() {
                   sessoes={sessoes}
                   selectedDate={dataSelecionada}
                   onStatusChange={handleStatusChange}
+                  onPagamentoChange={handlePagamentoChange}
                 />
               </div>
             </div>
@@ -292,6 +311,7 @@ export default function AgendaPage() {
                 inicioSemana={inicioSemana}
                 onOpenAgendar={handleAbrirAgendar}
                 onStatusChange={handleStatusChange}
+                onPagamentoChange={handlePagamentoChange}
                 onDeletarBloqueio={handleDeletarBloqueio}
                 isSecretaria={isSecretaria}
               />

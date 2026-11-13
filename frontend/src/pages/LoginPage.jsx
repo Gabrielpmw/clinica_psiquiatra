@@ -81,10 +81,10 @@ export default function LoginPage() {
           className="text-3xl font-semibold tracking-tight mb-3"
           style={{ color: '#F9FAF6' }}
         >
-          Sistema de Apoio à Clínica
+          Clínica Apoio — Marília Sávia
         </h1>
         <p className="text-base leading-relaxed max-w-xs" style={{ color: '#CFE5D8' }}>
-          Psiquiatria Infantojuvenil
+          Neuropsicopedagogia clínica e psicopedagogia clínica
         </p>
       </div>
 
@@ -102,8 +102,11 @@ export default function LoginPage() {
             <Stethoscope className="w-8 h-8" style={{ color: '#F9FAF6' }} />
           </div>
           <h2 className="text-xl font-semibold text-center" style={{ color: '#1E2A24' }}>
-            Sistema de Apoio à Clínica
+            Clínica Apoio — Marília Sávia
           </h2>
+          <p className="text-xs text-center mt-1" style={{ color: '#4A5A52' }}>
+            Neuropsicopedagogia clínica e psicopedagogia clínica
+          </p>
         </div>
 
         {/* Cartão de login */}

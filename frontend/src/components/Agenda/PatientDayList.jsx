@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Clock, FileText, CheckCircle2, XCircle, AlertTriangle, Calendar } from 'lucide-react';
+import { User, Clock, FileText, CheckCircle2, XCircle, AlertTriangle, Calendar, CircleDollarSign } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export default function PatientDayList({ sessoes = [], onStatusChange, selectedDate }) {
+export default function PatientDayList({ sessoes = [], onStatusChange, onPagamentoChange, selectedDate }) {
   const navigate = useNavigate();
   const { user, isSecretaria } = useAuth();
   const isDoctor = user?.role === 'DOUTORA';
@@ -100,27 +100,53 @@ export default function PatientDayList({ sessoes = [], onStatusChange, selectedD
                 </div>
 
                 {/* Linha 2: Alteração de status e Ações */}
-                <div className="flex items-center justify-between pt-2 border-t border-paper-200 text-xs">
-                  {/* Seletor de Status (RF06) */}
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-ink-400 text-[11px]">Status:</span>
-                    <select
-                      value={sessao.status}
-                      onChange={(e) => onStatusChange(sessao.id, e.target.value)}
-                      className="text-xs py-1 px-2 rounded-lg bg-paper-100 border border-paper-300 text-ink-900 focus:outline-none focus:ring-1 focus:ring-leaf-500 cursor-pointer"
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-paper-200 text-xs">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {/* Seletor de Status (RF06) */}
+                    <div className="flex items-center gap-1">
+                      <span className="text-ink-400 text-[11px]">Status:</span>
+                      <select
+                        value={sessao.status}
+                        onChange={(e) => onStatusChange(sessao.id, e.target.value)}
+                        className="text-xs py-1 px-1.5 rounded-lg bg-paper-100 border border-paper-300 text-ink-900 focus:outline-none focus:ring-1 focus:ring-leaf-500 cursor-pointer"
+                      >
+                        <option value="AGENDADA">Agendada</option>
+                        <option value="REALIZADA">Realizada</option>
+                        <option value="FALTA">Falta</option>
+                        <option value="CANCELADA">Cancelada</option>
+                      </select>
+                    </div>
+
+                    {/* Indicador de Pagamento */}
+                    <button
+                      type="button"
+                      onClick={() => onPagamentoChange && onPagamentoChange(sessao.id, !sessao.pago)}
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-medium border transition cursor-pointer select-none ${
+                        sessao.pago
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                          : 'bg-paper-100 text-ink-600 border-paper-300 hover:bg-paper-200'
+                      }`}
+                      title={sessao.pago ? 'Clique para marcar como pendente' : 'Clique para marcar como pago'}
                     >
-                      <option value="AGENDADA">Agendada</option>
-                      <option value="REALIZADA">Realizada</option>
-                      <option value="FALTA">Falta</option>
-                      <option value="CANCELADA">Cancelada</option>
-                    </select>
+                      {sessao.pago ? (
+                        <>
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                          <span>Pago</span>
+                        </>
+                      ) : (
+                        <>
+                          <CircleDollarSign className="w-3 h-3 text-ink-500 shrink-0" />
+                          <span>Pendente</span>
+                        </>
+                      )}
+                    </button>
                   </div>
 
                   {/* Botão Ver Prontuário (Oculto para Secretária) */}
                   {!isSecretaria && (
                     <button
                       onClick={() => navigate(`/prontuario/${sessao.paciente_id || sessao.paciente}`)}
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-leaf-700 bg-leaf-100 hover:bg-leaf-200 font-medium transition text-xs"
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-leaf-700 bg-leaf-100 hover:bg-leaf-200 font-medium transition text-xs shrink-0"
                       title="Abrir Prontuário do Paciente"
                     >
                       <FileText className="w-3.5 h-3.5" />

@@ -58,6 +58,10 @@ class Sessao(models.Model):
         default=TipoChoices.AVALIATIVA,
         verbose_name='Tipo de Sessão'
     )
+    pago = models.BooleanField(
+        default=False,
+        verbose_name='Sessão Paga'
+    )
 
     class Meta:
         verbose_name = 'Sessão'

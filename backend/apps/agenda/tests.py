@@ -150,3 +150,73 @@ class AgendaAPITestCase(APITestCase):
         res_bloq = self.client.post(self.url_bloqueios, payload_bloq, format='json')
         self.assertEqual(res_bloq.status_code, status.HTTP_201_CREATED)
         self.assertEqual(res_bloq.data['motivo'], 'Congresso de Psiquiatria Infantil')
+
+    def test_sessao_retorna_pago_false_por_padrao(self):
+        """Sessão deve vir com pago=False por padrão e expor na API."""
+        self.client.force_authenticate(user=self.secretaria)
+        inicio = self.agora + timedelta(days=1)
+        fim = inicio + timedelta(minutes=50)
+        sessao = Sessao.objects.create(
+            paciente=self.paciente,
+            usuario=self.doutora,
+            dataHoraInicio=inicio,
+            dataHoraFim=fim,
+            status=Sessao.StatusChoices.AGENDADA
+        )
+        url_detalhe = reverse('sessao-detail', kwargs={'pk': sessao.id})
+        res = self.client.get(url_detalhe)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('pago', res.data)
+        self.assertFalse(res.data['pago'])
+
+    def test_atualizar_pagamento_sessao(self):
+        """Action atualizar_pagamento altera indicador e retorna objeto atualizado."""
+        self.client.force_authenticate(user=self.secretaria)
+        inicio = self.agora + timedelta(days=1)
+        fim = inicio + timedelta(minutes=50)
+        sessao = Sessao.objects.create(
+            paciente=self.paciente,
+            usuario=self.doutora,
+            dataHoraInicio=inicio,
+            dataHoraFim=fim,
+            status=Sessao.StatusChoices.AGENDADA,
+            pago=False
+        )
+
+        url_pagamento = reverse('sessao-atualizar-pagamento', kwargs={'pk': sessao.id})
+
+        # Marcar como pago
+        res = self.client.patch(url_pagamento, {'pago': True}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data['pago'])
+        sessao.refresh_from_db()
+        self.assertTrue(sessao.pago)
+
+        # Desmarcar como pago
+        res = self.client.patch(url_pagamento, {'pago': False}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertFalse(res.data['pago'])
+        sessao.refresh_from_db()
+        self.assertFalse(sessao.pago)
+
+    def test_atualizar_pagamento_validacao(self):
+        """Valida que campo pago ausente ou inválido retorna 400."""
+        self.client.force_authenticate(user=self.secretaria)
+        inicio = self.agora + timedelta(days=1)
+        fim = inicio + timedelta(minutes=50)
+        sessao = Sessao.objects.create(
+            paciente=self.paciente,
+            usuario=self.doutora,
+            dataHoraInicio=inicio,
+            dataHoraFim=fim,
+            status=Sessao.StatusChoices.AGENDADA
+        )
+        url_pagamento = reverse('sessao-atualizar-pagamento', kwargs={'pk': sessao.id})
+
+        # Ausente
+        res = self.client.patch(url_pagamento, {}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Inválido
+        res = self.client.patch(url_pagamento, {'pago': 'invalido'}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

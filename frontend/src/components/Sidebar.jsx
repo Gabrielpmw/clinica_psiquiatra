@@ -69,7 +69,7 @@ export default function Sidebar({ activePage, isOpen = false, onClose }) {
             </div>
             <div>
               <h1 className="font-bold text-base leading-tight text-paper-50">Clínica Apoio</h1>
-              <p className="text-xs text-leaf-200">Psiquiatria Infantojuvenil</p>
+              <p className="text-xs text-leaf-200">Neuropsicopedagogia clínica e psicopedagogia clínica</p>
             </div>
           </div>
 

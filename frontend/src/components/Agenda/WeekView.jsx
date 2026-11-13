@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Clock, FileText, CheckCircle2, XCircle, AlertTriangle, Calendar as CalendarIcon, Trash2 } from 'lucide-react';
+import { Plus, Clock, FileText, CheckCircle2, XCircle, AlertTriangle, Calendar as CalendarIcon, Trash2, CircleDollarSign } from 'lucide-react';
 
 export default function WeekView({
   sessoes = [],
@@ -8,6 +8,7 @@ export default function WeekView({
   inicioSemana,
   onOpenAgendar,
   onStatusChange,
+  onPagamentoChange,
   onDeletarBloqueio,
   isSecretaria = false,
 }) {
@@ -172,11 +173,11 @@ export default function WeekView({
                       {sessao.paciente_nome}
                     </p>
 
-                    <div className="flex items-center justify-between pt-1 border-t border-paper-200/60 mt-0.5 text-[10px]">
+                    <div className="flex items-center justify-between gap-1 pt-1 border-t border-paper-200/60 mt-0.5 text-[10px]">
                       <select
                         value={sessao.status}
                         onChange={(e) => onStatusChange(sessao.id, e.target.value)}
-                        className="bg-transparent text-[10px] font-medium text-ink-600 cursor-pointer focus:outline-none"
+                        className="bg-transparent text-[10px] font-medium text-ink-600 cursor-pointer focus:outline-none max-w-[65px] truncate"
                       >
                         <option value="AGENDADA">Agendada</option>
                         <option value="REALIZADA">Realizada</option>
@@ -184,15 +185,36 @@ export default function WeekView({
                         <option value="CANCELADA">Cancelada</option>
                       </select>
 
-                      {!isSecretaria && (
-                        <button
-                          onClick={() => navigate(`/prontuario/${sessao.paciente_id || sessao.paciente}`)}
-                          className="text-leaf-700 hover:text-leaf-900 p-0.5"
-                          title="Ver Prontuário"
-                        >
-                          <FileText className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                      <div className="flex items-center gap-1">
+                        {onPagamentoChange && (
+                          <button
+                            type="button"
+                            onClick={() => onPagamentoChange(sessao.id, !sessao.pago)}
+                            className={`p-0.5 rounded transition cursor-pointer select-none ${
+                              sessao.pago
+                                ? 'text-emerald-600 hover:text-emerald-800'
+                                : 'text-ink-400 hover:text-ink-600'
+                            }`}
+                            title={sessao.pago ? 'Pago (clique para marcar pendente)' : 'Pendente (clique para marcar pago)'}
+                          >
+                            {sessao.pago ? (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            ) : (
+                              <CircleDollarSign className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        )}
+
+                        {!isSecretaria && (
+                          <button
+                            onClick={() => navigate(`/prontuario/${sessao.paciente_id || sessao.paciente}`)}
+                            className="text-leaf-700 hover:text-leaf-900 p-0.5"
+                            title="Ver Prontuário"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );

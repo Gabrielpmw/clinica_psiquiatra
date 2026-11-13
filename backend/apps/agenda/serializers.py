@@ -29,6 +29,7 @@ class SessaoSerializer(serializers.ModelSerializer):
             'id', 'paciente', 'paciente_id', 'paciente_nome',
             'usuario', 'dataHoraInicio', 'dataHoraFim',
             'status', 'status_display', 'tipo', 'tipo_display',
+            'pago',
         ]
         read_only_fields = ['id', 'paciente_id', 'paciente_nome', 'status_display', 'tipo_display']
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Plus, Lock, FileText, CheckCircle2, XCircle, AlertTriangle, Calendar as CalendarIcon, Trash2 } from 'lucide-react';
+import { Clock, Plus, Lock, FileText, CheckCircle2, XCircle, AlertTriangle, Calendar as CalendarIcon, Trash2, CircleDollarSign } from 'lucide-react';
 
 export default function DayView({
   sessoes = [],
@@ -8,6 +8,7 @@ export default function DayView({
   dataSelecionada,
   onOpenAgendar,
   onStatusChange,
+  onPagamentoChange,
   onDeletarBloqueio,
   isSecretaria = false,
 }) {
@@ -183,7 +184,31 @@ export default function DayView({
                 </div>
 
                 {/* Ações e Seletor de Status */}
-                <div className="flex items-center gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-paper-200">
+                <div className="flex flex-wrap items-center gap-2.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-paper-200">
+                  {/* Indicador de Pagamento */}
+                  <button
+                    type="button"
+                    onClick={() => onPagamentoChange && onPagamentoChange(sessao.id, !sessao.pago)}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border transition cursor-pointer select-none ${
+                      sessao.pago
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                        : 'bg-paper-100 text-ink-600 border-paper-300 hover:bg-paper-200'
+                    }`}
+                    title={sessao.pago ? 'Clique para marcar como pendente' : 'Clique para marcar como pago'}
+                  >
+                    {sessao.pago ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>Pago</span>
+                      </>
+                    ) : (
+                      <>
+                        <CircleDollarSign className="w-3.5 h-3.5 text-ink-500 shrink-0" />
+                        <span>Pendente</span>
+                      </>
+                    )}
+                  </button>
+
                   <div className="flex items-center gap-1.5 text-xs">
                     <label className="text-ink-400 font-medium">Status:</label>
                     <select

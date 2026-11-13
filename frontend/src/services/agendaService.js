@@ -38,6 +38,13 @@ export const atualizarStatusSessao = async (sessaoId, status) => {
   return response.data;
 };
 
+export const atualizarPagamentoSessao = async (sessaoId, pago) => {
+  const response = await api.patch(`/agenda/sessoes/${sessaoId}/atualizar_pagamento/`, {
+    pago,
+  });
+  return response.data;
+};
+
 export const cancelarSessao = async (sessaoId) => {
   return atualizarStatusSessao(sessaoId, 'CANCELADA');
 };

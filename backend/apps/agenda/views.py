@@ -83,6 +83,37 @@ class SessaoViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(sessao)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['patch'], url_path='atualizar_pagamento')
+    def atualizar_pagamento(self, request, pk=None):
+        """
+        Altera apenas o indicador de pagamento da sessão (pago: True/False).
+        """
+        sessao = self.get_object()
+        pago = request.data.get('pago')
+
+        if pago is None:
+            return Response(
+                {'error': 'O campo pago é obrigatório.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not isinstance(pago, bool):
+            if str(pago).lower() in ['true', '1']:
+                pago = True
+            elif str(pago).lower() in ['false', '0']:
+                pago = False
+            else:
+                return Response(
+                    {'error': 'O campo pago deve ser um booleano (true ou false).'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        sessao.pago = pago
+        sessao.save(update_fields=['pago'])
+
+        serializer = self.get_serializer(sessao)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class DisponibilidadeViewSet(viewsets.ModelViewSet):
     """
