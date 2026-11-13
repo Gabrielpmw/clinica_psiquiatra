@@ -1,16 +1,32 @@
 [
 {
+  "model": "sessions.session",
+  "pk": "6o2lnqw9o5xfj9bikdmrqvfy23svoowm",
+  "fields": {
+    "session_data": ".eJxVjTsOwjAQBe_imlj-rY0p6TlDtOtdkwBKpHwqxN1JpBRQv5l5b9XiunTtOsvU9qwuCiKYQiE0EtE0gXJscvK5qSkm8miASlWnX42wPGXYXX7gcB91GYdl6knviD7WWd9Gltf1YP8CHc7dZp-LBa4CDlAIbXVZPBbg7Z5ITLCOq-Mgcs4x5uJsTmCdt1BjrEykPl_zQkGE:1xAGDD:UTJ_2nivk8yExR5oI8LTxfoPPWvlBUzdbghfBhPbcnk",
+    "expire_date": "2026-10-10T00:24:19.719Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "8gklv4urholwlu1vhl9hdfgk26nm3qsi",
+  "fields": {
+    "session_data": ".eJxVjTsOwjAQBe_imlj-rY0p6TlDtOtdkwBKpHwqxN1JpBRQv5l5b9XiunTtOsvU9qwuCiKYQiE0EtE0gXJscvK5qSkm8miASlWnX42wPGXYXX7gcB91GYdl6knviD7WWd9Gltf1YP8CHc7dZp-LBa4CDlAIbXVZPBbg7Z5ITLCOq-Mgcs4x5uJsTmCdt1BjrEykPl_zQkGE:1xAGDP:2C73a5Y24HDshOwFbWdF2LMUAQXePcEqMv73a65uikY",
+    "expire_date": "2026-10-10T00:24:31.817Z"
+  }
+},
+{
   "model": "usuarios.usuario",
   "fields": {
-    "password": "bcrypt_sha256$$2b$12$4pM5ax0cXpBoMgWGcSInte/6HNDfjwBOu0vzNVxKzcMMj7KjOj0O.",
-    "last_login": null,
-    "is_superuser": false,
-    "nome": "Gabriel Vieira Ribeiro",
-    "email": "gabriel@gmail.com",
-    "role": "DOUTORA",
+    "password": "bcrypt_sha256$$2b$12$fedBrIF8fMU2Qy9BIMbYp.5SYLHqyLX9FtBMan9jGMlgJpk2yy00u",
+    "last_login": "2026-09-26T00:24:31.814Z",
+    "is_superuser": true,
+    "nome": "Administrador do Sistema",
+    "email": "admin@clinica.com",
+    "role": "ADMINISTRACAO",
     "status": true,
-    "is_staff": false,
-    "dataCriacao": "2026-10-21T15:07:34.335Z",
+    "is_staff": true,
+    "dataCriacao": "2026-09-25T23:29:01.003Z",
     "groups": [],
     "user_permissions": []
   }
@@ -18,7 +34,7 @@
 {
   "model": "usuarios.usuario",
   "fields": {
-    "password": "bcrypt_sha256$$2b$12$2u8IUr8axnP1gotwM8EkkeeI/QfW/7TD91k12JquCA4c4OleKgDQy",
+    "password": "bcrypt_sha256$$2b$12$nHVLE9FZWbmkZSJW1PdwhuaPIF7U7G5K7pFi7TRrdWTwYc69rOtri",
     "last_login": null,
     "is_superuser": false,
     "nome": "Milena Almeida Alves Vieira",
@@ -26,7 +42,7 @@
     "role": "SECRETARIA",
     "status": true,
     "is_staff": false,
-    "dataCriacao": "2026-10-21T15:07:34.102Z",
+    "dataCriacao": "2026-11-13T14:37:34.761Z",
     "groups": [],
     "user_permissions": []
   }
@@ -34,390 +50,379 @@
 {
   "model": "usuarios.usuario",
   "fields": {
-    "password": "bcrypt_sha256$$2b$12$pQ3/OsRTN5lyHHCddJ./U.LrH1B6WEGjhYdBCyw5V51RBCuAE96oy",
+    "password": "bcrypt_sha256$$2b$12$R8mLrxtGN.cdvBiGpwcV5uJQg4nYFAreKiY7BdDeYFgQWQYZIAJfe",
     "last_login": null,
-    "is_superuser": true,
-    "nome": "Administrador do Sistema",
-    "email": "admin@clinica.com",
-    "role": "ADMINISTRACAO",
+    "is_superuser": false,
+    "nome": "Gabriel Vieira Ribeiro",
+    "email": "gabriel@gmail.com",
+    "role": "DOUTORA",
     "status": true,
-    "is_staff": true,
-    "dataCriacao": "2026-10-21T15:04:35.914Z",
+    "is_staff": false,
+    "dataCriacao": "2026-11-13T14:37:35.012Z",
     "groups": [],
     "user_permissions": []
   }
 },
 {
   "model": "pacientes.paciente",
-  "pk": "579c72cb-f462-40bf-8e3f-15e0f8d0ef85",
-  "fields": {
-    "nomeCompleto": "Enzo Gabriel Santos",
-    "dataNascimento": "2013-02-15",
-    "sexo": "M",
-    "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.561Z"
-  }
-},
-{
-  "model": "pacientes.paciente",
-  "pk": "5c124c05-96f3-462c-8b02-dcdbf5fb8a20",
-  "fields": {
-    "nomeCompleto": "Alice Fernandes Souza",
-    "dataNascimento": "2012-08-25",
-    "sexo": "F",
-    "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.911Z"
-  }
-},
-{
-  "model": "pacientes.paciente",
-  "pk": "60bfdd0f-bbfc-4240-8bf0-af9b75b3c985",
-  "fields": {
-    "nomeCompleto": "Isabella Duarte Nogueira",
-    "dataNascimento": "2015-12-10",
-    "sexo": "F",
-    "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.910Z"
-  }
-},
-{
-  "model": "pacientes.paciente",
-  "pk": "873de08d-cfbf-4003-a927-06a51758457a",
-  "fields": {
-    "nomeCompleto": "Manuela Costa Ribeiro",
-    "dataNascimento": "2020-01-18",
-    "sexo": "F",
-    "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.913Z"
-  }
-},
-{
-  "model": "pacientes.paciente",
-  "pk": "9cb95213-adb1-4922-ab05-ef6a3887d553",
-  "fields": {
-    "nomeCompleto": "Laura Beatriz Lima",
-    "dataNascimento": "2019-11-05",
-    "sexo": "F",
-    "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.562Z"
-  }
-},
-{
-  "model": "pacientes.paciente",
-  "pk": "c2b70137-fdb6-49dd-850e-778baf0918ae",
-  "fields": {
-    "nomeCompleto": "Matheus Henrique Rocha",
-    "dataNascimento": "2010-07-30",
-    "sexo": "M",
-    "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.563Z"
-  }
-},
-{
-  "model": "pacientes.paciente",
-  "pk": "ca9675f1-6917-4734-b68b-0978c8dafb3a",
-  "fields": {
-    "nomeCompleto": "Pedro Lucas Guimarães",
-    "dataNascimento": "2008-03-14",
-    "sexo": "M",
-    "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.912Z"
-  }
-},
-{
-  "model": "pacientes.paciente",
-  "pk": "d2aef78b-3e9d-4839-8bb6-45b86c292fc8",
-  "fields": {
-    "nomeCompleto": "Lucas Silva Mendes",
-    "dataNascimento": "2016-04-12",
-    "sexo": "M",
-    "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.560Z"
-  }
-},
-{
-  "model": "pacientes.paciente",
-  "pk": "da4a9d6f-bba9-49a3-b818-dd2787f6f305",
-  "fields": {
-    "nomeCompleto": "Sophia Carvalho Ferreira",
-    "dataNascimento": "2018-09-20",
-    "sexo": "F",
-    "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.561Z"
-  }
-},
-{
-  "model": "pacientes.paciente",
-  "pk": "e4c05b46-1938-4a6a-b545-47f47852ee51",
+  "pk": "0018c386-27a1-4714-9f62-b28f8be6ea91",
   "fields": {
     "nomeCompleto": "Arthur Vinicius Pires",
     "dataNascimento": "2014-10-08",
     "sexo": "M",
     "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.913Z"
+    "dataCadastro": "2026-11-13T14:37:35.288Z"
   }
 },
 {
   "model": "pacientes.paciente",
-  "pk": "fb968e9f-d79d-4c1a-8477-064e8d010476",
+  "pk": "22c7eb4f-ccfb-46ea-89a0-4819a9ff54a0",
+  "fields": {
+    "nomeCompleto": "Isabella Duarte Nogueira",
+    "dataNascimento": "2015-12-10",
+    "sexo": "F",
+    "status": true,
+    "dataCadastro": "2026-11-13T14:37:35.279Z"
+  }
+},
+{
+  "model": "pacientes.paciente",
+  "pk": "2c19c1f1-a8a9-4a50-aaea-56a8fd14fd84",
+  "fields": {
+    "nomeCompleto": "Pedro Lucas GuimarÃ£es",
+    "dataNascimento": "2008-03-14",
+    "sexo": "M",
+    "status": true,
+    "dataCadastro": "2026-11-13T14:37:35.284Z"
+  }
+},
+{
+  "model": "pacientes.paciente",
+  "pk": "338cd00b-e463-4e94-8c21-07c23f6d798d",
+  "fields": {
+    "nomeCompleto": "Manuela Costa Ribeiro",
+    "dataNascimento": "2020-01-18",
+    "sexo": "F",
+    "status": true,
+    "dataCadastro": "2026-11-13T14:37:35.286Z"
+  }
+},
+{
+  "model": "pacientes.paciente",
+  "pk": "6167dc3a-885d-4f0c-9a6b-c0842b6ddc16",
+  "fields": {
+    "nomeCompleto": "Alice Fernandes Souza",
+    "dataNascimento": "2012-08-25",
+    "sexo": "F",
+    "status": true,
+    "dataCadastro": "2026-11-13T14:37:35.283Z"
+  }
+},
+{
+  "model": "pacientes.paciente",
+  "pk": "6b7344af-9fa7-4088-98c8-8bfdc075d45e",
+  "fields": {
+    "nomeCompleto": "Lucas Silva Mendes",
+    "dataNascimento": "2016-04-12",
+    "sexo": "M",
+    "status": true,
+    "dataCadastro": "2026-11-13T14:37:35.269Z"
+  }
+},
+{
+  "model": "pacientes.paciente",
+  "pk": "74db0930-b484-434e-94aa-78cc53dae04f",
+  "fields": {
+    "nomeCompleto": "Laura Beatriz Lima",
+    "dataNascimento": "2019-11-05",
+    "sexo": "F",
+    "status": true,
+    "dataCadastro": "2026-11-13T14:37:35.275Z"
+  }
+},
+{
+  "model": "pacientes.paciente",
+  "pk": "7bb47f47-c85a-40a3-9ada-aff78f6974e2",
+  "fields": {
+    "nomeCompleto": "Enzo Gabriel Santos",
+    "dataNascimento": "2013-02-15",
+    "sexo": "M",
+    "status": true,
+    "dataCadastro": "2026-11-13T14:37:35.274Z"
+  }
+},
+{
+  "model": "pacientes.paciente",
+  "pk": "7c2634d1-8660-425c-9f72-960a90cf6b43",
   "fields": {
     "nomeCompleto": "Helena Ramos Vasconcelos",
     "dataNascimento": "2011-06-22",
     "sexo": "F",
     "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.914Z"
+    "dataCadastro": "2026-11-13T14:37:35.289Z"
   }
 },
 {
   "model": "pacientes.paciente",
-  "pk": "fe57c7c3-2b36-4257-b8e1-1c2b7ebdcb6a",
+  "pk": "899b78f9-40e4-4655-bc58-70810ba62c98",
+  "fields": {
+    "nomeCompleto": "Matheus Henrique Rocha",
+    "dataNascimento": "2010-07-30",
+    "sexo": "M",
+    "status": true,
+    "dataCadastro": "2026-11-13T14:37:35.277Z"
+  }
+},
+{
+  "model": "pacientes.paciente",
+  "pk": "cdf4b441-75dd-4190-a088-f743c667231b",
+  "fields": {
+    "nomeCompleto": "Sophia Carvalho Ferreira",
+    "dataNascimento": "2018-09-20",
+    "sexo": "F",
+    "status": true,
+    "dataCadastro": "2026-11-13T14:37:35.272Z"
+  }
+},
+{
+  "model": "pacientes.paciente",
+  "pk": "e65e74cf-75ea-42e7-9ee3-87fb0b7eebc9",
   "fields": {
     "nomeCompleto": "Theo Albuquerque Martins",
     "dataNascimento": "2017-05-18",
     "sexo": "M",
     "status": true,
-    "dataCadastro": "2026-10-21T15:07:34.911Z"
+    "dataCadastro": "2026-11-13T14:37:35.281Z"
   }
 },
 {
   "model": "pacientes.endereco",
-  "pk": "078f6dc1-dca4-4f1d-8816-bce56cece1b4",
+  "pk": "14dd88ed-c489-4abc-9ba2-b60064a1a8c0",
   "fields": {
-    "paciente": "ca9675f1-6917-4734-b68b-0978c8dafb3a",
-    "tituloLocal": "Casa",
-    "cep": "01415-001",
-    "logradouro": "Rua Bela Cintra",
-    "numero": "1400",
-    "bairro": "Consolação",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-},
-{
-  "model": "pacientes.endereco",
-  "pk": "1e6931aa-35c7-41b6-bcf9-985045785e62",
-  "fields": {
-    "paciente": "fe57c7c3-2b36-4257-b8e1-1c2b7ebdcb6a",
-    "tituloLocal": "Principal",
-    "cep": "01405-001",
-    "logradouro": "Rua Pamplona",
-    "numero": "900",
-    "bairro": "Jardim Paulista",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-},
-{
-  "model": "pacientes.endereco",
-  "pk": "238e2a91-e346-4f93-b229-9fac7dfc55d3",
-  "fields": {
-    "paciente": "da4a9d6f-bba9-49a3-b818-dd2787f6f305",
-    "tituloLocal": "Casa da Família",
-    "cep": "01304-001",
-    "logradouro": "Rua Augusta",
-    "numero": "850",
-    "bairro": "Consolação",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-},
-{
-  "model": "pacientes.endereco",
-  "pk": "26c59573-beb8-481a-a0f6-61bdc16bdb4c",
-  "fields": {
-    "paciente": "60bfdd0f-bbfc-4240-8bf0-af9b75b3c985",
-    "tituloLocal": "Principal",
-    "cep": "04036-000",
-    "logradouro": "Rua Domingos de Morais",
-    "numero": "1800",
-    "bairro": "Vila Mariana",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-},
-{
-  "model": "pacientes.endereco",
-  "pk": "56d7a95b-74a0-4ffa-99ff-49eb891183df",
-  "fields": {
-    "paciente": "d2aef78b-3e9d-4839-8bb6-45b86c292fc8",
-    "tituloLocal": "Residencial",
-    "cep": "01310-200",
-    "logradouro": "Avenida Paulista",
-    "numero": "1500",
-    "bairro": "Bela Vista",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-},
-{
-  "model": "pacientes.endereco",
-  "pk": "5e95ff0e-ffc5-4181-8bbc-c90b2cf6dffb",
-  "fields": {
-    "paciente": "e4c05b46-1938-4a6a-b545-47f47852ee51",
-    "tituloLocal": "Principal",
-    "cep": "05406-050",
-    "logradouro": "Rua Teodoro Sampaio",
-    "numero": "1100",
-    "bairro": "Pinheiros",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-},
-{
-  "model": "pacientes.endereco",
-  "pk": "783585ff-c319-44e8-861b-29f22f979da7",
-  "fields": {
-    "paciente": "fb968e9f-d79d-4c1a-8477-064e8d010476",
-    "tituloLocal": "Residência",
-    "cep": "01301-100",
-    "logradouro": "Rua da Consolação",
-    "numero": "2100",
-    "bairro": "Consolação",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-},
-{
-  "model": "pacientes.endereco",
-  "pk": "8107049d-d1b1-4d4d-affb-fb32a6c50ba7",
-  "fields": {
-    "paciente": "579c72cb-f462-40bf-8e3f-15e0f8d0ef85",
-    "tituloLocal": "Principal",
-    "cep": "04101-100",
-    "logradouro": "Rua Vergueiro",
-    "numero": "2200",
-    "bairro": "Vila Mariana",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-},
-{
-  "model": "pacientes.endereco",
-  "pk": "977fadf2-749d-4b39-8371-18036d13ff4d",
-  "fields": {
-    "paciente": "873de08d-cfbf-4003-a927-06a51758457a",
-    "tituloLocal": "Residencial",
-    "cep": "01426-000",
-    "logradouro": "Rua Oscar Freire",
-    "numero": "600",
-    "bairro": "Cerqueira César",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-},
-{
-  "model": "pacientes.endereco",
-  "pk": "b39a2c88-5f36-4a66-9b51-719b8da4b3e7",
-  "fields": {
-    "paciente": "5c124c05-96f3-462c-8b02-dcdbf5fb8a20",
-    "tituloLocal": "Residência",
-    "cep": "05402-400",
-    "logradouro": "Avenida Rebouças",
-    "numero": "2500",
-    "bairro": "Pinheiros",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-},
-{
-  "model": "pacientes.endereco",
-  "pk": "d63a2f3d-4edd-4a93-bdd1-0d0cb247ef9b",
-  "fields": {
-    "paciente": "9cb95213-adb1-4922-ab05-ef6a3887d553",
-    "tituloLocal": "Residência",
-    "cep": "01418-100",
-    "logradouro": "Alameda Santos",
-    "numero": "1200",
-    "bairro": "Cerqueira César",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-},
-{
-  "model": "pacientes.endereco",
-  "pk": "ee1b1bb5-a5b7-438f-81ad-5d8a9e80c2cd",
-  "fields": {
-    "paciente": "c2b70137-fdb6-49dd-850e-778baf0918ae",
+    "paciente": "899b78f9-40e4-4655-bc58-70810ba62c98",
     "tituloLocal": "Residencial",
     "cep": "04538-133",
     "logradouro": "Avenida Brigadeiro Faria Lima",
     "numero": "3477",
     "bairro": "Itaim Bibi",
-    "cidade": "São Paulo",
+    "cidade": "SÃ£o Paulo",
+    "estado": "SP"
+  }
+},
+{
+  "model": "pacientes.endereco",
+  "pk": "21043408-3db6-43cc-aff2-f2314866b90c",
+  "fields": {
+    "paciente": "7c2634d1-8660-425c-9f72-960a90cf6b43",
+    "tituloLocal": "ResidÃªncia",
+    "cep": "01301-100",
+    "logradouro": "Rua da ConsolaÃ§Ã£o",
+    "numero": "2100",
+    "bairro": "ConsolaÃ§Ã£o",
+    "cidade": "SÃ£o Paulo",
+    "estado": "SP"
+  }
+},
+{
+  "model": "pacientes.endereco",
+  "pk": "22a4b07f-be53-4b5a-93d7-ef99646da6f5",
+  "fields": {
+    "paciente": "7bb47f47-c85a-40a3-9ada-aff78f6974e2",
+    "tituloLocal": "Principal",
+    "cep": "04101-100",
+    "logradouro": "Rua Vergueiro",
+    "numero": "2200",
+    "bairro": "Vila Mariana",
+    "cidade": "SÃ£o Paulo",
+    "estado": "SP"
+  }
+},
+{
+  "model": "pacientes.endereco",
+  "pk": "64a37274-611d-4c16-957a-548df14a0037",
+  "fields": {
+    "paciente": "22c7eb4f-ccfb-46ea-89a0-4819a9ff54a0",
+    "tituloLocal": "Principal",
+    "cep": "04036-000",
+    "logradouro": "Rua Domingos de Morais",
+    "numero": "1800",
+    "bairro": "Vila Mariana",
+    "cidade": "SÃ£o Paulo",
+    "estado": "SP"
+  }
+},
+{
+  "model": "pacientes.endereco",
+  "pk": "9cc90abd-7c41-41f7-87cf-c566160ffa5f",
+  "fields": {
+    "paciente": "0018c386-27a1-4714-9f62-b28f8be6ea91",
+    "tituloLocal": "Principal",
+    "cep": "05406-050",
+    "logradouro": "Rua Teodoro Sampaio",
+    "numero": "1100",
+    "bairro": "Pinheiros",
+    "cidade": "SÃ£o Paulo",
+    "estado": "SP"
+  }
+},
+{
+  "model": "pacientes.endereco",
+  "pk": "a96fd8c1-df42-4c39-91cb-5492922608b5",
+  "fields": {
+    "paciente": "74db0930-b484-434e-94aa-78cc53dae04f",
+    "tituloLocal": "ResidÃªncia",
+    "cep": "01418-100",
+    "logradouro": "Alameda Santos",
+    "numero": "1200",
+    "bairro": "Cerqueira CÃ©sar",
+    "cidade": "SÃ£o Paulo",
+    "estado": "SP"
+  }
+},
+{
+  "model": "pacientes.endereco",
+  "pk": "add6970c-df30-4a6e-8208-2b80d4ae4ad6",
+  "fields": {
+    "paciente": "2c19c1f1-a8a9-4a50-aaea-56a8fd14fd84",
+    "tituloLocal": "Casa",
+    "cep": "01415-001",
+    "logradouro": "Rua Bela Cintra",
+    "numero": "1400",
+    "bairro": "ConsolaÃ§Ã£o",
+    "cidade": "SÃ£o Paulo",
+    "estado": "SP"
+  }
+},
+{
+  "model": "pacientes.endereco",
+  "pk": "b19c46e0-b900-46a2-9883-edfc75577fb7",
+  "fields": {
+    "paciente": "cdf4b441-75dd-4190-a088-f743c667231b",
+    "tituloLocal": "Casa da FamÃ­lia",
+    "cep": "01304-001",
+    "logradouro": "Rua Augusta",
+    "numero": "850",
+    "bairro": "ConsolaÃ§Ã£o",
+    "cidade": "SÃ£o Paulo",
+    "estado": "SP"
+  }
+},
+{
+  "model": "pacientes.endereco",
+  "pk": "d19c121e-b39e-40d9-ad41-7523e1cc1e08",
+  "fields": {
+    "paciente": "e65e74cf-75ea-42e7-9ee3-87fb0b7eebc9",
+    "tituloLocal": "Principal",
+    "cep": "01405-001",
+    "logradouro": "Rua Pamplona",
+    "numero": "900",
+    "bairro": "Jardim Paulista",
+    "cidade": "SÃ£o Paulo",
+    "estado": "SP"
+  }
+},
+{
+  "model": "pacientes.endereco",
+  "pk": "dc7b2575-99a1-40fd-993d-d3b01ba6bb15",
+  "fields": {
+    "paciente": "6167dc3a-885d-4f0c-9a6b-c0842b6ddc16",
+    "tituloLocal": "ResidÃªncia",
+    "cep": "05402-400",
+    "logradouro": "Avenida RebouÃ§as",
+    "numero": "2500",
+    "bairro": "Pinheiros",
+    "cidade": "SÃ£o Paulo",
+    "estado": "SP"
+  }
+},
+{
+  "model": "pacientes.endereco",
+  "pk": "f1043e67-ac7c-46eb-944d-ef178852bd33",
+  "fields": {
+    "paciente": "338cd00b-e463-4e94-8c21-07c23f6d798d",
+    "tituloLocal": "Residencial",
+    "cep": "01426-000",
+    "logradouro": "Rua Oscar Freire",
+    "numero": "600",
+    "bairro": "Cerqueira CÃ©sar",
+    "cidade": "SÃ£o Paulo",
+    "estado": "SP"
+  }
+},
+{
+  "model": "pacientes.endereco",
+  "pk": "f12953a3-fab8-4067-8cf8-072d3505795f",
+  "fields": {
+    "paciente": "6b7344af-9fa7-4088-98c8-8bfdc075d45e",
+    "tituloLocal": "Residencial",
+    "cep": "01310-200",
+    "logradouro": "Avenida Paulista",
+    "numero": "1500",
+    "bairro": "Bela Vista",
+    "cidade": "SÃ£o Paulo",
     "estado": "SP"
   }
 },
 {
   "model": "pacientes.responsavel",
-  "pk": "1e8ec365-c38d-44a6-9218-202a7f23c31d",
+  "pk": "071d2244-7d3b-4502-82b1-3d1a68d03dc2",
   "fields": {
-    "paciente": "c2b70137-fdb6-49dd-850e-778baf0918ae",
-    "nomeCompleto": "Fernando Rocha de Oliveira",
-    "cpf": "567.890.123-45",
-    "contato": "(11) 94321-0987",
-    "parentesco": "Pai"
+    "paciente": "74db0930-b484-434e-94aa-78cc53dae04f",
+    "nomeCompleto": "Juliana Lima Albuquerque",
+    "cpf": "456.789.012-34",
+    "contato": "(11) 95432-1098",
+    "parentesco": "MÃ£e"
   }
 },
 {
   "model": "pacientes.responsavel",
-  "pk": "3c4c4342-480d-4700-98be-d84bcf62b385",
+  "pk": "0a212980-fc55-4756-84ad-52cd306173e2",
   "fields": {
-    "paciente": "e4c05b46-1938-4a6a-b545-47f47852ee51",
-    "nomeCompleto": "André Pires",
-    "cpf": "112.233.445-56",
-    "contato": "(11) 98123-4567",
-    "parentesco": "Pai"
+    "paciente": "338cd00b-e463-4e94-8c21-07c23f6d798d",
+    "nomeCompleto": "Vanessa Costa Ribeiro",
+    "cpf": "012.345.678-90",
+    "contato": "(11) 99876-5432",
+    "parentesco": "MÃ£e"
   }
 },
 {
   "model": "pacientes.responsavel",
-  "pk": "4cde8947-e637-4f2c-9b96-ebb22eee6731",
+  "pk": "193455c7-cb7e-4461-ac0b-eb4664784352",
   "fields": {
-    "paciente": "ca9675f1-6917-4734-b68b-0978c8dafb3a",
-    "nomeCompleto": "Helena Guimarães",
+    "paciente": "2c19c1f1-a8a9-4a50-aaea-56a8fd14fd84",
+    "nomeCompleto": "Helena GuimarÃ£es",
     "cpf": "901.234.567-89",
     "contato": "(11) 90987-6543",
-    "parentesco": "Mãe"
+    "parentesco": "MÃ£e"
   }
 },
 {
   "model": "pacientes.responsavel",
-  "pk": "4e5372ce-c871-4b7a-b4f8-b994bb0198fd",
+  "pk": "35f7b8ef-c3e5-4e23-84a1-0379f666052d",
   "fields": {
-    "paciente": "d2aef78b-3e9d-4839-8bb6-45b86c292fc8",
+    "paciente": "6b7344af-9fa7-4088-98c8-8bfdc075d45e",
     "nomeCompleto": "Mariana Silva Mendes",
     "cpf": "123.456.789-01",
     "contato": "(11) 98765-4321",
-    "parentesco": "Mãe"
+    "parentesco": "MÃ£e"
   }
 },
 {
   "model": "pacientes.responsavel",
-  "pk": "79b8994a-5889-4c54-aae0-4efdab9f0173",
+  "pk": "380b8b66-072c-4f8f-ac99-7a6783fc47c0",
   "fields": {
-    "paciente": "da4a9d6f-bba9-49a3-b818-dd2787f6f305",
-    "nomeCompleto": "Rodrigo Alves Ferreira",
-    "cpf": "234.567.890-12",
-    "contato": "(11) 97654-3210",
-    "parentesco": "Pai"
+    "paciente": "22c7eb4f-ccfb-46ea-89a0-4819a9ff54a0",
+    "nomeCompleto": "PatrÃ­cia Duarte Nogueira",
+    "cpf": "678.901.234-56",
+    "contato": "(11) 93210-9876",
+    "parentesco": "MÃ£e"
   }
 },
 {
   "model": "pacientes.responsavel",
-  "pk": "ba73607c-8eb3-4d37-a8a7-bb348d530d16",
+  "pk": "7d7c36ad-5e78-42e1-9766-d61430d205e9",
   "fields": {
-    "paciente": "579c72cb-f462-40bf-8e3f-15e0f8d0ef85",
-    "nomeCompleto": "Carla Regina Santos",
-    "cpf": "345.678.901-23",
-    "contato": "(11) 96543-2109",
-    "parentesco": "Mãe"
-  }
-},
-{
-  "model": "pacientes.responsavel",
-  "pk": "be03a7a9-777c-4516-a44d-d53b50a58c78",
-  "fields": {
-    "paciente": "fe57c7c3-2b36-4257-b8e1-1c2b7ebdcb6a",
+    "paciente": "e65e74cf-75ea-42e7-9ee3-87fb0b7eebc9",
     "nomeCompleto": "Marcelo Martins",
     "cpf": "789.012.345-67",
     "contato": "(11) 92109-8765",
@@ -426,466 +431,1048 @@
 },
 {
   "model": "pacientes.responsavel",
-  "pk": "e4690b54-3669-4150-9627-397bee67f5ed",
+  "pk": "95ad23e8-d18a-49f3-8602-37b3c9e2efa7",
   "fields": {
-    "paciente": "60bfdd0f-bbfc-4240-8bf0-af9b75b3c985",
-    "nomeCompleto": "Patrícia Duarte Nogueira",
-    "cpf": "678.901.234-56",
-    "contato": "(11) 93210-9876",
-    "parentesco": "Mãe"
+    "paciente": "899b78f9-40e4-4655-bc58-70810ba62c98",
+    "nomeCompleto": "Fernando Rocha de Oliveira",
+    "cpf": "567.890.123-45",
+    "contato": "(11) 94321-0987",
+    "parentesco": "Pai"
   }
 },
 {
   "model": "pacientes.responsavel",
-  "pk": "e56f618b-16dc-424f-b511-e5341b298010",
+  "pk": "9b9979fd-921d-44d9-aaba-59f29670292d",
   "fields": {
-    "paciente": "873de08d-cfbf-4003-a927-06a51758457a",
-    "nomeCompleto": "Vanessa Costa Ribeiro",
-    "cpf": "012.345.678-90",
-    "contato": "(11) 99876-5432",
-    "parentesco": "Mãe"
+    "paciente": "0018c386-27a1-4714-9f62-b28f8be6ea91",
+    "nomeCompleto": "AndrÃ© Pires",
+    "cpf": "112.233.445-56",
+    "contato": "(11) 98123-4567",
+    "parentesco": "Pai"
   }
 },
 {
   "model": "pacientes.responsavel",
-  "pk": "ee07a22a-e1f1-4526-9211-bf7255234a9c",
+  "pk": "a09b3182-65a7-4534-ad52-71b115c9b014",
   "fields": {
-    "paciente": "fb968e9f-d79d-4c1a-8477-064e8d010476",
+    "paciente": "7bb47f47-c85a-40a3-9ada-aff78f6974e2",
+    "nomeCompleto": "Carla Regina Santos",
+    "cpf": "345.678.901-23",
+    "contato": "(11) 96543-2109",
+    "parentesco": "MÃ£e"
+  }
+},
+{
+  "model": "pacientes.responsavel",
+  "pk": "e27cb314-27c5-48f1-b434-22bc2869fe53",
+  "fields": {
+    "paciente": "7c2634d1-8660-425c-9f72-960a90cf6b43",
     "nomeCompleto": "Silvana Ramos Vasconcelos",
     "cpf": "223.344.556-67",
     "contato": "(11) 97234-5678",
-    "parentesco": "Mãe"
+    "parentesco": "MÃ£e"
   }
 },
 {
   "model": "pacientes.responsavel",
-  "pk": "f3729ac1-8b0e-40ba-ac52-e5edbc3c687c",
+  "pk": "e5225792-71fa-43eb-92fd-5370d6eb58f6",
   "fields": {
-    "paciente": "9cb95213-adb1-4922-ab05-ef6a3887d553",
-    "nomeCompleto": "Juliana Lima Albuquerque",
-    "cpf": "456.789.012-34",
-    "contato": "(11) 95432-1098",
-    "parentesco": "Mãe"
+    "paciente": "cdf4b441-75dd-4190-a088-f743c667231b",
+    "nomeCompleto": "Rodrigo Alves Ferreira",
+    "cpf": "234.567.890-12",
+    "contato": "(11) 97654-3210",
+    "parentesco": "Pai"
   }
 },
 {
   "model": "pacientes.responsavel",
-  "pk": "f8d77198-d4dc-4424-8ded-f0fab5432d7c",
+  "pk": "f8d62479-7115-4c61-b11e-a2d61242a684",
   "fields": {
-    "paciente": "5c124c05-96f3-462c-8b02-dcdbf5fb8a20",
+    "paciente": "6167dc3a-885d-4f0c-9a6b-c0842b6ddc16",
     "nomeCompleto": "Beatriz Fernandes",
     "cpf": "890.123.456-78",
     "contato": "(11) 91098-7654",
-    "parentesco": "Mãe"
+    "parentesco": "MÃ£e"
   }
 },
 {
   "model": "agenda.sessao",
-  "pk": "07cfc11c-8ef1-47c3-9784-a91ef2042eac",
+  "pk": "026b5920-bb4b-453e-8e5b-5386135ee4b3",
   "fields": {
-    "paciente": "5c124c05-96f3-462c-8b02-dcdbf5fb8a20",
+    "paciente": "cdf4b441-75dd-4190-a088-f743c667231b",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "dataHoraInicio": "2026-10-20T17:30:00Z",
-    "dataHoraFim": "2026-10-20T18:20:00Z",
+    "dataHoraInicio": "2026-11-03T17:00:00Z",
+    "dataHoraFim": "2026-11-03T17:50:00Z",
     "status": "REALIZADA",
-    "tipo": "INTERVENTIVA"
+    "tipo": "INTERVENTIVA",
+    "pago": true
   }
 },
 {
   "model": "agenda.sessao",
-  "pk": "13db9ef7-0192-44ba-8920-b36da17f68d7",
+  "pk": "0ca2a927-ab40-44b7-bc7b-f5ad5ebba82b",
   "fields": {
-    "paciente": "ca9675f1-6917-4734-b68b-0978c8dafb3a",
+    "paciente": "6b7344af-9fa7-4088-98c8-8bfdc075d45e",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "dataHoraInicio": "2026-10-23T17:30:00Z",
-    "dataHoraFim": "2026-10-23T18:20:00Z",
+    "dataHoraInicio": "2026-11-23T18:30:00Z",
+    "dataHoraFim": "2026-11-23T19:20:00Z",
     "status": "AGENDADA",
-    "tipo": "INTERVENTIVA"
+    "tipo": "INTERVENTIVA",
+    "pago": true
   }
 },
 {
   "model": "agenda.sessao",
-  "pk": "1c94d0a3-2361-4495-aff1-2b1785af57a4",
+  "pk": "103a1590-df29-4bbc-b004-f19c0b50c910",
   "fields": {
-    "paciente": "fe57c7c3-2b36-4257-b8e1-1c2b7ebdcb6a",
+    "paciente": "e65e74cf-75ea-42e7-9ee3-87fb0b7eebc9",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "dataHoraInicio": "2026-10-19T11:30:00Z",
-    "dataHoraFim": "2026-10-19T12:20:00Z",
-    "status": "REALIZADA",
-    "tipo": "INTERVENTIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "1cff4d6b-98c8-43cf-9790-e3e564502db4",
-  "fields": {
-    "paciente": "579c72cb-f462-40bf-8e3f-15e0f8d0ef85",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-22T12:00:00Z",
-    "dataHoraFim": "2026-10-22T12:50:00Z",
+    "dataHoraInicio": "2026-12-10T18:30:00Z",
+    "dataHoraFim": "2026-12-10T19:20:00Z",
     "status": "AGENDADA",
-    "tipo": "INTERVENTIVA"
+    "tipo": "INTERVENTIVA",
+    "pago": false
   }
 },
 {
   "model": "agenda.sessao",
-  "pk": "24710e15-dcbb-4ad9-9bf4-667f857511fb",
+  "pk": "191dcabf-01b7-45e1-b272-122a4eeef1e4",
   "fields": {
-    "paciente": "e4c05b46-1938-4a6a-b545-47f47852ee51",
+    "paciente": "6167dc3a-885d-4f0c-9a6b-c0842b6ddc16",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "dataHoraInicio": "2026-10-25T13:30:00Z",
-    "dataHoraFim": "2026-10-25T14:20:00Z",
+    "dataHoraInicio": "2026-11-27T13:00:00Z",
+    "dataHoraFim": "2026-11-27T13:50:00Z",
     "status": "AGENDADA",
-    "tipo": "AVALIATIVA"
+    "tipo": "INTERVENTIVA",
+    "pago": false
   }
 },
 {
   "model": "agenda.sessao",
-  "pk": "29b72a49-66d8-448d-af30-fc8d6b150592",
+  "pk": "1d711db9-bc8c-472a-bd27-bc8c902f72d4",
   "fields": {
-    "paciente": "da4a9d6f-bba9-49a3-b818-dd2787f6f305",
+    "paciente": "cdf4b441-75dd-4190-a088-f743c667231b",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "dataHoraInicio": "2026-10-21T17:30:00Z",
-    "dataHoraFim": "2026-10-21T18:20:00Z",
+    "dataHoraInicio": "2026-11-13T18:30:00Z",
+    "dataHoraFim": "2026-11-13T19:20:00Z",
     "status": "AGENDADA",
-    "tipo": "INTERVENTIVA"
+    "tipo": "INTERVENTIVA",
+    "pago": false
   }
 },
 {
   "model": "agenda.sessao",
-  "pk": "2b1e755d-c475-4042-8128-114fff997dcb",
+  "pk": "1fb5f232-dbd7-44ba-a79a-b31747986bc8",
   "fields": {
-    "paciente": "60bfdd0f-bbfc-4240-8bf0-af9b75b3c985",
+    "paciente": "0018c386-27a1-4714-9f62-b28f8be6ea91",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "dataHoraInicio": "2026-10-23T13:00:00Z",
-    "dataHoraFim": "2026-10-23T13:50:00Z",
-    "status": "AGENDADA",
-    "tipo": "INTERVENTIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "456e94ae-adaf-4d55-b53b-7ae0c093ee67",
-  "fields": {
-    "paciente": "d2aef78b-3e9d-4839-8bb6-45b86c292fc8",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-21T12:00:00Z",
-    "dataHoraFim": "2026-10-21T12:50:00Z",
-    "status": "REALIZADA",
-    "tipo": "INTERVENTIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "56331f68-5f1d-4343-a2e5-40c264f192db",
-  "fields": {
-    "paciente": "fb968e9f-d79d-4c1a-8477-064e8d010476",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-21T19:00:00Z",
-    "dataHoraFim": "2026-10-21T19:50:00Z",
-    "status": "AGENDADA",
-    "tipo": "AVALIATIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "65c09ac9-ea57-479c-b613-a5ecdb3b91e9",
-  "fields": {
-    "paciente": "873de08d-cfbf-4003-a927-06a51758457a",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-19T13:30:00Z",
-    "dataHoraFim": "2026-10-19T14:20:00Z",
-    "status": "CANCELADA",
-    "tipo": "AVALIATIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "87780e9f-44a9-4c6c-9da8-5034e34da435",
-  "fields": {
-    "paciente": "fe57c7c3-2b36-4257-b8e1-1c2b7ebdcb6a",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-23T11:30:00Z",
-    "dataHoraFim": "2026-10-23T12:20:00Z",
-    "status": "AGENDADA",
-    "tipo": "INTERVENTIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "91d4d56c-99f4-4781-aa91-a020f9266a85",
-  "fields": {
-    "paciente": "c2b70137-fdb6-49dd-850e-778baf0918ae",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-22T18:00:00Z",
-    "dataHoraFim": "2026-10-22T18:50:00Z",
-    "status": "AGENDADA",
-    "tipo": "INTERVENTIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "9ce6b7dc-853f-44a1-bcb2-7de888ae76fb",
-  "fields": {
-    "paciente": "da4a9d6f-bba9-49a3-b818-dd2787f6f305",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-13T17:00:00Z",
-    "dataHoraFim": "2026-10-13T17:50:00Z",
-    "status": "REALIZADA",
-    "tipo": "INTERVENTIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "a1b2d686-ef38-4c91-9ecf-162a92cbf548",
-  "fields": {
-    "paciente": "60bfdd0f-bbfc-4240-8bf0-af9b75b3c985",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-18T14:00:00Z",
-    "dataHoraFim": "2026-10-18T14:50:00Z",
-    "status": "REALIZADA",
-    "tipo": "AVALIATIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "a949039f-a794-4822-9758-6237a02653d0",
-  "fields": {
-    "paciente": "9cb95213-adb1-4922-ab05-ef6a3887d553",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-16T18:00:00Z",
-    "dataHoraFim": "2026-10-16T18:50:00Z",
-    "status": "REALIZADA",
-    "tipo": "AVALIATIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "b587532b-393e-4adc-aad6-a30c7e91d62a",
-  "fields": {
-    "paciente": "579c72cb-f462-40bf-8e3f-15e0f8d0ef85",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-15T13:00:00Z",
-    "dataHoraFim": "2026-10-15T13:50:00Z",
-    "status": "REALIZADA",
-    "tipo": "AVALIATIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "c18a3cb3-4b7d-4ca0-b7e7-18e1965b567d",
-  "fields": {
-    "paciente": "d2aef78b-3e9d-4839-8bb6-45b86c292fc8",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-11T12:00:00Z",
-    "dataHoraFim": "2026-10-11T12:50:00Z",
-    "status": "REALIZADA",
-    "tipo": "AVALIATIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "ca270438-184c-401e-9751-2845acfcbe6a",
-  "fields": {
-    "paciente": "9cb95213-adb1-4922-ab05-ef6a3887d553",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-22T13:30:00Z",
-    "dataHoraFim": "2026-10-22T14:20:00Z",
-    "status": "AGENDADA",
-    "tipo": "INTERVENTIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "d365e6cb-7adf-466c-9ccc-f4cc33e6df73",
-  "fields": {
-    "paciente": "e4c05b46-1938-4a6a-b545-47f47852ee51",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-18T12:30:00Z",
-    "dataHoraFim": "2026-10-18T13:20:00Z",
+    "dataHoraInicio": "2026-11-12T12:30:00Z",
+    "dataHoraFim": "2026-11-12T13:20:00Z",
     "status": "FALTA",
-    "tipo": "AVALIATIVA"
+    "tipo": "AVALIATIVA",
+    "pago": false
   }
 },
 {
   "model": "agenda.sessao",
-  "pk": "d9785c0e-bcb6-43b0-a3c2-82fab4daaf3a",
+  "pk": "2102b383-0f67-4880-bae8-8941787215a2",
   "fields": {
-    "paciente": "873de08d-cfbf-4003-a927-06a51758457a",
+    "paciente": "6b7344af-9fa7-4088-98c8-8bfdc075d45e",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "dataHoraInicio": "2026-10-25T12:00:00Z",
-    "dataHoraFim": "2026-10-25T12:50:00Z",
-    "status": "AGENDADA",
-    "tipo": "AVALIATIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "d9a44ef2-1b39-454f-a9e3-64fe8e25b5f1",
-  "fields": {
-    "paciente": "5c124c05-96f3-462c-8b02-dcdbf5fb8a20",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-26T17:00:00Z",
-    "dataHoraFim": "2026-10-26T17:50:00Z",
-    "status": "AGENDADA",
-    "tipo": "INTERVENTIVA"
-  }
-},
-{
-  "model": "agenda.sessao",
-  "pk": "f8122ad5-ae3f-420d-a5c7-4b6994ea29b6",
-  "fields": {
-    "paciente": "c2b70137-fdb6-49dd-850e-778baf0918ae",
-    "usuario": [
-      "gabriel@gmail.com"
-    ],
-    "dataHoraInicio": "2026-10-17T19:00:00Z",
-    "dataHoraFim": "2026-10-17T19:50:00Z",
+    "dataHoraInicio": "2026-11-02T12:00:00Z",
+    "dataHoraFim": "2026-11-02T12:50:00Z",
     "status": "REALIZADA",
-    "tipo": "INTERVENTIVA"
+    "tipo": "AVALIATIVA",
+    "pago": true
   }
 },
 {
-  "model": "agenda.disponibilidade",
-  "pk": "2df67ffa-7c69-410a-b59d-bbad976404a3",
+  "model": "agenda.sessao",
+  "pk": "2a7e79c7-afd3-4ec1-8715-f7f174a1d6d6",
   "fields": {
+    "paciente": "6b7344af-9fa7-4088-98c8-8bfdc075d45e",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "diaSemana": 3,
-    "horaInicio": "14:00:00",
-    "horaFim": "18:00:00"
+    "dataHoraInicio": "2026-11-09T12:00:00Z",
+    "dataHoraFim": "2026-11-09T12:50:00Z",
+    "status": "REALIZADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
   }
 },
 {
-  "model": "agenda.disponibilidade",
-  "pk": "78400ab3-3987-41db-8406-9a63a8345c2c",
+  "model": "agenda.sessao",
+  "pk": "2cff6ca3-938d-41b4-9f4d-c01e37965d4b",
   "fields": {
+    "paciente": "7c2634d1-8660-425c-9f72-960a90cf6b43",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "diaSemana": 2,
-    "horaInicio": "08:00:00",
-    "horaFim": "12:00:00"
+    "dataHoraInicio": "2026-11-30T12:00:00Z",
+    "dataHoraFim": "2026-11-30T12:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "AVALIATIVA",
+    "pago": false
   }
 },
 {
-  "model": "agenda.disponibilidade",
-  "pk": "798ce71d-f9c0-42c6-87e7-0523b09eceb5",
+  "model": "agenda.sessao",
+  "pk": "2deff0a9-f8d7-4a13-842f-b2c57b455319",
   "fields": {
+    "paciente": "0018c386-27a1-4714-9f62-b28f8be6ea91",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "diaSemana": 3,
-    "horaInicio": "08:00:00",
-    "horaFim": "12:00:00"
+    "dataHoraInicio": "2026-11-26T12:30:00Z",
+    "dataHoraFim": "2026-11-26T13:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "AVALIATIVA",
+    "pago": false
   }
 },
 {
-  "model": "agenda.disponibilidade",
-  "pk": "8093ed2f-83ae-4099-8019-254249a551b9",
+  "model": "agenda.sessao",
+  "pk": "34665457-2225-411e-acfd-58f1037a9d4c",
   "fields": {
+    "paciente": "7c2634d1-8660-425c-9f72-960a90cf6b43",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "diaSemana": 4,
-    "horaInicio": "08:00:00",
-    "horaFim": "12:00:00"
+    "dataHoraInicio": "2026-11-19T19:00:00Z",
+    "dataHoraFim": "2026-11-19T19:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "AVALIATIVA",
+    "pago": false
   }
 },
 {
-  "model": "agenda.disponibilidade",
-  "pk": "8cb1f2bd-334d-458a-b6c0-a3936d6bb2b8",
+  "model": "agenda.sessao",
+  "pk": "37655f6f-8054-4276-9bf2-b9e662a6c139",
   "fields": {
+    "paciente": "338cd00b-e463-4e94-8c21-07c23f6d798d",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "diaSemana": 0,
-    "horaInicio": "14:00:00",
-    "horaFim": "18:00:00"
+    "dataHoraInicio": "2026-11-11T13:30:00Z",
+    "dataHoraFim": "2026-11-11T14:20:00Z",
+    "status": "CANCELADA",
+    "tipo": "AVALIATIVA",
+    "pago": false
   }
 },
 {
-  "model": "agenda.disponibilidade",
-  "pk": "996c94c1-f9a2-4e05-af08-6ff598084964",
+  "model": "agenda.sessao",
+  "pk": "3aa6d56d-94c3-475e-8886-4e01269efeed",
   "fields": {
+    "paciente": "2c19c1f1-a8a9-4a50-aaea-56a8fd14fd84",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "diaSemana": 2,
-    "horaInicio": "14:00:00",
-    "horaFim": "18:00:00"
+    "dataHoraInicio": "2026-11-13T11:30:00Z",
+    "dataHoraFim": "2026-11-13T12:20:00Z",
+    "status": "REALIZADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
   }
 },
 {
-  "model": "agenda.disponibilidade",
-  "pk": "b26fb3fb-044d-4074-83b2-aa5d3cc7009b",
+  "model": "agenda.sessao",
+  "pk": "3b361e22-80e6-4246-9eeb-0ebe88b0d78a",
   "fields": {
+    "paciente": "899b78f9-40e4-4655-bc58-70810ba62c98",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "diaSemana": 0,
-    "horaInicio": "08:00:00",
-    "horaFim": "12:00:00"
+    "dataHoraInicio": "2026-11-30T17:30:00Z",
+    "dataHoraFim": "2026-11-30T18:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
   }
 },
 {
-  "model": "agenda.disponibilidade",
-  "pk": "c352b59d-e6c0-4696-8ef1-32354325b5f0",
+  "model": "agenda.sessao",
+  "pk": "44a924e2-0db3-4351-8ede-67931a74ad09",
   "fields": {
+    "paciente": "6167dc3a-885d-4f0c-9a6b-c0842b6ddc16",
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "diaSemana": 4,
-    "horaInicio": "14:00:00",
-    "horaFim": "18:00:00"
+    "dataHoraInicio": "2026-11-12T17:30:00Z",
+    "dataHoraFim": "2026-11-12T18:20:00Z",
+    "status": "REALIZADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "4793071b-bcb8-4f39-a7c7-7f1cc06cca1f",
+  "fields": {
+    "paciente": "6167dc3a-885d-4f0c-9a6b-c0842b6ddc16",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-10-30T17:30:00Z",
+    "dataHoraFim": "2026-10-30T18:20:00Z",
+    "status": "REALIZADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "4fa18596-82a0-45b7-b896-22e22d05410e",
+  "fields": {
+    "paciente": "0018c386-27a1-4714-9f62-b28f8be6ea91",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-04T14:00:00Z",
+    "dataHoraFim": "2026-12-04T14:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "AVALIATIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "569ced41-aa48-4774-bea1-4e03b31e4196",
+  "fields": {
+    "paciente": "cdf4b441-75dd-4190-a088-f743c667231b",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-18T17:00:00Z",
+    "dataHoraFim": "2026-11-18T17:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "58172b80-64f4-4411-9016-32bf3a2161e9",
+  "fields": {
+    "paciente": "7bb47f47-c85a-40a3-9ada-aff78f6974e2",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-24T17:00:00Z",
+    "dataHoraFim": "2026-11-24T17:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "593147e8-4b18-42d4-a883-81d0ec5e3629",
+  "fields": {
+    "paciente": "74db0930-b484-434e-94aa-78cc53dae04f",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-11T14:00:00Z",
+    "dataHoraFim": "2026-12-11T14:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "5d27777e-6b32-424b-a251-24adc6ece6b8",
+  "fields": {
+    "paciente": "e65e74cf-75ea-42e7-9ee3-87fb0b7eebc9",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-25T11:30:00Z",
+    "dataHoraFim": "2026-11-25T12:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "6581bac0-2f2a-459e-b8ea-da685d32cbb9",
+  "fields": {
+    "paciente": "cdf4b441-75dd-4190-a088-f743c667231b",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-09T12:00:00Z",
+    "dataHoraFim": "2026-12-09T12:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "6acabe99-bfa9-48d8-826b-a24e87f32909",
+  "fields": {
+    "paciente": "22c7eb4f-ccfb-46ea-89a0-4819a9ff54a0",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-11T12:30:00Z",
+    "dataHoraFim": "2026-12-11T13:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "6ad55474-e700-42e4-b093-b741c2af4b75",
+  "fields": {
+    "paciente": "e65e74cf-75ea-42e7-9ee3-87fb0b7eebc9",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-10-28T11:30:00Z",
+    "dataHoraFim": "2026-10-28T12:20:00Z",
+    "status": "REALIZADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "70c4c451-a321-43b7-9639-da6a5c243b29",
+  "fields": {
+    "paciente": "2c19c1f1-a8a9-4a50-aaea-56a8fd14fd84",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-26T17:30:00Z",
+    "dataHoraFim": "2026-11-26T18:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "79bb4461-62d4-4c70-a368-3070dd2959ba",
+  "fields": {
+    "paciente": "7c2634d1-8660-425c-9f72-960a90cf6b43",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-13T17:00:00Z",
+    "dataHoraFim": "2026-11-13T17:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "AVALIATIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "7d4b23b6-19fc-4bac-b0f7-56eff6b98b84",
+  "fields": {
+    "paciente": "7bb47f47-c85a-40a3-9ada-aff78f6974e2",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-10T13:00:00Z",
+    "dataHoraFim": "2026-11-10T13:50:00Z",
+    "status": "REALIZADA",
+    "tipo": "AVALIATIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "860b1b4a-3edb-482a-a80a-1f4a1fe2c6d6",
+  "fields": {
+    "paciente": "e65e74cf-75ea-42e7-9ee3-87fb0b7eebc9",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-17T11:30:00Z",
+    "dataHoraFim": "2026-11-17T12:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "885f2b8f-27dd-45b4-8130-7d18d5c20b4a",
+  "fields": {
+    "paciente": "338cd00b-e463-4e94-8c21-07c23f6d798d",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-16T17:30:00Z",
+    "dataHoraFim": "2026-11-16T18:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "AVALIATIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "8a95ed7b-c9aa-4a24-8359-b161d8c62f29",
+  "fields": {
+    "paciente": "e65e74cf-75ea-42e7-9ee3-87fb0b7eebc9",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-11T19:00:00Z",
+    "dataHoraFim": "2026-11-11T19:50:00Z",
+    "status": "REALIZADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "8b04f960-5164-4159-904a-69932f852c8a",
+  "fields": {
+    "paciente": "899b78f9-40e4-4655-bc58-70810ba62c98",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-06T19:00:00Z",
+    "dataHoraFim": "2026-11-06T19:50:00Z",
+    "status": "REALIZADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "8d7d56a0-cb95-4673-8227-fafeae726e93",
+  "fields": {
+    "paciente": "74db0930-b484-434e-94aa-78cc53dae04f",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-10T18:00:00Z",
+    "dataHoraFim": "2026-11-10T18:50:00Z",
+    "status": "REALIZADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "9310243e-b487-46c4-b5fb-e1a1f73e83ff",
+  "fields": {
+    "paciente": "7bb47f47-c85a-40a3-9ada-aff78f6974e2",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-16T12:00:00Z",
+    "dataHoraFim": "2026-11-16T12:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "94f983c8-2f08-4c83-a171-f990f9dff72b",
+  "fields": {
+    "paciente": "6b7344af-9fa7-4088-98c8-8bfdc075d45e",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-08T13:00:00Z",
+    "dataHoraFim": "2026-12-08T13:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "9990234f-4017-4c77-b4dd-a3f9e6c61f5e",
+  "fields": {
+    "paciente": "22c7eb4f-ccfb-46ea-89a0-4819a9ff54a0",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-19T13:00:00Z",
+    "dataHoraFim": "2026-11-19T13:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "9ab1b665-a935-47c1-bf51-aa870347b661",
+  "fields": {
+    "paciente": "2c19c1f1-a8a9-4a50-aaea-56a8fd14fd84",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-19T17:30:00Z",
+    "dataHoraFim": "2026-11-19T18:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "9ade24b6-1280-4139-b69f-02b8e945b476",
+  "fields": {
+    "paciente": "74db0930-b484-434e-94aa-78cc53dae04f",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-03T13:00:00Z",
+    "dataHoraFim": "2026-12-03T13:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "9e3f9eeb-6b73-4ac3-b40e-e3772dca5d39",
+  "fields": {
+    "paciente": "74db0930-b484-434e-94aa-78cc53dae04f",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-17T13:30:00Z",
+    "dataHoraFim": "2026-11-17T14:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "9e71bdb7-76e0-480f-91c5-ab7fe2c177b8",
+  "fields": {
+    "paciente": "74db0930-b484-434e-94aa-78cc53dae04f",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-23T13:00:00Z",
+    "dataHoraFim": "2026-11-23T13:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "a70de056-1fb7-49fb-b23c-0370710d9e0b",
+  "fields": {
+    "paciente": "6b7344af-9fa7-4088-98c8-8bfdc075d45e",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-18T12:00:00Z",
+    "dataHoraFim": "2026-11-18T12:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "a71c8f8e-4fcd-4f01-944b-75bd616c0fc8",
+  "fields": {
+    "paciente": "338cd00b-e463-4e94-8c21-07c23f6d798d",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-04T12:30:00Z",
+    "dataHoraFim": "2026-12-04T13:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "AVALIATIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "ade884f1-a2e5-4a87-bf63-6c0d6da20819",
+  "fields": {
+    "paciente": "899b78f9-40e4-4655-bc58-70810ba62c98",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-11T11:30:00Z",
+    "dataHoraFim": "2026-11-11T12:20:00Z",
+    "status": "REALIZADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "af34dcac-2232-4eb9-9a43-c3cdc8426064",
+  "fields": {
+    "paciente": "899b78f9-40e4-4655-bc58-70810ba62c98",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-13T19:40:00Z",
+    "dataHoraFim": "2026-11-13T20:30:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "b1277960-9d1f-4d4a-b0e2-e97b5981856a",
+  "fields": {
+    "paciente": "899b78f9-40e4-4655-bc58-70810ba62c98",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-08T18:00:00Z",
+    "dataHoraFim": "2026-12-08T18:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "b310dbce-513a-43ef-96c4-dd1ada6ba7b5",
+  "fields": {
+    "paciente": "cdf4b441-75dd-4190-a088-f743c667231b",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-09T17:30:00Z",
+    "dataHoraFim": "2026-11-09T18:20:00Z",
+    "status": "REALIZADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "b69a62f2-08c2-4973-96ec-4411986471e9",
+  "fields": {
+    "paciente": "6b7344af-9fa7-4088-98c8-8bfdc075d45e",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-01T13:30:00Z",
+    "dataHoraFim": "2026-12-01T14:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "baf85cba-28bc-44e6-89e7-e4d3dd21819f",
+  "fields": {
+    "paciente": "7bb47f47-c85a-40a3-9ada-aff78f6974e2",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-02T12:00:00Z",
+    "dataHoraFim": "2026-12-02T12:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "c25f882b-8cdf-4cf5-9062-c6f6aa76d32b",
+  "fields": {
+    "paciente": "899b78f9-40e4-4655-bc58-70810ba62c98",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-17T18:00:00Z",
+    "dataHoraFim": "2026-11-17T18:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "c75a6bbb-0379-4fc3-ad48-ca085dea88b2",
+  "fields": {
+    "paciente": "74db0930-b484-434e-94aa-78cc53dae04f",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-05T18:00:00Z",
+    "dataHoraFim": "2026-11-05T18:50:00Z",
+    "status": "REALIZADA",
+    "tipo": "AVALIATIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "cc0cdb8a-b3ab-4fec-ad04-e56adf484b3d",
+  "fields": {
+    "paciente": "22c7eb4f-ccfb-46ea-89a0-4819a9ff54a0",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-25T13:30:00Z",
+    "dataHoraFim": "2026-11-25T14:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "cc7f84a4-a3d6-4702-b88e-de9eb8544aec",
+  "fields": {
+    "paciente": "0018c386-27a1-4714-9f62-b28f8be6ea91",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-20T12:30:00Z",
+    "dataHoraFim": "2026-11-20T13:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "AVALIATIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "cf460abe-8e3e-40ba-b0a0-4da306a27466",
+  "fields": {
+    "paciente": "cdf4b441-75dd-4190-a088-f743c667231b",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-24T12:00:00Z",
+    "dataHoraFim": "2026-11-24T12:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "d095703e-040b-4229-9971-e5eaa4397d32",
+  "fields": {
+    "paciente": "7bb47f47-c85a-40a3-9ada-aff78f6974e2",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-10T13:30:00Z",
+    "dataHoraFim": "2026-12-10T14:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "d0caf738-d81f-4d41-a17f-c48bd4f0713b",
+  "fields": {
+    "paciente": "338cd00b-e463-4e94-8c21-07c23f6d798d",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-25T18:00:00Z",
+    "dataHoraFim": "2026-11-25T18:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "AVALIATIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "d4d53b1d-ca81-40ea-8e74-ee061c074be2",
+  "fields": {
+    "paciente": "22c7eb4f-ccfb-46ea-89a0-4819a9ff54a0",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-10-27T14:00:00Z",
+    "dataHoraFim": "2026-10-27T14:50:00Z",
+    "status": "REALIZADA",
+    "tipo": "AVALIATIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "d6cb957b-2d00-43a0-ae23-1a8fdd5730a2",
+  "fields": {
+    "paciente": "6167dc3a-885d-4f0c-9a6b-c0842b6ddc16",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-07T17:30:00Z",
+    "dataHoraFim": "2026-12-07T18:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "d8121c17-35a2-4b82-a738-80a8fed0f195",
+  "fields": {
+    "paciente": "7c2634d1-8660-425c-9f72-960a90cf6b43",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-09T17:00:00Z",
+    "dataHoraFim": "2026-12-09T17:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "AVALIATIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "e094f278-6799-447e-ab0c-b2fed58624ad",
+  "fields": {
+    "paciente": "7bb47f47-c85a-40a3-9ada-aff78f6974e2",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-04T13:00:00Z",
+    "dataHoraFim": "2026-11-04T13:50:00Z",
+    "status": "REALIZADA",
+    "tipo": "AVALIATIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "e6369f11-1606-4328-b544-056ea8dbae22",
+  "fields": {
+    "paciente": "cdf4b441-75dd-4190-a088-f743c667231b",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-01T18:00:00Z",
+    "dataHoraFim": "2026-12-01T18:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "e9571a70-420a-452c-8ad1-dbcfdd8c8d38",
+  "fields": {
+    "paciente": "e65e74cf-75ea-42e7-9ee3-87fb0b7eebc9",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-02T17:00:00Z",
+    "dataHoraFim": "2026-12-02T17:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "e9a15acc-a515-4714-84e4-0e4db7f149a2",
+  "fields": {
+    "paciente": "6167dc3a-885d-4f0c-9a6b-c0842b6ddc16",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-20T14:00:00Z",
+    "dataHoraFim": "2026-11-20T14:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "f3fcc694-13cf-485c-93f9-86a380484fce",
+  "fields": {
+    "paciente": "2c19c1f1-a8a9-4a50-aaea-56a8fd14fd84",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-07T12:00:00Z",
+    "dataHoraFim": "2026-12-07T12:50:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "f9b39e30-1b49-46b2-8157-1240816fe12a",
+  "fields": {
+    "paciente": "22c7eb4f-ccfb-46ea-89a0-4819a9ff54a0",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-03T18:30:00Z",
+    "dataHoraFim": "2026-12-03T19:20:00Z",
+    "status": "AGENDADA",
+    "tipo": "INTERVENTIVA",
+    "pago": false
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "f9fed2aa-dacf-4927-a845-1ffc8f7ce420",
+  "fields": {
+    "paciente": "22c7eb4f-ccfb-46ea-89a0-4819a9ff54a0",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-12T14:00:00Z",
+    "dataHoraFim": "2026-11-12T14:50:00Z",
+    "status": "REALIZADA",
+    "tipo": "AVALIATIVA",
+    "pago": true
+  }
+},
+{
+  "model": "agenda.sessao",
+  "pk": "fd979da9-089d-42e8-96c6-0f707c4685c6",
+  "fields": {
+    "paciente": "6b7344af-9fa7-4088-98c8-8bfdc075d45e",
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-13T13:00:00Z",
+    "dataHoraFim": "2026-11-13T13:50:00Z",
+    "status": "REALIZADA",
+    "tipo": "INTERVENTIVA",
+    "pago": true
   }
 },
 {
   "model": "agenda.disponibilidade",
-  "pk": "cf3b10ac-1f1d-4c3b-86b6-a113d07fc929",
+  "pk": "151b64b5-1fef-4686-a13b-5c303b77364e",
   "fields": {
     "usuario": [
       "gabriel@gmail.com"
@@ -897,7 +1484,31 @@
 },
 {
   "model": "agenda.disponibilidade",
-  "pk": "d1d8e809-bda8-47e1-b31c-1504ddb0e2f4",
+  "pk": "2d6e1914-b187-4a4d-9192-15e7b697b0e4",
+  "fields": {
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "diaSemana": 0,
+    "horaInicio": "14:00:00",
+    "horaFim": "18:00:00"
+  }
+},
+{
+  "model": "agenda.disponibilidade",
+  "pk": "33708566-43d9-4dcd-a35a-cc7564713a5d",
+  "fields": {
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "diaSemana": 2,
+    "horaInicio": "08:00:00",
+    "horaFim": "12:00:00"
+  }
+},
+{
+  "model": "agenda.disponibilidade",
+  "pk": "5cfa0b31-e61b-4066-bf3c-f613647fdc93",
   "fields": {
     "usuario": [
       "gabriel@gmail.com"
@@ -908,348 +1519,536 @@
   }
 },
 {
-  "model": "agenda.bloqueio",
-  "pk": "0a2bceb4-6d19-44b1-a66b-517f7eca5313",
+  "model": "agenda.disponibilidade",
+  "pk": "870a853c-1b7e-4d18-b44e-5d368a521a15",
   "fields": {
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "dataHoraInicio": "2026-10-23T19:00:00Z",
-    "dataHoraFim": "2026-10-23T21:00:00Z",
-    "motivo": "Reunião Clínica e Estudo de Caso de TEA",
-    "dataCriacao": "2026-10-21T15:07:34.925Z"
+    "diaSemana": 3,
+    "horaInicio": "08:00:00",
+    "horaFim": "12:00:00"
   }
 },
 {
-  "model": "agenda.bloqueio",
-  "pk": "27fdcedb-bed4-463e-9e38-4242c61955e8",
+  "model": "agenda.disponibilidade",
+  "pk": "990fc000-f87e-4983-952c-7e3f473894da",
   "fields": {
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "dataHoraInicio": "2026-10-22T15:00:00Z",
-    "dataHoraFim": "2026-10-22T17:00:00Z",
-    "motivo": "Intervalo para almoço e discussão com equipe de Terapia Ocupacional",
-    "dataCriacao": "2026-10-21T15:07:34.924Z"
+    "diaSemana": 2,
+    "horaInicio": "14:00:00",
+    "horaFim": "18:00:00"
   }
 },
 {
-  "model": "agenda.bloqueio",
-  "pk": "2a293bd5-abfc-4fa5-8988-20343cc60733",
+  "model": "agenda.disponibilidade",
+  "pk": "9ace08dc-a213-49df-94cb-1004012d092a",
   "fields": {
     "usuario": [
       "gabriel@gmail.com"
     ],
-    "dataHoraInicio": "2026-10-26T11:00:00Z",
-    "dataHoraFim": "2026-10-26T13:00:00Z",
-    "motivo": "Participação em Congresso Brasileiro de Neuropsiquiatria da Infância",
-    "dataCriacao": "2026-10-21T15:07:34.925Z"
+    "diaSemana": 4,
+    "horaInicio": "08:00:00",
+    "horaFim": "12:00:00"
+  }
+},
+{
+  "model": "agenda.disponibilidade",
+  "pk": "babcda04-105d-4037-b50e-bff097ebbc2a",
+  "fields": {
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "diaSemana": 3,
+    "horaInicio": "14:00:00",
+    "horaFim": "18:00:00"
+  }
+},
+{
+  "model": "agenda.disponibilidade",
+  "pk": "d8f2deef-ce96-438c-9bcf-802daa3c25c8",
+  "fields": {
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "diaSemana": 0,
+    "horaInicio": "08:00:00",
+    "horaFim": "12:00:00"
+  }
+},
+{
+  "model": "agenda.disponibilidade",
+  "pk": "f3657ba0-e75b-433a-b3c7-50bc5bd55892",
+  "fields": {
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "diaSemana": 4,
+    "horaInicio": "14:00:00",
+    "horaFim": "18:00:00"
+  }
+},
+{
+  "model": "agenda.bloqueio",
+  "pk": "14083a8f-9c97-4651-99b8-a1d6acb34a9d",
+  "fields": {
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-09T14:30:00Z",
+    "dataHoraFim": "2026-12-09T16:00:00Z",
+    "motivo": "ReuniÃ£o com CoordenaÃ§Ã£o PedagÃ³gica e Devolutiva Escolar",
+    "dataCriacao": "2026-11-13T14:37:35.298Z"
+  }
+},
+{
+  "model": "agenda.bloqueio",
+  "pk": "502029a5-ceb5-492c-89a1-b5141bdd38f4",
+  "fields": {
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-27T17:00:00Z",
+    "dataHoraFim": "2026-11-27T20:30:00Z",
+    "motivo": "ParticipaÃ§Ã£o em Congresso Brasileiro de Neuropsicopedagogia ClÃ­nica",
+    "dataCriacao": "2026-11-13T14:37:35.296Z"
+  }
+},
+{
+  "model": "agenda.bloqueio",
+  "pk": "d575f4e7-8570-46ef-b4f5-6bcebac72ad5",
+  "fields": {
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-18T14:30:00Z",
+    "dataHoraFim": "2026-11-18T15:30:00Z",
+    "motivo": "ReuniÃ£o de Alinhamento Multidisciplinar Escolar",
+    "dataCriacao": "2026-11-13T14:37:35.295Z"
+  }
+},
+{
+  "model": "agenda.bloqueio",
+  "pk": "df6f7f0e-de1e-4116-8ee8-6110b994a24d",
+  "fields": {
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-11-13T15:00:00Z",
+    "dataHoraFim": "2026-11-13T16:30:00Z",
+    "motivo": "Intervalo para almoÃ§o e discussÃ£o com equipe multidisciplinar",
+    "dataCriacao": "2026-11-13T14:37:35.293Z"
+  }
+},
+{
+  "model": "agenda.bloqueio",
+  "pk": "e8f2af83-1532-48f7-aff8-846c9df11cdb",
+  "fields": {
+    "usuario": [
+      "gabriel@gmail.com"
+    ],
+    "dataHoraInicio": "2026-12-01T11:00:00Z",
+    "dataHoraFim": "2026-12-01T12:30:00Z",
+    "motivo": "SupervisÃ£o ClÃ­nica Institucional e DiscussÃ£o de Casos Complexos",
+    "dataCriacao": "2026-11-13T14:37:35.296Z"
   }
 },
 {
   "model": "prontuario.anamnese",
-  "pk": "0169caaf-4783-4169-b050-10b3c445bf65",
+  "pk": "190eea16-b3ab-480c-8501-66629dc2033e",
   "fields": {
-    "paciente": "579c72cb-f462-40bf-8e3f-15e0f8d0ef85",
-    "escolaridade": "6º ano do Ensino Fundamental II.",
-    "tipoParto": "Cesárea com 36 semanas por descolamento marginal de placenta; UTI neonatal por 3 dias em observação respiratória.",
-    "intercorrencias": "Marcos motores e de linguagem atingidos dentro do padrão esperado.",
-    "seletividadeAlimentar": "Sem seletividade alimentar perceptível.",
-    "dificuldadeRotina": "Adaptação adequada a imprevistos, demonstrando apenas impulsividade ocasional.",
-    "sensibilidadeEtiquetas": "Nenhuma queixa de sensibilidade tátil.",
-    "historicoFamiliar": "Pai com diagnóstico de TDAH combinado na infância e irmão com sintomas hiperativos.",
-    "adesaoRegras": "Dificuldade constante em seguir instruções múltiplas em sala de aula; esquecimento de tarefas e perda de materiais.",
-    "observacoesGerais": "Investigação diagnóstica de TDAH combinado. Relato escolar de alta inquietação motora e interrupção frequente das falas alheias.",
-    "dataRegistro": "2026-10-21T15:07:34.562Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.562Z"
+    "paciente": "22c7eb4f-ccfb-46ea-89a0-4819a9ff54a0",
+    "escolaridade": "4Âº ano do Ensino Fundamental I.",
+    "tipoParto": "CesÃ¡rea a termo sem intercorrÃªncias.",
+    "intercorrencias": "Sem intercorrÃªncias no desenvolvimento.",
+    "seletividadeAlimentar": "NÃ£o aceita que alimentos distintos se toquem no prato; pratos com divisÃ³rias preferidos.",
+    "dificuldadeRotina": "Rigidez com pontualidade e horÃ¡rios de saÃ­da de casa.",
+    "sensibilidadeEtiquetas": "Desconforto com elÃ¡sticos de calÃ§as ou bermudas muito apertados.",
+    "historicoFamiliar": "IrmÃ£o mais velho com diagnÃ³stico de TDAH.",
+    "adesaoRegras": "Perfeccionismo acentuado; desfaz trabalhos escolares inteiros quando nota pequenas rasuras.",
+    "observacoesGerais": "Ansiedade de desempenho e traÃ§os de perfeccionismo disfuncional gerando sofrimento psÃ­quico e lentidÃ£o na execuÃ§Ã£o de provas.",
+    "dataRegistro": "2026-11-13T14:37:35.281Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.281Z"
   }
 },
 {
   "model": "prontuario.anamnese",
-  "pk": "066b9ca2-88e2-478d-9a73-1df4be9ea439",
+  "pk": "1e2d640d-b3b5-451d-8b40-ca522e9edba8",
   "fields": {
-    "paciente": "873de08d-cfbf-4003-a927-06a51758457a",
-    "escolaridade": "Educação Infantil (Maternal II).",
-    "tipoParto": "Cesárea sem intercorrências.",
-    "intercorrencias": "Atraso no início da marcha (19 meses); marcha frequente em pontas dos pés.",
-    "seletividadeAlimentar": "Seletividade severa: aceita purê de maçã e duas marcas exclusivas de biscoito integral.",
-    "dificuldadeRotina": "Intolerância severa a deslocamento de móveis em casa ou mudança de itinerário.",
-    "sensibilidadeEtiquetas": "Choro intenso perante tecidos sintéticos ou etiquetas em contato com a pele.",
-    "historicoFamiliar": "Irmão primogênito com TEA de grau moderado.",
-    "adesaoRegras": "Compreensão de regras ainda em desenvolvimento; necessita de modelagem concreta e apoio visual.",
-    "observacoesGerais": "Investigação diagnóstica de TEA nível 2 de suporte com acompanhamento conjunto em Fonoaudiologia e Terapia Ocupacional.",
-    "dataRegistro": "2026-10-21T15:07:34.913Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.913Z"
+    "paciente": "6b7344af-9fa7-4088-98c8-8bfdc075d45e",
+    "escolaridade": "3Âº ano do Ensino Fundamental I em escola regular com suporte pedagÃ³gico.",
+    "tipoParto": "CesÃ¡rea a termo (38 semanas), sem complicaÃ§Ãµes imediatas.",
+    "intercorrencias": "IcterÃ­cia neonatal leve tratada com fototerapia por 2 dias; atraso expressivo da fala (primeiras palavras aos 2 anos e meio).",
+    "seletividadeAlimentar": "Recusa alimentos pastosos e homogÃªneos; preferÃªncia acentuada por texturas crocantes e cores neutras.",
+    "dificuldadeRotina": "Crises de desregulaÃ§Ã£o com choro e agitaÃ§Ã£o motora em caso de mudanÃ§as inesperadas de trajeto ou horÃ¡rios escolares.",
+    "sensibilidadeEtiquetas": "Hipersensibilidade tÃ¡til: recusa terminantemente roupas com etiquetas internas e meias com costuras aparentes.",
+    "historicoFamiliar": "Tio paterno diagnosticado tardiamente com TEA nÃ­vel 1 de suporte; mÃ£e com histÃ³rico de transtorno ansioso.",
+    "adesaoRegras": "Boa aceitaÃ§Ã£o com pistas visuais e combinados prÃ©vios; resistÃªncia severa a comandos verbais bruscos em transiÃ§Ã£o de atividades.",
+    "observacoesGerais": "Encaminhado pela escola para investigaÃ§Ã£o diagnÃ³stica de TEA nÃ­vel 1 de suporte. Apresenta hiperfoco em temas sobre o sistema solar e mapas.",
+    "dataRegistro": "2026-11-13T14:37:35.271Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.271Z"
   }
 },
 {
   "model": "prontuario.anamnese",
-  "pk": "21f89033-46d7-45e8-b11e-70a73fad810e",
+  "pk": "36893429-f633-4ee7-bd33-7fd87a486081",
   "fields": {
-    "paciente": "9cb95213-adb1-4922-ab05-ef6a3887d553",
-    "escolaridade": "Educação Infantil (Pré II).",
-    "tipoParto": "Cesárea eletiva, 39 semanas, Apgar 9/10.",
-    "intercorrencias": "Sem intercorrências médicas relevantes.",
-    "seletividadeAlimentar": "Dieta restrita a alimentos beges/claros (arroz, batata, maçã descascada e frango grelhado).",
-    "dificuldadeRotina": "Rituais fixos para adormecer; desorganização comportamental se a ordem das etapas noturnas for alterada.",
-    "sensibilidadeEtiquetas": "Reação aversiva imediata a zíperes em contato com a pele e roupas com gola justa.",
-    "historicoFamiliar": "Sem histórico psiquiátrico relevante relatado na família de primeiro grau.",
-    "adesaoRegras": "Seguimento de regras associado à previsibilidade do ambiente; sobrecarga sensorial com barulhos de intensidade súbita.",
-    "observacoesGerais": "Avaliação de perfil do processamento sensorial e investigação diagnóstica de espectro autista com bom nível de linguagem.",
-    "dataRegistro": "2026-10-21T15:07:34.562Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.562Z"
+    "paciente": "7c2634d1-8660-425c-9f72-960a90cf6b43",
+    "escolaridade": "8Âº ano do Ensino Fundamental II.",
+    "tipoParto": "Normal hospitalar sem intercorrÃªncias.",
+    "intercorrencias": "Sem intercorrÃªncias no desenvolvimento inicial.",
+    "seletividadeAlimentar": "Normal.",
+    "dificuldadeRotina": "Ansiedade elevada perante mudanÃ§as bruscas de horÃ¡rios ou adiamento de eventos.",
+    "sensibilidadeEtiquetas": "Nenhuma.",
+    "historicoFamiliar": "MÃ£e com histÃ³rico de crises de pÃ¢nico.",
+    "adesaoRegras": "Muito cooperativa e dedicada, com exigÃªncia extrema em relaÃ§Ã£o ao prÃ³prio desempenho acadÃªmico.",
+    "observacoesGerais": "Acompanhamento de ansiedade de desempenho e somatizaÃ§Ãµes cardiorrespiratÃ³rias em perÃ­odos de provas escolares.",
+    "dataRegistro": "2026-11-13T14:37:35.291Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.291Z"
   }
 },
 {
   "model": "prontuario.anamnese",
-  "pk": "2bf7263d-881f-4550-a483-720107ed140e",
+  "pk": "4065b6d3-bd5a-4a17-8e93-0410dccbbad7",
   "fields": {
-    "paciente": "fe57c7c3-2b36-4257-b8e1-1c2b7ebdcb6a",
-    "escolaridade": "2º ano do Ensino Fundamental I.",
+    "paciente": "e65e74cf-75ea-42e7-9ee3-87fb0b7eebc9",
+    "escolaridade": "2Âº ano do Ensino Fundamental I.",
     "tipoParto": "Parto normal hospitalar.",
-    "intercorrencias": "Episódio de bronquiolite aos 8 meses; desenvolvimento neuropsicomotor típico.",
-    "seletividadeAlimentar": "Alimentação variada.",
-    "dificuldadeRotina": "Resistência ao encerramento de brincadeiras preferidas.",
+    "intercorrencias": "EpisÃ³dio de bronquiolite aos 8 meses; desenvolvimento neuropsicomotor tÃ­pico.",
+    "seletividadeAlimentar": "AlimentaÃ§Ã£o variada.",
+    "dificuldadeRotina": "ResistÃªncia ao encerramento de brincadeiras preferidas.",
     "sensibilidadeEtiquetas": "Sem queixas sensoriais relevantes.",
     "historicoFamiliar": "Pai com transtorno de ansiedade.",
-    "adesaoRegras": "Inquietação verbal e necessidade frequente de reforço positivo.",
-    "observacoesGerais": "Acompanhamento comportamental e avaliação de TDAH versus ansiedade infantil.",
-    "dataRegistro": "2026-10-21T15:07:34.911Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.911Z"
+    "adesaoRegras": "InquietaÃ§Ã£o verbal e necessidade frequente de reforÃ§o positivo.",
+    "observacoesGerais": "Acompanhamento comportamental e avaliaÃ§Ã£o de TDAH versus ansiedade infantil.",
+    "dataRegistro": "2026-11-13T14:37:35.282Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.282Z"
   }
 },
 {
   "model": "prontuario.anamnese",
-  "pk": "518052a0-6f45-47c4-9e07-6bcf550d5690",
+  "pk": "46e1a3ca-879d-4738-92e2-ee4d9a181b6a",
   "fields": {
-    "paciente": "da4a9d6f-bba9-49a3-b818-dd2787f6f305",
-    "escolaridade": "1º ano do Ensino Fundamental I.",
-    "tipoParto": "Parto normal a termo, sem intercorrências.",
-    "intercorrencias": "Sem histórico de intercorrências gestacionais ou perinatais.",
-    "seletividadeAlimentar": "Recusa vegetais folhosos e frutas com casca; tolerância alimentar ampla no restante.",
-    "dificuldadeRotina": "Ansiedade antecipatória evidente aos domingos à noite perante a volta das aulas na segunda-feira.",
-    "sensibilidadeEtiquetas": "Desconforto com sapatos rígidos ou apertados; prefere calçados macios e flexíveis.",
+    "paciente": "74db0930-b484-434e-94aa-78cc53dae04f",
+    "escolaridade": "EducaÃ§Ã£o Infantil (PrÃ© II).",
+    "tipoParto": "CesÃ¡rea eletiva, 39 semanas, Apgar 9/10.",
+    "intercorrencias": "Sem intercorrÃªncias mÃ©dicas relevantes.",
+    "seletividadeAlimentar": "Dieta restrita a alimentos beges/claros (arroz, batata, maÃ§Ã£ descascada e frango grelhado).",
+    "dificuldadeRotina": "Rituais fixos para adormecer; desorganizaÃ§Ã£o comportamental se a ordem das etapas noturnas for alterada.",
+    "sensibilidadeEtiquetas": "ReaÃ§Ã£o aversiva imediata a zÃ­peres em contato com a pele e roupas com gola justa.",
+    "historicoFamiliar": "Sem histÃ³rico psiquiÃ¡trico relevante relatado na famÃ­lia de primeiro grau.",
+    "adesaoRegras": "Seguimento de regras associado Ã  previsibilidade do ambiente; sobrecarga sensorial com barulhos de intensidade sÃºbita.",
+    "observacoesGerais": "AvaliaÃ§Ã£o de perfil do processamento sensorial e investigaÃ§Ã£o diagnÃ³stica de espectro autista com bom nÃ­vel de linguagem.",
+    "dataRegistro": "2026-11-13T14:37:35.277Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.277Z"
+  }
+},
+{
+  "model": "prontuario.anamnese",
+  "pk": "4f2e1a31-5d2b-4be2-92cb-5395023549ac",
+  "fields": {
+    "paciente": "7bb47f47-c85a-40a3-9ada-aff78f6974e2",
+    "escolaridade": "6Âº ano do Ensino Fundamental II.",
+    "tipoParto": "CesÃ¡rea com 36 semanas por descolamento marginal de placenta; UTI neonatal por 3 dias em observaÃ§Ã£o respiratÃ³ria.",
+    "intercorrencias": "Marcos motores e de linguagem atingidos dentro do padrÃ£o esperado.",
+    "seletividadeAlimentar": "Sem seletividade alimentar perceptÃ­vel.",
+    "dificuldadeRotina": "AdaptaÃ§Ã£o adequada a imprevistos, demonstrando apenas impulsividade ocasional.",
+    "sensibilidadeEtiquetas": "Nenhuma queixa de sensibilidade tÃ¡til.",
+    "historicoFamiliar": "Pai com diagnÃ³stico de TDAH combinado na infÃ¢ncia e irmÃ£o com sintomas hiperativos.",
+    "adesaoRegras": "Dificuldade constante em seguir instruÃ§Ãµes mÃºltiplas em sala de aula; esquecimento de tarefas e perda de materiais.",
+    "observacoesGerais": "InvestigaÃ§Ã£o diagnÃ³stica de TDAH combinado. Relato escolar de alta inquietaÃ§Ã£o motora e interrupÃ§Ã£o frequente das falas alheias.",
+    "dataRegistro": "2026-11-13T14:37:35.275Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.275Z"
+  }
+},
+{
+  "model": "prontuario.anamnese",
+  "pk": "800a75f4-0683-482c-aab9-8e57bcfe1033",
+  "fields": {
+    "paciente": "6167dc3a-885d-4f0c-9a6b-c0842b6ddc16",
+    "escolaridade": "7Âº ano do Ensino Fundamental II.",
+    "tipoParto": "CesÃ¡rea a termo.",
+    "intercorrencias": "Nenhuma.",
+    "seletividadeAlimentar": "Normal.",
+    "dificuldadeRotina": "PreocupaÃ§Ã£o acentuada com alteraÃ§Ãµes em cronogramas de avaliaÃ§Ãµes.",
+    "sensibilidadeEtiquetas": "Desconforto com luzes excessivas e ambientes com sobreposiÃ§Ã£o de estÃ­mulos sonoros.",
+    "historicoFamiliar": "AvÃ´ materno com histÃ³rico de transtorno afetivo bipolar.",
+    "adesaoRegras": "Cumprimento rigoroso de regras, com inibiÃ§Ã£o social e timidez extrema diante de figuras estranhas.",
+    "observacoesGerais": "Manejo clÃ­nico de ansiedade social e fobia de desempenho em contexto acadÃªmico.",
+    "dataRegistro": "2026-11-13T14:37:35.284Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.284Z"
+  }
+},
+{
+  "model": "prontuario.anamnese",
+  "pk": "8c2027c0-3e8f-4a56-b621-6942046597be",
+  "fields": {
+    "paciente": "899b78f9-40e4-4655-bc58-70810ba62c98",
+    "escolaridade": "9Âº ano do Ensino Fundamental II.",
+    "tipoParto": "Normal hospitalar sem intercorrÃªncias.",
+    "intercorrencias": "Nenhuma.",
+    "seletividadeAlimentar": "AlimentaÃ§Ã£o balanceada e adequada.",
+    "dificuldadeRotina": "ProcrastinaÃ§Ã£o crÃ´nica para iniciar atividades acadÃªmicas; dificuldade de autogerenciamento do tempo.",
+    "sensibilidadeEtiquetas": "Nenhuma.",
+    "historicoFamiliar": "MÃ£e tratada ambulatorialmente para depressÃ£o maior.",
+    "adesaoRegras": "Desafio Ã  autoridade escolar em situaÃ§Ãµes percebidas como injustas; recolhimento no quarto com uso prolongado de computador.",
+    "observacoesGerais": "Acompanhamento psiquiÃ¡trico de sintomas ansiosos e queixas de desmotivaÃ§Ã£o e fadiga mental no Ãºltimo bimestre.",
+    "dataRegistro": "2026-11-13T14:37:35.279Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.279Z"
+  }
+},
+{
+  "model": "prontuario.anamnese",
+  "pk": "a07d998a-2210-4a44-803e-dc8b85cc77fd",
+  "fields": {
+    "paciente": "cdf4b441-75dd-4190-a088-f743c667231b",
+    "escolaridade": "1Âº ano do Ensino Fundamental I.",
+    "tipoParto": "Parto normal a termo, sem intercorrÃªncias.",
+    "intercorrencias": "Sem histÃ³rico de intercorrÃªncias gestacionais ou perinatais.",
+    "seletividadeAlimentar": "Recusa vegetais folhosos e frutas com casca; tolerÃ¢ncia alimentar ampla no restante.",
+    "dificuldadeRotina": "Ansiedade antecipatÃ³ria evidente aos domingos Ã  noite perante a volta das aulas na segunda-feira.",
+    "sensibilidadeEtiquetas": "Desconforto com sapatos rÃ­gidos ou apertados; prefere calÃ§ados macios e flexÃ­veis.",
     "historicoFamiliar": "Prima materna com TDAH do tipo predominantemente desatento.",
-    "adesaoRegras": "Compreende regras em brincadeiras estruturadas, porém tem baixa tolerância à frustração quando não é a primeira colocada.",
-    "observacoesGerais": "Criança comunicativa e muito expressiva, queixa de oscilações bruscas de humor em momentos de cansaço ou sobrecarga.",
-    "dataRegistro": "2026-10-21T15:07:34.561Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.561Z"
+    "adesaoRegras": "Compreende regras em brincadeiras estruturadas, porÃ©m tem baixa tolerÃ¢ncia Ã  frustraÃ§Ã£o quando nÃ£o Ã© a primeira colocada.",
+    "observacoesGerais": "CrianÃ§a comunicativa e muito expressiva, queixa de oscilaÃ§Ãµes bruscas de humor em momentos de cansaÃ§o ou sobrecarga.",
+    "dataRegistro": "2026-11-13T14:37:35.273Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.273Z"
   }
 },
 {
   "model": "prontuario.anamnese",
-  "pk": "82b7479d-856d-4072-a0bd-3db6c78a1624",
+  "pk": "b8898574-5dcb-4748-a4cf-1e27e6eae825",
   "fields": {
-    "paciente": "ca9675f1-6917-4734-b68b-0978c8dafb3a",
-    "escolaridade": "2º ano do Ensino Médio.",
+    "paciente": "2c19c1f1-a8a9-4a50-aaea-56a8fd14fd84",
+    "escolaridade": "2Âº ano do Ensino MÃ©dio.",
     "tipoParto": "Parto normal humanizado a termo.",
     "intercorrencias": "Nenhuma.",
     "seletividadeAlimentar": "Adequada.",
-    "dificuldadeRotina": "Transições escolares geraram períodos de retração e anedonia.",
+    "dificuldadeRotina": "TransiÃ§Ãµes escolares geraram perÃ­odos de retraÃ§Ã£o e anedonia.",
     "sensibilidadeEtiquetas": "Nenhuma.",
-    "historicoFamiliar": "Mãe com histórico de transtorno depressivo recorrente.",
-    "adesaoRegras": "Adolescente cooperativo e solícito.",
-    "observacoesGerais": "Acompanhamento psiquiátrico para manejo de quadro de Humor Depressivo e Ansiedade no adolescente em plano conjunto com psicoterapia externa.",
-    "dataRegistro": "2026-10-21T15:07:34.913Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.913Z"
+    "historicoFamiliar": "MÃ£e com histÃ³rico de transtorno depressivo recorrente.",
+    "adesaoRegras": "Adolescente cooperativo e solÃ­cito.",
+    "observacoesGerais": "Acompanhamento psiquiÃ¡trico para manejo de quadro de Humor Depressivo e Ansiedade no adolescente em plano conjunto com psicoterapia externa.",
+    "dataRegistro": "2026-11-13T14:37:35.286Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.286Z"
   }
 },
 {
   "model": "prontuario.anamnese",
-  "pk": "89d8aaba-cf2a-4f4f-b5aa-a85d99bf09bb",
+  "pk": "bf6bba6f-c803-4434-9f64-6e3ce66b4967",
   "fields": {
-    "paciente": "d2aef78b-3e9d-4839-8bb6-45b86c292fc8",
-    "escolaridade": "3º ano do Ensino Fundamental I em escola regular com suporte pedagógico.",
-    "tipoParto": "Cesárea a termo (38 semanas), sem complicações imediatas.",
-    "intercorrencias": "Icterícia neonatal leve tratada com fototerapia por 2 dias; atraso expressivo da fala (primeiras palavras aos 2 anos e meio).",
-    "seletividadeAlimentar": "Recusa alimentos pastosos e homogêneos; preferência acentuada por texturas crocantes e cores neutras.",
-    "dificuldadeRotina": "Crises de desregulação com choro e agitação motora em caso de mudanças inesperadas de trajeto ou horários escolares.",
-    "sensibilidadeEtiquetas": "Hipersensibilidade tátil: recusa terminantemente roupas com etiquetas internas e meias com costuras aparentes.",
-    "historicoFamiliar": "Tio paterno diagnosticado tardiamente com TEA nível 1 de suporte; mãe com histórico de transtorno ansioso.",
-    "adesaoRegras": "Boa aceitação com pistas visuais e combinados prévios; resistência severa a comandos verbais bruscos em transição de atividades.",
-    "observacoesGerais": "Encaminhado pela escola para investigação diagnóstica de TEA nível 1 de suporte. Apresenta hiperfoco em temas sobre o sistema solar e mapas.",
-    "dataRegistro": "2026-10-21T15:07:34.561Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.561Z"
-  }
-},
-{
-  "model": "prontuario.anamnese",
-  "pk": "95892be2-4eda-4fa5-bda0-d8c430af5265",
-  "fields": {
-    "paciente": "5c124c05-96f3-462c-8b02-dcdbf5fb8a20",
-    "escolaridade": "7º ano do Ensino Fundamental II.",
-    "tipoParto": "Cesárea a termo.",
-    "intercorrencias": "Nenhuma.",
-    "seletividadeAlimentar": "Normal.",
-    "dificuldadeRotina": "Preocupação acentuada com alterações em cronogramas de avaliações.",
-    "sensibilidadeEtiquetas": "Desconforto com luzes excessivas e ambientes com sobreposição de estímulos sonoros.",
-    "historicoFamiliar": "Avô materno com histórico de transtorno afetivo bipolar.",
-    "adesaoRegras": "Cumprimento rigoroso de regras, com inibição social e timidez extrema diante de figuras estranhas.",
-    "observacoesGerais": "Manejo clínico de ansiedade social e fobia de desempenho em contexto acadêmico.",
-    "dataRegistro": "2026-10-21T15:07:34.912Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.912Z"
-  }
-},
-{
-  "model": "prontuario.anamnese",
-  "pk": "a7c149d2-487e-4091-8478-dbf3a9675c27",
-  "fields": {
-    "paciente": "c2b70137-fdb6-49dd-850e-778baf0918ae",
-    "escolaridade": "9º ano do Ensino Fundamental II.",
-    "tipoParto": "Normal hospitalar sem intercorrências.",
-    "intercorrencias": "Nenhuma.",
-    "seletividadeAlimentar": "Alimentação balanceada e adequada.",
-    "dificuldadeRotina": "Procrastinação crônica para iniciar atividades acadêmicas; dificuldade de autogerenciamento do tempo.",
-    "sensibilidadeEtiquetas": "Nenhuma.",
-    "historicoFamiliar": "Mãe tratada ambulatorialmente para depressão maior.",
-    "adesaoRegras": "Desafio à autoridade escolar em situações percebidas como injustas; recolhimento no quarto com uso prolongado de computador.",
-    "observacoesGerais": "Acompanhamento psiquiátrico de sintomas ansiosos e queixas de desmotivação e fadiga mental no último bimestre.",
-    "dataRegistro": "2026-10-21T15:07:34.564Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.564Z"
-  }
-},
-{
-  "model": "prontuario.anamnese",
-  "pk": "b805dd63-f74d-44f0-8f6c-ca4d38107a27",
-  "fields": {
-    "paciente": "fb968e9f-d79d-4c1a-8477-064e8d010476",
-    "escolaridade": "8º ano do Ensino Fundamental II.",
-    "tipoParto": "Normal hospitalar sem intercorrências.",
-    "intercorrencias": "Sem intercorrências no desenvolvimento inicial.",
-    "seletividadeAlimentar": "Normal.",
-    "dificuldadeRotina": "Ansiedade elevada perante mudanças bruscas de horários ou adiamento de eventos.",
-    "sensibilidadeEtiquetas": "Nenhuma.",
-    "historicoFamiliar": "Mãe com histórico de crises de pânico.",
-    "adesaoRegras": "Muito cooperativa e dedicada, com exigência extrema em relação ao próprio desempenho acadêmico.",
-    "observacoesGerais": "Acompanhamento de ansiedade de desempenho e somatizações cardiorrespiratórias em períodos de provas escolares.",
-    "dataRegistro": "2026-10-21T15:07:34.914Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.914Z"
-  }
-},
-{
-  "model": "prontuario.anamnese",
-  "pk": "bcfb5475-5dfa-4724-8e85-dc07fe89f2c3",
-  "fields": {
-    "paciente": "e4c05b46-1938-4a6a-b545-47f47852ee51",
-    "escolaridade": "5º ano do Ensino Fundamental I.",
-    "tipoParto": "Cesárea a termo.",
-    "intercorrencias": "Crise febril única aos 2 anos, sem repercussões clínicas posteriores.",
-    "seletividadeAlimentar": "Aversão a alimentos de odor intenso (ex: peixes).",
+    "paciente": "0018c386-27a1-4714-9f62-b28f8be6ea91",
+    "escolaridade": "5Âº ano do Ensino Fundamental I.",
+    "tipoParto": "CesÃ¡rea a termo.",
+    "intercorrencias": "Crise febril Ãºnica aos 2 anos, sem repercussÃµes clÃ­nicas posteriores.",
+    "seletividadeAlimentar": "AversÃ£o a alimentos de odor intenso (ex: peixes).",
     "dificuldadeRotina": "Irritabilidade quando interrompido em tarefas focadas de interesse.",
     "sensibilidadeEtiquetas": "Desconforto com camisas polo ou golas justas.",
     "historicoFamiliar": "Tio materno com dislexia.",
-    "adesaoRegras": "Dificuldade na sustentação da atenção durante explicações orais extensas.",
-    "observacoesGerais": "Investigação de transtornos específicos de aprendizagem associados a perfil desatento.",
-    "dataRegistro": "2026-10-21T15:07:34.914Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.914Z"
+    "adesaoRegras": "Dificuldade na sustentaÃ§Ã£o da atenÃ§Ã£o durante explicaÃ§Ãµes orais extensas.",
+    "observacoesGerais": "InvestigaÃ§Ã£o de transtornos especÃ­ficos de aprendizagem associados a perfil desatento.",
+    "dataRegistro": "2026-11-13T14:37:35.289Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.289Z"
   }
 },
 {
   "model": "prontuario.anamnese",
-  "pk": "c8207372-1153-4269-838e-72d8b34467ec",
+  "pk": "fea5484c-d2b5-42ea-80cc-9a4d875b025e",
   "fields": {
-    "paciente": "60bfdd0f-bbfc-4240-8bf0-af9b75b3c985",
-    "escolaridade": "4º ano do Ensino Fundamental I.",
-    "tipoParto": "Cesárea a termo sem intercorrências.",
-    "intercorrencias": "Sem intercorrências no desenvolvimento.",
-    "seletividadeAlimentar": "Não aceita que alimentos distintos se toquem no prato; pratos com divisórias preferidos.",
-    "dificuldadeRotina": "Rigidez com pontualidade e horários de saída de casa.",
-    "sensibilidadeEtiquetas": "Desconforto com elásticos de calças ou bermudas muito apertados.",
-    "historicoFamiliar": "Irmão mais velho com diagnóstico de TDAH.",
-    "adesaoRegras": "Perfeccionismo acentuado; desfaz trabalhos escolares inteiros quando nota pequenas rasuras.",
-    "observacoesGerais": "Ansiedade de desempenho e traços de perfeccionismo disfuncional gerando sofrimento psíquico e lentidão na execução de provas.",
-    "dataRegistro": "2026-10-21T15:07:34.911Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.911Z"
+    "paciente": "338cd00b-e463-4e94-8c21-07c23f6d798d",
+    "escolaridade": "EducaÃ§Ã£o Infantil (Maternal II).",
+    "tipoParto": "CesÃ¡rea sem intercorrÃªncias.",
+    "intercorrencias": "Atraso no inÃ­cio da marcha (19 meses); marcha frequente em pontas dos pÃ©s.",
+    "seletividadeAlimentar": "Seletividade severa: aceita purÃª de maÃ§Ã£ e duas marcas exclusivas de biscoito integral.",
+    "dificuldadeRotina": "IntolerÃ¢ncia severa a deslocamento de mÃ³veis em casa ou mudanÃ§a de itinerÃ¡rio.",
+    "sensibilidadeEtiquetas": "Choro intenso perante tecidos sintÃ©ticos ou etiquetas em contato com a pele.",
+    "historicoFamiliar": "IrmÃ£o primogÃªnito com TEA de grau moderado.",
+    "adesaoRegras": "CompreensÃ£o de regras ainda em desenvolvimento; necessita de modelagem concreta e apoio visual.",
+    "observacoesGerais": "InvestigaÃ§Ã£o diagnÃ³stica de TEA nÃ­vel 2 de suporte com acompanhamento conjunto em Fonoaudiologia e Terapia Ocupacional.",
+    "dataRegistro": "2026-11-13T14:37:35.287Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.287Z"
   }
 },
 {
   "model": "prontuario.anotacaosessao",
-  "pk": "0e87295c-14c9-48e1-afb9-3d2c93f27ec9",
+  "pk": "04877c2b-705d-446d-9079-516c12c3efd0",
   "fields": {
-    "sessao": "a1b2d686-ef38-4c91-9ecf-162a92cbf548",
-    "textoLivre": "Primeira consulta clínica. Observado comportamento perfeccionista marcante durante a realização de desenhos livres (solicitou nova folha três vezes por considerar o traço inicial incorreto). Mãe pontua sofrimento significativo com tarefas escolares. Orientada a família a não validar os rituais de checagem excessiva e reforçar positivamente o esforço e não apenas o resultado final. Retorno agendado para avaliação continuada.",
-    "dataRegistro": "2026-10-21T15:07:35.122Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:35.122Z"
+    "sessao": "f9fed2aa-dacf-4927-a845-1ffc8f7ce420",
+    "textoLivre": "AvaliaÃ§Ã£o neuropsicopedagÃ³gica continuada. Boa responsividade Ã s dinÃ¢micas sem julgamento de erro. MÃ£e orientada sobre relaxamento em casa.",
+    "dataRegistro": "2026-11-13T14:37:35.316Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.316Z"
   }
 },
 {
   "model": "prontuario.anotacaosessao",
-  "pk": "516f3643-6be4-4a5b-b758-ee80ec412180",
+  "pk": "08c07ff3-78dc-4f2b-bc49-80aa8073d3e7",
   "fields": {
-    "sessao": "b587532b-393e-4adc-aad6-a30c7e91d62a",
-    "textoLivre": "Consulta avaliativa psiquiátrica. Paciente com 11 anos, queixa de inquietação motora e desatenção severa no contexto de sala de aula. Aplicada escala SNAP-IV com os responsáveis e colhidas informações preliminares da coordenação escolar. Observada hiperatividade motora durante a consulta (levantou-se repetidamente da cadeira, manuseou objetos sobre a mesa). Discutidas orientações psicoeducacionais sobre TDAH com a mãe. Proposto início de investigação detalhada e avaliação cardiológica prévia a eventual conduta farmacológica.",
-    "dataRegistro": "2026-10-21T15:07:34.926Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.926Z"
+    "sessao": "4793071b-bcb8-4f39-a7c7-7f1cc06cca1f",
+    "textoLivre": "Consulta de acompanhamento de ansiedade social e fobia de desempenho em adolescente. Alice relatou ter conseguido apresentar um trabalho em grupo na escola na Ãºltima semana com apoio da professora orientadora, o que representou grande vitÃ³ria subjetiva. Revisados registros de pensamentos disfuncionais e mantidas orientaÃ§Ãµes de enfrentamento gradual.",
+    "dataRegistro": "2026-11-13T14:37:35.304Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.304Z"
   }
 },
 {
   "model": "prontuario.anotacaosessao",
-  "pk": "6d25c1c2-6439-4218-ac52-343e2a75aaa6",
+  "pk": "0cbc5cf2-3350-4ce1-8dd4-ff23e0a3b919",
   "fields": {
-    "sessao": "c18a3cb3-4b7d-4ca0-b7e7-18e1965b567d",
-    "textoLivre": "Primeira consulta de acolhimento e anamnese psiquiátrica infantil. Paciente compareceu acompanhado da mãe, Sra. Mariana. Durante o atendimento lúdico, demonstrou boa interação compartilhada em torno de temas de seu interesse (astronomia), porém com fixação e pouca flexibilidade para alternância de brinquedos. Evitou contato visual direto prolongado, mas manteve atenção conjunta satisfatória. Mãe relatou queixas escolares de desatenção e sobrecarga sensorial em momentos de recreio. Solicitado relatório pedagógico da escola e avaliação neuropsicológica complementar. Hipótese diagnóstica: Investigação de TEA nível 1 de suporte. Retorno agendado em 10 dias.",
-    "dataRegistro": "2026-10-21T15:07:34.926Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.926Z"
+    "sessao": "2102b383-0f67-4880-bae8-8941787215a2",
+    "textoLivre": "Primeira consulta de acolhimento e anamnese psiquiÃ¡trica infantil. Paciente compareceu acompanhado da mÃ£e, Sra. Mariana. Durante o atendimento lÃºdico, demonstrou boa interaÃ§Ã£o compartilhada em torno de temas de seu interesse (astronomia), porÃ©m com fixaÃ§Ã£o e pouca flexibilidade para alternÃ¢ncia de brinquedos. Evitou contato visual direto prolongado, mas manteve atenÃ§Ã£o conjunta satisfatÃ³ria. Solicitado relatÃ³rio pedagÃ³gico da escola e avaliaÃ§Ã£o neuropsicolÃ³gica complementar.",
+    "dataRegistro": "2026-11-13T14:37:35.305Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.305Z"
   }
 },
 {
   "model": "prontuario.anotacaosessao",
-  "pk": "8a8fc072-57f8-4a81-8141-71934f524f9d",
+  "pk": "0e08a680-ae32-4d2e-adef-3b2fcbfc52b8",
   "fields": {
-    "sessao": "07cfc11c-8ef1-47c3-9784-a91ef2042eac",
-    "textoLivre": "Consulta de acompanhamento de ansiedade social e fobia de desempenho em adolescente. Alice relatou ter conseguido apresentar um trabalho em grupo na escola na última semana com apoio da professora orientadora, o que representou grande vitória subjetiva. Revisados registros de pensamentos disfuncionais e mantidas orientações de enfrentamento gradual.",
-    "dataRegistro": "2026-10-21T15:07:35.123Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:35.123Z"
+    "sessao": "fd979da9-089d-42e8-96c6-0f707c4685c6",
+    "textoLivre": "SessÃ£o de seguimento semanal. Fechamento de metas para o final de semana e alinhamento do diÃ¡rio visual de emoÃ§Ãµes com a mÃ£e Mariana.",
+    "dataRegistro": "2026-11-13T14:37:35.319Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.319Z"
   }
 },
 {
   "model": "prontuario.anotacaosessao",
-  "pk": "bd364b49-9261-444a-8491-63cc0b05c1e8",
+  "pk": "12031ad0-1cca-46b6-a1e4-79a07093bab4",
   "fields": {
-    "sessao": "9ce6b7dc-853f-44a1-bcb2-7de888ae76fb",
-    "textoLivre": "Sessão de seguimento terapêutico com foco em regulação emocional e manejo comportamental. Criança compareceu disposta, interagiu ativamente com os jogos de tabuleiro adaptados. Trabalhadas estratégias lúdicas para identificação das emoções primárias (termômetro das emoções). Pais relatam melhora na contenção das crises de oposição após introdução do quadro de combinados visuais em casa. Mantido plano de acompanhamento quinzenal.",
-    "dataRegistro": "2026-10-21T15:07:34.926Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.926Z"
+    "sessao": "8d7d56a0-cb95-4673-8227-fafeae726e93",
+    "textoLivre": "IntervenÃ§Ã£o psicopedagÃ³gica com estimulaÃ§Ã£o de linguagem expressiva e reduÃ§Ã£o de seletividade a texturas lÃºdicas (massinhas e tintas).",
+    "dataRegistro": "2026-11-13T14:37:35.313Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.313Z"
   }
 },
 {
   "model": "prontuario.anotacaosessao",
-  "pk": "bf5df499-79b9-4a24-80f8-7d34b1401e3a",
+  "pk": "3309ffce-027e-45bd-95cc-2db88cf34357",
   "fields": {
-    "sessao": "a949039f-a794-4822-9758-6237a02653d0",
-    "textoLivre": "Atendimento clínico com foco na avaliação sensorial e de rotina da paciente. Observada rigidez significativa na escolha de materiais lúdicos (ordenou blocos por cor e tamanho, demonstrando desconforto quando desordenados). Relato materno de intensas crises no momento do banho e recusa alimentar seletiva. Encaminhada para Terapia Ocupacional com abordagem de Integração Sensorial de Ayres. Orientada família sobre adaptação da rotina noturna.",
-    "dataRegistro": "2026-10-21T15:07:34.927Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.927Z"
+    "sessao": "8a95ed7b-c9aa-4a24-8359-b161d8c62f29",
+    "textoLivre": "IntervenÃ§Ã£o de autorregulaÃ§Ã£o. Theo conseguiu realizar todas as tarefas estruturadas sem episÃ³dios de desregulaÃ§Ã£o motora.",
+    "dataRegistro": "2026-11-13T14:37:35.315Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.315Z"
   }
 },
 {
   "model": "prontuario.anotacaosessao",
-  "pk": "c7253680-2940-48fa-8a1f-065f8f53343c",
+  "pk": "525f39ef-bb29-492f-afb7-789468ddf6a5",
   "fields": {
-    "sessao": "456e94ae-adaf-4d55-b53b-7ae0c093ee67",
-    "textoLivre": "Sessão de acompanhamento realizada hoje. Paciente trouxe o relatório pedagógico solicitado na primeira sessão. Análise dos apontamentos escolares confirma perfil de hiperfoco e dificuldades na transição entre matérias. Trabalhadas dinâmicas de flexibilização cognitiva com jogos de regras alternadas. Paciente muito colaborativo e comunicativo. Próxima consulta em 15 dias com a devolutiva formal para a escola e fechamento de conduta.",
-    "dataRegistro": "2026-10-21T15:07:35.123Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:35.123Z"
+    "sessao": "44a924e2-0db3-4351-8ede-67931a74ad09",
+    "textoLivre": "Desenvolvimento de estratÃ©gias de enfrentamento para situaÃ§Ãµes sociais. Paciente demonstrou autopercepÃ§Ã£o aguÃ§ada e motivaÃ§Ã£o.",
+    "dataRegistro": "2026-11-13T14:37:35.317Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.317Z"
   }
 },
 {
   "model": "prontuario.anotacaosessao",
-  "pk": "ca7d123a-11f6-4397-b82e-0acaeb399f0d",
+  "pk": "52ccfd13-4d49-421e-8eae-2daf9d67ac88",
   "fields": {
-    "sessao": "f8122ad5-ae3f-420d-a5c7-4b6994ea29b6",
-    "textoLivre": "Consulta de retorno do adolescente Matheus (14 anos). Paciente compareceu sozinho inicialmente, demonstrando postura tímida e afeto embotado, posteriormente integrando o pai à conversa. Relatou diminuição das crises de ansiedade após o início dos exercícios de respiração diafragmática. Discutida a importância do estabelecimento de limites no tempo de telas e retorno gradual às atividades físicas extracurriculares. Paciente concordou com a meta de caminhar 3x por semana.",
-    "dataRegistro": "2026-10-21T15:07:34.927Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:34.927Z"
+    "sessao": "2a7e79c7-afd3-4ec1-8715-f7f174a1d6d6",
+    "textoLivre": "SessÃ£o com anÃ¡lise dos relatÃ³rios escolares trazidos pela mÃ£e. Trabalho focado em dinÃ¢micas de flexibilizaÃ§Ã£o cognitiva com jogos de regras alternadas. Paciente muito colaborativo e interessado.",
+    "dataRegistro": "2026-11-13T14:37:35.310Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.310Z"
   }
 },
 {
   "model": "prontuario.anotacaosessao",
-  "pk": "ee9758dd-5de3-498d-a3f7-68a49a7e7610",
+  "pk": "661ebda6-c468-4c6d-a728-68a143be2f52",
   "fields": {
-    "sessao": "1c94d0a3-2361-4495-aff1-2b1785af57a4",
-    "textoLivre": "Sessão de intervenção clínica comportamental. Theo participou de dinâmicas de autocontrole e espera de turnos. Demonstrou evolução no tempo de tolerância à frustração em comparação ao primeiro encontro. Pais pontuam que o ambiente escolar tem respondido bem às pausas programadas sugeridas no relatório anterior.",
-    "dataRegistro": "2026-10-21T15:07:35.122Z",
-    "dataUltimaAtualizacao": "2026-10-21T15:07:35.122Z"
+    "sessao": "8b04f960-5164-4159-904a-69932f852c8a",
+    "textoLivre": "Consulta de retorno do adolescente Matheus (14 anos). Paciente compareceu sozinho inicialmente, demonstrando postura tÃ­mida e afeto embotado, posteriormente integrando o pai Ã  conversa. Relatou diminuiÃ§Ã£o das crises de ansiedade apÃ³s o inÃ­cio dos exercÃ­cios de respiraÃ§Ã£o diafragmÃ¡tica. Discutida a importÃ¢ncia do estabelecimento de limites no tempo de telas.",
+    "dataRegistro": "2026-11-13T14:37:35.309Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.309Z"
+  }
+},
+{
+  "model": "prontuario.anotacaosessao",
+  "pk": "672ead49-86b6-4a01-b932-72c5dc160cf4",
+  "fields": {
+    "sessao": "6ad55474-e700-42e4-b093-b741c2af4b75",
+    "textoLivre": "SessÃ£o de intervenÃ§Ã£o clÃ­nica comportamental. Theo participou de dinÃ¢micas de autocontrole e espera de turnos. Demonstrou evoluÃ§Ã£o no tempo de tolerÃ¢ncia Ã  frustraÃ§Ã£o em comparaÃ§Ã£o ao primeiro encontro. Pais pontuam que o ambiente escolar tem respondido bem Ã s pausas programadas sugeridas no relatÃ³rio anterior.",
+    "dataRegistro": "2026-11-13T14:37:35.303Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.303Z"
+  }
+},
+{
+  "model": "prontuario.anotacaosessao",
+  "pk": "6c47c37f-abbe-4397-89cd-5dfb76652c15",
+  "fields": {
+    "sessao": "ade884f1-a2e5-4a87-bf63-6c0d6da20819",
+    "textoLivre": "Adolescente manteve as metas de atividade fÃ­sica semanal. Sintomas depressivos e de ansiedade em curva de melhora gradual.",
+    "dataRegistro": "2026-11-13T14:37:35.314Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.314Z"
+  }
+},
+{
+  "model": "prontuario.anotacaosessao",
+  "pk": "6d598a49-9de1-4b17-a46c-776d633cb1a4",
+  "fields": {
+    "sessao": "3aa6d56d-94c3-475e-8886-4e01269efeed",
+    "textoLivre": "SessÃ£o matinal de intervenÃ§Ã£o focada em atenÃ§Ã£o sustentada e memÃ³ria operacional. Pedro completou os circuitos propostos com Ã³timo desempenho.",
+    "dataRegistro": "2026-11-13T14:37:35.318Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.318Z"
+  }
+},
+{
+  "model": "prontuario.anotacaosessao",
+  "pk": "84512216-1587-4c5e-8c8c-052b9e9b377c",
+  "fields": {
+    "sessao": "7d4b23b6-19fc-4bac-b0f7-56eff6b98b84",
+    "textoLivre": "Segunda etapa avaliativa. AvaliaÃ§Ã£o de funÃ§Ãµes executivas e rastreio attentional. Pais relatam inÃ­cio de melhora com a nova rotina.",
+    "dataRegistro": "2026-11-13T14:37:35.312Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.312Z"
+  }
+},
+{
+  "model": "prontuario.anotacaosessao",
+  "pk": "a1237bce-4472-42ba-95fb-395f2fa94a46",
+  "fields": {
+    "sessao": "e094f278-6799-447e-ab0c-b2fed58624ad",
+    "textoLivre": "Consulta avaliativa psiquiÃ¡trica. Paciente com 11 anos, queixa de inquietaÃ§Ã£o motora e desatenÃ§Ã£o severa no contexto de sala de aula. Aplicada escala SNAP-IV com os responsÃ¡veis e colhidas informaÃ§Ãµes preliminares da coordenaÃ§Ã£o escolar. Observada hiperatividade motora durante a consulta. Discutidas orientaÃ§Ãµes psicoeducacionais.",
+    "dataRegistro": "2026-11-13T14:37:35.307Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.307Z"
+  }
+},
+{
+  "model": "prontuario.anotacaosessao",
+  "pk": "c1f61b5b-8dc5-438d-8eba-a8cd48a66de8",
+  "fields": {
+    "sessao": "b310dbce-513a-43ef-96c4-dd1ada6ba7b5",
+    "textoLivre": "Continuidade das atividades de treino de tolerÃ¢ncia Ã  frustraÃ§Ã£o. Sophia compreendeu bem a regra de rodÃ­zio de lideranÃ§a nos jogos.",
+    "dataRegistro": "2026-11-13T14:37:35.311Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.311Z"
+  }
+},
+{
+  "model": "prontuario.anotacaosessao",
+  "pk": "d326fcd3-379c-4bf5-87c3-6213872aedfe",
+  "fields": {
+    "sessao": "026b5920-bb4b-453e-8e5b-5386135ee4b3",
+    "textoLivre": "SessÃ£o de seguimento terapÃªutico com foco em regulaÃ§Ã£o emocional e manejo comportamental. CrianÃ§a compareceu disposta, interagiu ativamente com os jogos de tabuleiro adaptados. Trabalhadas estratÃ©gias lÃºdicas para identificaÃ§Ã£o das emoÃ§Ãµes primÃ¡rias (termÃ´metro das emoÃ§Ãµes). Pais relatam melhora na contenÃ§Ã£o das crises de oposiÃ§Ã£o apÃ³s introduÃ§Ã£o do quadro de combinados visuais em casa.",
+    "dataRegistro": "2026-11-13T14:37:35.306Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.306Z"
+  }
+},
+{
+  "model": "prontuario.anotacaosessao",
+  "pk": "e3841c44-7181-4286-b31d-1a022e43bd35",
+  "fields": {
+    "sessao": "c75a6bbb-0379-4fc3-ad48-ca085dea88b2",
+    "textoLivre": "Atendimento clÃ­nico com foco na avaliaÃ§Ã£o sensorial e de rotina da paciente. Observada rigidez significativa na escolha de materiais lÃºdicos (ordenou blocos por cor e tamanho). Relato materno de intensas crises no momento do banho e recusa alimentar seletiva. Encaminhada para Terapia Ocupacional com abordagem de IntegraÃ§Ã£o Sensorial.",
+    "dataRegistro": "2026-11-13T14:37:35.308Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.308Z"
+  }
+},
+{
+  "model": "prontuario.anotacaosessao",
+  "pk": "fb9f8efa-09bf-46f7-a7d1-7e5c98632305",
+  "fields": {
+    "sessao": "d4d53b1d-ca81-40ea-8e74-ee061c074be2",
+    "textoLivre": "Primeira consulta de acolhimento. Observado comportamento perfeccionista marcante durante a realizaÃ§Ã£o de desenhos livres (solicitou nova folha trÃªs vezes por considerar o traÃ§o inicial incorreto). MÃ£e pontua sofrimento significativo com tarefas escolares. Orientada a famÃ­lia a nÃ£o validar os rituais de checagem excessiva e reforÃ§ar positivamente o esforÃ§o e nÃ£o apenas o resultado final. Retorno agendado para avaliaÃ§Ã£o continuada.",
+    "dataRegistro": "2026-11-13T14:37:35.300Z",
+    "dataUltimaAtualizacao": "2026-11-13T14:37:35.300Z"
   }
 }
 ]

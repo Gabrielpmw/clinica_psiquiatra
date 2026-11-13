@@ -73,11 +73,9 @@ class Command(BaseCommand):
                     is_superuser=True,
                     status=True,
                 )
-                admin_user.set_password('Admin@123')
-                admin_user.save()
-                self.stdout.write(self.style.SUCCESS("  [+] Criado Admin: admin@clinica.com / Admin@123"))
-            else:
-                self.stdout.write(self.style.SUCCESS(f"  [=] Admin preservado: {admin_user.email}"))
+            admin_user.set_password('admin123456')
+            admin_user.save()
+            self.stdout.write(self.style.SUCCESS("  [+] Admin configurado: admin@clinica.com / admin123456"))
 
             # 3. Criar ou atualizar Secretária: Milena
             sec_email = 'milena@gmail.com'
@@ -564,130 +562,82 @@ class Command(BaseCommand):
             tz = timezone.get_current_timezone()
             now = timezone.now()
             today = timezone.localtime(now).date()
+            monday_this_week = today - timedelta(days=today.weekday())
 
-            def make_dt(day_offset, hour, minute):
-                target_date = today + timedelta(days=day_offset)
+            def make_dt(week_offset, weekday, hour, minute):
+                """
+                Gera datetime no timezone correto para uma determinada semana e dia útil.
+                week_offset: 0 = semana atual, 1 = próxima semana, -1 = semana anterior, etc.
+                weekday: 0 = Segunda, 1 = Terça, 2 = Quarta, 3 = Quinta, 4 = Sexta
+                """
+                target_date = monday_this_week + timedelta(weeks=week_offset, days=weekday)
                 dt = datetime.combine(target_date, time(hour, minute))
                 return timezone.make_aware(dt, tz)
 
             bloqueios_data = [
                 {
-                    "day_offset": 1,
+                    "week_offset": 0,
+                    "weekday": today.weekday(),
                     "inicio": (12, 0),
-                    "fim": (14, 0),
-                    "motivo": "Intervalo para almoço e discussão com equipe de Terapia Ocupacional"
+                    "fim": (13, 30),
+                    "motivo": "Intervalo para almoço e discussão com equipe multidisciplinar"
                 },
                 {
-                    "day_offset": 2,
-                    "inicio": (16, 0),
-                    "fim": (18, 0),
-                    "motivo": "Reunião Clínica e Estudo de Caso de TEA"
+                    "week_offset": 1,
+                    "weekday": 2,  # Quarta-feira
+                    "inicio": (11, 30),
+                    "fim": (12, 30),
+                    "motivo": "Reunião de Alinhamento Multidisciplinar Escolar"
                 },
                 {
-                    "day_offset": 5,
+                    "week_offset": 2,
+                    "weekday": 4,  # Sexta-feira
+                    "inicio": (14, 0),
+                    "fim": (17, 30),
+                    "motivo": "Participação em Congresso Brasileiro de Neuropsicopedagogia Clínica"
+                },
+                {
+                    "week_offset": 3,
+                    "weekday": 1,  # Terça-feira
                     "inicio": (8, 0),
-                    "fim": (10, 0),
-                    "motivo": "Participação em Congresso Brasileiro de Neuropsiquiatria da Infância"
+                    "fim": (9, 30),
+                    "motivo": "Supervisão Clínica Institucional e Discussão de Casos Complexos"
+                },
+                {
+                    "week_offset": 4,
+                    "weekday": 2,  # Quarta-feira
+                    "inicio": (11, 30),
+                    "fim": (13, 0),
+                    "motivo": "Reunião com Coordenação Pedagógica e Devolutiva Escolar"
                 }
             ]
 
             for b in bloqueios_data:
                 Bloqueio.objects.create(
                     usuario=doc_user,
-                    dataHoraInicio=make_dt(b["day_offset"], b["inicio"][0], b["inicio"][1]),
-                    dataHoraFim=make_dt(b["day_offset"], b["fim"][0], b["fim"][1]),
+                    dataHoraInicio=make_dt(b["week_offset"], b["weekday"], b["inicio"][0], b["inicio"][1]),
+                    dataHoraFim=make_dt(b["week_offset"], b["weekday"], b["fim"][0], b["fim"][1]),
                     motivo=b["motivo"]
                 )
             self.stdout.write(self.style.SUCCESS("  [+] Bloqueios de horário cadastrados na agenda do Dr. Gabriel."))
 
             # 8. Criar Sessões e Anotações de Prontuário
-            # Sessões no passado (com anotação clínica), hoje e futuro
+            # Cobrindo semanas passadas, a semana atual (inclusive hoje) e 4 semanas futuras
             sessoes_data = [
-                # --- SESSÕES PASSADAS (REALIZADAS) ---
-                {
-                    "paciente": "Lucas Silva Mendes",
-                    "day_offset": -10,
-                    "inicio": (9, 0),
-                    "fim": (9, 50),
-                    "status": Sessao.StatusChoices.REALIZADA,
-                    "tipo": Sessao.TipoChoices.AVALIATIVA,
-                    "anotacao": (
-                        "Primeira consulta de acolhimento e anamnese psiquiátrica infantil. "
-                        "Paciente compareceu acompanhado da mãe, Sra. Mariana. Durante o atendimento lúdico, "
-                        "demonstrou boa interação compartilhada em torno de temas de seu interesse (astronomia), "
-                        "porém com fixação e pouca flexibilidade para alternância de brinquedos. Evitou contato visual direto prolongado, "
-                        "mas manteve atenção conjunta satisfatória. Mãe relatou queixas escolares de desatenção e sobrecarga sensorial "
-                        "em momentos de recreio. Solicitado relatório pedagógico da escola e avaliação neuropsicológica complementar. "
-                        "Hipótese diagnóstica: Investigação de TEA nível 1 de suporte. Retorno agendado em 10 dias."
-                    )
-                },
-                {
-                    "paciente": "Sophia Carvalho Ferreira",
-                    "day_offset": -8,
-                    "inicio": (14, 0),
-                    "fim": (14, 50),
-                    "status": Sessao.StatusChoices.REALIZADA,
-                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
-                    "anotacao": (
-                        "Sessão de seguimento terapêutico com foco em regulação emocional e manejo comportamental. "
-                        "Criança compareceu disposta, interagiu ativamente com os jogos de tabuleiro adaptados. "
-                        "Trabalhadas estratégias lúdicas para identificação das emoções primárias (termômetro das emoções). "
-                        "Pais relatam melhora na contenção das crises de oposição após introdução do quadro de combinados visuais em casa. "
-                        "Mantido plano de acompanhamento quinzenal."
-                    )
-                },
-                {
-                    "paciente": "Enzo Gabriel Santos",
-                    "day_offset": -6,
-                    "inicio": (10, 0),
-                    "fim": (10, 50),
-                    "status": Sessao.StatusChoices.REALIZADA,
-                    "tipo": Sessao.TipoChoices.AVALIATIVA,
-                    "anotacao": (
-                        "Consulta avaliativa psiquiátrica. Paciente com 11 anos, queixa de inquietação motora e desatenção severa "
-                        "no contexto de sala de aula. Aplicada escala SNAP-IV com os responsáveis e colhidas informações preliminares "
-                        "da coordenação escolar. Observada hiperatividade motora durante a consulta (levantou-se repetidamente da cadeira, "
-                        "manuseou objetos sobre a mesa). Discutidas orientações psicoeducacionais sobre TDAH com a mãe. Proposto início "
-                        "de investigação detalhada e avaliação cardiológica prévia a eventual conduta farmacológica."
-                    )
-                },
-                {
-                    "paciente": "Laura Beatriz Lima",
-                    "day_offset": -5,
-                    "inicio": (15, 0),
-                    "fim": (15, 50),
-                    "status": Sessao.StatusChoices.REALIZADA,
-                    "tipo": Sessao.TipoChoices.AVALIATIVA,
-                    "anotacao": (
-                        "Atendimento clínico com foco na avaliação sensorial e de rotina da paciente. Observada rigidez significativa na escolha "
-                        "de materiais lúdicos (ordenou blocos por cor e tamanho, demonstrando desconforto quando desordenados). "
-                        "Relato materno de intensas crises no momento do banho e recusa alimentar seletiva. Encaminhada para Terapia Ocupacional "
-                        "com abordagem de Integração Sensorial de Ayres. Orientada família sobre adaptação da rotina noturna."
-                    )
-                },
-                {
-                    "paciente": "Matheus Henrique Rocha",
-                    "day_offset": -4,
-                    "inicio": (16, 0),
-                    "fim": (16, 50),
-                    "status": Sessao.StatusChoices.REALIZADA,
-                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
-                    "anotacao": (
-                        "Consulta de retorno do adolescente Matheus (14 anos). Paciente compareceu sozinho inicialmente, demonstrando postura tímida "
-                        "e afeto embotado, posteriormente integrando o pai à conversa. Relatou diminuição das crises de ansiedade após o início dos "
-                        "exercícios de respiração diafragmática. Discutida a importância do estabelecimento de limites no tempo de telas e retorno "
-                        "gradual às atividades físicas extracurriculares. Paciente concordou com a meta de caminhar 3x por semana."
-                    )
-                },
+                # ==============================================================
+                # --- SEMANA -2 (DUAS SEMANAS ATRÁS) ---
+                # ==============================================================
                 {
                     "paciente": "Isabella Duarte Nogueira",
-                    "day_offset": -3,
+                    "week_offset": -2,
+                    "weekday": 1,  # Terça
                     "inicio": (11, 0),
                     "fim": (11, 50),
                     "status": Sessao.StatusChoices.REALIZADA,
                     "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": True,
                     "anotacao": (
-                        "Primeira consulta clínica. Observado comportamento perfeccionista marcante durante a realização de desenhos livres "
+                        "Primeira consulta de acolhimento. Observado comportamento perfeccionista marcante durante a realização de desenhos livres "
                         "(solicitou nova folha três vezes por considerar o traço inicial incorreto). Mãe pontua sofrimento significativo com tarefas escolares. "
                         "Orientada a família a não validar os rituais de checagem excessiva e reforçar positivamente o esforço e não apenas o resultado final. "
                         "Retorno agendado para avaliação continuada."
@@ -695,11 +645,13 @@ class Command(BaseCommand):
                 },
                 {
                     "paciente": "Theo Albuquerque Martins",
-                    "day_offset": -2,
+                    "week_offset": -2,
+                    "weekday": 2,  # Quarta
                     "inicio": (8, 30),
                     "fim": (9, 20),
                     "status": Sessao.StatusChoices.REALIZADA,
                     "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
                     "anotacao": (
                         "Sessão de intervenção clínica comportamental. Theo participou de dinâmicas de autocontrole e espera de turnos. "
                         "Demonstrou evolução no tempo de tolerância à frustração em comparação ao primeiro encontro. Pais pontuam que o ambiente escolar "
@@ -708,151 +660,772 @@ class Command(BaseCommand):
                 },
                 {
                     "paciente": "Alice Fernandes Souza",
-                    "day_offset": -1,
+                    "week_offset": -2,
+                    "weekday": 4,  # Sexta
                     "inicio": (14, 30),
                     "fim": (15, 20),
                     "status": Sessao.StatusChoices.REALIZADA,
                     "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
                     "anotacao": (
                         "Consulta de acompanhamento de ansiedade social e fobia de desempenho em adolescente. Alice relatou ter conseguido apresentar "
                         "um trabalho em grupo na escola na última semana com apoio da professora orientadora, o que representou grande vitória subjetiva. "
                         "Revisados registros de pensamentos disfuncionais e mantidas orientações de enfrentamento gradual."
                     )
                 },
-                # Sessões passadas com Falta e Cancelamento
-                {
-                    "paciente": "Arthur Vinicius Pires",
-                    "day_offset": -3,
-                    "inicio": (9, 30),
-                    "fim": (10, 20),
-                    "status": Sessao.StatusChoices.FALTA,
-                    "tipo": Sessao.TipoChoices.AVALIATIVA,
-                    "anotacao": None
-                },
-                {
-                    "paciente": "Manuela Costa Ribeiro",
-                    "day_offset": -2,
-                    "inicio": (10, 30),
-                    "fim": (11, 20),
-                    "status": Sessao.StatusChoices.CANCELADA,
-                    "tipo": Sessao.TipoChoices.AVALIATIVA,
-                    "anotacao": None
-                },
 
-                # --- SESSÕES DE HOJE ---
+                # ==============================================================
+                # --- SEMANA -1 (SEMANA ANTERIOR) ---
+                # ==============================================================
                 {
                     "paciente": "Lucas Silva Mendes",
-                    "day_offset": 0,
+                    "week_offset": -1,
+                    "weekday": 0,  # Segunda
                     "inicio": (9, 0),
                     "fim": (9, 50),
                     "status": Sessao.StatusChoices.REALIZADA,
-                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": True,
                     "anotacao": (
-                        "Sessão de acompanhamento realizada hoje. Paciente trouxe o relatório pedagógico solicitado na primeira sessão. "
-                        "Análise dos apontamentos escolares confirma perfil de hiperfoco e dificuldades na transição entre matérias. "
-                        "Trabalhadas dinâmicas de flexibilização cognitiva com jogos de regras alternadas. Paciente muito colaborativo e comunicativo. "
-                        "Próxima consulta em 15 dias com a devolutiva formal para a escola e fechamento de conduta."
+                        "Primeira consulta de acolhimento e anamnese psiquiátrica infantil. "
+                        "Paciente compareceu acompanhado da mãe, Sra. Mariana. Durante o atendimento lúdico, "
+                        "demonstrou boa interação compartilhada em torno de temas de seu interesse (astronomia), "
+                        "porém com fixação e pouca flexibilidade para alternância de brinquedos. Evitou contato visual direto prolongado, "
+                        "mas manteve atenção conjunta satisfatória. Solicitado relatório pedagógico da escola e avaliação neuropsicológica complementar."
                     )
                 },
                 {
                     "paciente": "Sophia Carvalho Ferreira",
-                    "day_offset": 0,
-                    "inicio": (14, 30),
-                    "fim": (15, 20),
-                    "status": Sessao.StatusChoices.AGENDADA,
+                    "week_offset": -1,
+                    "weekday": 1,  # Terça
+                    "inicio": (14, 0),
+                    "fim": (14, 50),
+                    "status": Sessao.StatusChoices.REALIZADA,
                     "tipo": Sessao.TipoChoices.INTERVENTIVA,
-                    "anotacao": None
+                    "pago": True,
+                    "anotacao": (
+                        "Sessão de seguimento terapêutico com foco em regulação emocional e manejo comportamental. "
+                        "Criança compareceu disposta, interagiu ativamente com os jogos de tabuleiro adaptados. "
+                        "Trabalhadas estratégias lúdicas para identificação das emoções primárias (termômetro das emoções). "
+                        "Pais relatam melhora na contenção das crises de oposição após introdução do quadro de combinados visuais em casa."
+                    )
                 },
-                {
-                    "paciente": "Helena Ramos Vasconcelos",
-                    "day_offset": 0,
-                    "inicio": (16, 0),
-                    "fim": (16, 50),
-                    "status": Sessao.StatusChoices.AGENDADA,
-                    "tipo": Sessao.TipoChoices.AVALIATIVA,
-                    "anotacao": None
-                },
-
-                # --- SESSÕES FUTURAS ---
                 {
                     "paciente": "Enzo Gabriel Santos",
-                    "day_offset": 1,
-                    "inicio": (9, 0),
-                    "fim": (9, 50),
-                    "status": Sessao.StatusChoices.AGENDADA,
-                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
-                    "anotacao": None
+                    "week_offset": -1,
+                    "weekday": 2,  # Quarta
+                    "inicio": (10, 0),
+                    "fim": (10, 50),
+                    "status": Sessao.StatusChoices.REALIZADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Consulta avaliativa psiquiátrica. Paciente com 11 anos, queixa de inquietação motora e desatenção severa "
+                        "no contexto de sala de aula. Aplicada escala SNAP-IV com os responsáveis e colhidas informações preliminares "
+                        "da coordenação escolar. Observada hiperatividade motora durante a consulta. Discutidas orientações psicoeducacionais."
+                    )
                 },
                 {
                     "paciente": "Laura Beatriz Lima",
-                    "day_offset": 1,
-                    "inicio": (10, 30),
-                    "fim": (11, 20),
-                    "status": Sessao.StatusChoices.AGENDADA,
-                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
-                    "anotacao": None
+                    "week_offset": -1,
+                    "weekday": 3,  # Quinta
+                    "inicio": (15, 0),
+                    "fim": (15, 50),
+                    "status": Sessao.StatusChoices.REALIZADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Atendimento clínico com foco na avaliação sensorial e de rotina da paciente. Observada rigidez significativa na escolha "
+                        "de materiais lúdicos (ordenou blocos por cor e tamanho). Relato materno de intensas crises no momento do banho e recusa alimentar seletiva. "
+                        "Encaminhada para Terapia Ocupacional com abordagem de Integração Sensorial."
+                    )
                 },
                 {
                     "paciente": "Matheus Henrique Rocha",
-                    "day_offset": 1,
+                    "week_offset": -1,
+                    "weekday": 4,  # Sexta
+                    "inicio": (16, 0),
+                    "fim": (16, 50),
+                    "status": Sessao.StatusChoices.REALIZADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Consulta de retorno do adolescente Matheus (14 anos). Paciente compareceu sozinho inicialmente, demonstrando postura tímida "
+                        "e afeto embotado, posteriormente integrando o pai à conversa. Relatou diminuição das crises de ansiedade após o início dos "
+                        "exercícios de respiração diafragmática. Discutida a importância do estabelecimento de limites no tempo de telas."
+                    )
+                },
+
+                # ==============================================================
+                # --- SEMANA 0 (SEMANA ATUAL) ---
+                # ==============================================================
+                # Segunda-feira
+                {
+                    "paciente": "Lucas Silva Mendes",
+                    "week_offset": 0,
+                    "weekday": 0,
+                    "inicio": (9, 0),
+                    "fim": (9, 50),
+                    "status": Sessao.StatusChoices.REALIZADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Sessão com análise dos relatórios escolares trazidos pela mãe. Trabalho focado em dinâmicas de flexibilização cognitiva "
+                        "com jogos de regras alternadas. Paciente muito colaborativo e interessado."
+                    )
+                },
+                {
+                    "paciente": "Sophia Carvalho Ferreira",
+                    "week_offset": 0,
+                    "weekday": 0,
+                    "inicio": (14, 30),
+                    "fim": (15, 20),
+                    "status": Sessao.StatusChoices.REALIZADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Continuidade das atividades de treino de tolerância à frustração. Sophia compreendeu bem a regra de rodízio de liderança nos jogos."
+                    )
+                },
+                # Terça-feira
+                {
+                    "paciente": "Enzo Gabriel Santos",
+                    "week_offset": 0,
+                    "weekday": 1,
+                    "inicio": (10, 0),
+                    "fim": (10, 50),
+                    "status": Sessao.StatusChoices.REALIZADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Segunda etapa avaliativa. Avaliação de funções executivas e rastreio attentional. Pais relatam início de melhora com a nova rotina."
+                    )
+                },
+                {
+                    "paciente": "Laura Beatriz Lima",
+                    "week_offset": 0,
+                    "weekday": 1,
                     "inicio": (15, 0),
                     "fim": (15, 50),
-                    "status": Sessao.StatusChoices.AGENDADA,
+                    "status": Sessao.StatusChoices.REALIZADA,
                     "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Intervenção psicopedagógica com estimulação de linguagem expressiva e redução de seletividade a texturas lúdicas (massinhas e tintas)."
+                    )
+                },
+                # Quarta-feira
+                {
+                    "paciente": "Matheus Henrique Rocha",
+                    "week_offset": 0,
+                    "weekday": 2,
+                    "inicio": (8, 30),
+                    "fim": (9, 20),
+                    "status": Sessao.StatusChoices.REALIZADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Adolescente manteve as metas de atividade física semanal. Sintomas depressivos e de ansiedade em curva de melhora gradual."
+                    )
+                },
+                {
+                    "paciente": "Manuela Costa Ribeiro",
+                    "week_offset": 0,
+                    "weekday": 2,
+                    "inicio": (10, 30),
+                    "fim": (11, 20),
+                    "status": Sessao.StatusChoices.CANCELADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": False,
                     "anotacao": None
                 },
                 {
                     "paciente": "Theo Albuquerque Martins",
-                    "day_offset": 2,
-                    "inicio": (8, 30),
-                    "fim": (9, 20),
-                    "status": Sessao.StatusChoices.AGENDADA,
+                    "week_offset": 0,
+                    "weekday": 2,
+                    "inicio": (16, 0),
+                    "fim": (16, 50),
+                    "status": Sessao.StatusChoices.REALIZADA,
                     "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Intervenção de autorregulação. Theo conseguiu realizar todas as tarefas estruturadas sem episódios de desregulação motora."
+                    )
+                },
+                # Quinta-feira
+                {
+                    "paciente": "Arthur Vinicius Pires",
+                    "week_offset": 0,
+                    "weekday": 3,
+                    "inicio": (9, 30),
+                    "fim": (10, 20),
+                    "status": Sessao.StatusChoices.FALTA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": False,
                     "anotacao": None
                 },
                 {
                     "paciente": "Isabella Duarte Nogueira",
-                    "day_offset": 2,
+                    "week_offset": 0,
+                    "weekday": 3,
+                    "inicio": (11, 0),
+                    "fim": (11, 50),
+                    "status": Sessao.StatusChoices.REALIZADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Avaliação neuropsicopedagógica continuada. Boa responsividade às dinâmicas sem julgamento de erro. Mãe orientada sobre relaxamento em casa."
+                    )
+                },
+                {
+                    "paciente": "Alice Fernandes Souza",
+                    "week_offset": 0,
+                    "weekday": 3,
+                    "inicio": (14, 30),
+                    "fim": (15, 20),
+                    "status": Sessao.StatusChoices.REALIZADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Desenvolvimento de estratégias de enfrentamento para situações sociais. Paciente demonstrou autopercepção aguçada e motivação."
+                    )
+                },
+                # Sexta-feira (Hoje)
+                {
+                    "paciente": "Pedro Lucas Guimarães",
+                    "week_offset": 0,
+                    "weekday": 4,
+                    "inicio": (8, 30),
+                    "fim": (9, 20),
+                    "status": Sessao.StatusChoices.REALIZADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Sessão matinal de intervenção focada em atenção sustentada e memória operacional. Pedro completou os circuitos propostos com ótimo desempenho."
+                    )
+                },
+                {
+                    "paciente": "Lucas Silva Mendes",
+                    "week_offset": 0,
+                    "weekday": 4,
                     "inicio": (10, 0),
                     "fim": (10, 50),
-                    "status": Sessao.StatusChoices.AGENDADA,
+                    "status": Sessao.StatusChoices.REALIZADA,
                     "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
+                    "anotacao": (
+                        "Sessão de seguimento semanal. Fechamento de metas para o final de semana e alinhamento do diário visual de emoções com a mãe Mariana."
+                    )
+                },
+                {
+                    "paciente": "Helena Ramos Vasconcelos",
+                    "week_offset": 0,
+                    "weekday": 4,
+                    "inicio": (14, 0),
+                    "fim": (14, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": True,
                     "anotacao": None
                 },
                 {
-                    "paciente": "Pedro Lucas Guimarães",
-                    "day_offset": 2,
-                    "inicio": (14, 30),
-                    "fim": (15, 20),
+                    "paciente": "Sophia Carvalho Ferreira",
+                    "week_offset": 0,
+                    "weekday": 4,
+                    "inicio": (15, 30),
+                    "fim": (16, 20),
                     "status": Sessao.StatusChoices.AGENDADA,
                     "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Matheus Henrique Rocha",
+                    "week_offset": 0,
+                    "weekday": 4,
+                    "inicio": (16, 40),
+                    "fim": (17, 30),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+
+                # ==============================================================
+                # --- SEMANA +1 (PRÓXIMA SEMANA) ---
+                # ==============================================================
+                {
+                    "paciente": "Enzo Gabriel Santos",
+                    "week_offset": 1,
+                    "weekday": 0,  # Segunda
+                    "inicio": (9, 0),
+                    "fim": (9, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
                     "anotacao": None
                 },
                 {
                     "paciente": "Manuela Costa Ribeiro",
-                    "day_offset": 4,
-                    "inicio": (9, 0),
-                    "fim": (9, 50),
+                    "week_offset": 1,
+                    "weekday": 0,  # Segunda
+                    "inicio": (14, 30),
+                    "fim": (15, 20),
                     "status": Sessao.StatusChoices.AGENDADA,
                     "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": True,
                     "anotacao": None
                 },
                 {
-                    "paciente": "Arthur Vinicius Pires",
-                    "day_offset": 4,
+                    "paciente": "Theo Albuquerque Martins",
+                    "week_offset": 1,
+                    "weekday": 1,  # Terça
+                    "inicio": (8, 30),
+                    "fim": (9, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Laura Beatriz Lima",
+                    "week_offset": 1,
+                    "weekday": 1,  # Terça
                     "inicio": (10, 30),
                     "fim": (11, 20),
                     "status": Sessao.StatusChoices.AGENDADA,
-                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
                     "anotacao": None
                 },
                 {
-                    "paciente": "Alice Fernandes Souza",
-                    "day_offset": 5,
+                    "paciente": "Matheus Henrique Rocha",
+                    "week_offset": 1,
+                    "weekday": 1,  # Terça
+                    "inicio": (15, 0),
+                    "fim": (15, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Lucas Silva Mendes",
+                    "week_offset": 1,
+                    "weekday": 2,  # Quarta
+                    "inicio": (9, 0),
+                    "fim": (9, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Sophia Carvalho Ferreira",
+                    "week_offset": 1,
+                    "weekday": 2,  # Quarta
                     "inicio": (14, 0),
                     "fim": (14, 50),
                     "status": Sessao.StatusChoices.AGENDADA,
                     "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Isabella Duarte Nogueira",
+                    "week_offset": 1,
+                    "weekday": 3,  # Quinta
+                    "inicio": (10, 0),
+                    "fim": (10, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Pedro Lucas Guimarães",
+                    "week_offset": 1,
+                    "weekday": 3,  # Quinta
+                    "inicio": (14, 30),
+                    "fim": (15, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Helena Ramos Vasconcelos",
+                    "week_offset": 1,
+                    "weekday": 3,  # Quinta
+                    "inicio": (16, 0),
+                    "fim": (16, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Arthur Vinicius Pires",
+                    "week_offset": 1,
+                    "weekday": 4,  # Sexta
+                    "inicio": (9, 30),
+                    "fim": (10, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Alice Fernandes Souza",
+                    "week_offset": 1,
+                    "weekday": 4,  # Sexta
+                    "inicio": (11, 0),
+                    "fim": (11, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+
+                # ==============================================================
+                # --- SEMANA +2 (EM 2 SEMANAS) ---
+                # ==============================================================
+                {
+                    "paciente": "Laura Beatriz Lima",
+                    "week_offset": 2,
+                    "weekday": 0,  # Segunda
+                    "inicio": (10, 0),
+                    "fim": (10, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Lucas Silva Mendes",
+                    "week_offset": 2,
+                    "weekday": 0,  # Segunda
+                    "inicio": (15, 30),
+                    "fim": (16, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": True,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Sophia Carvalho Ferreira",
+                    "week_offset": 2,
+                    "weekday": 1,  # Terça
+                    "inicio": (9, 0),
+                    "fim": (9, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Enzo Gabriel Santos",
+                    "week_offset": 2,
+                    "weekday": 1,  # Terça
+                    "inicio": (14, 0),
+                    "fim": (14, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Theo Albuquerque Martins",
+                    "week_offset": 2,
+                    "weekday": 2,  # Quarta
+                    "inicio": (8, 30),
+                    "fim": (9, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Isabella Duarte Nogueira",
+                    "week_offset": 2,
+                    "weekday": 2,  # Quarta
+                    "inicio": (10, 30),
+                    "fim": (11, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Manuela Costa Ribeiro",
+                    "week_offset": 2,
+                    "weekday": 2,  # Quarta
+                    "inicio": (15, 0),
+                    "fim": (15, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Arthur Vinicius Pires",
+                    "week_offset": 2,
+                    "weekday": 3,  # Quinta
+                    "inicio": (9, 30),
+                    "fim": (10, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Pedro Lucas Guimarães",
+                    "week_offset": 2,
+                    "weekday": 3,  # Quinta
+                    "inicio": (14, 30),
+                    "fim": (15, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Alice Fernandes Souza",
+                    "week_offset": 2,
+                    "weekday": 4,  # Sexta
+                    "inicio": (10, 0),
+                    "fim": (10, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+
+                # ==============================================================
+                # --- SEMANA +3 (EM 3 SEMANAS) ---
+                # ==============================================================
+                {
+                    "paciente": "Helena Ramos Vasconcelos",
+                    "week_offset": 3,
+                    "weekday": 0,  # Segunda
+                    "inicio": (9, 0),
+                    "fim": (9, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Matheus Henrique Rocha",
+                    "week_offset": 3,
+                    "weekday": 0,  # Segunda
+                    "inicio": (14, 30),
+                    "fim": (15, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Lucas Silva Mendes",
+                    "week_offset": 3,
+                    "weekday": 1,  # Terça
+                    "inicio": (10, 30),
+                    "fim": (11, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Sophia Carvalho Ferreira",
+                    "week_offset": 3,
+                    "weekday": 1,  # Terça
+                    "inicio": (15, 0),
+                    "fim": (15, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Enzo Gabriel Santos",
+                    "week_offset": 3,
+                    "weekday": 2,  # Quarta
+                    "inicio": (9, 0),
+                    "fim": (9, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Theo Albuquerque Martins",
+                    "week_offset": 3,
+                    "weekday": 2,  # Quarta
+                    "inicio": (14, 0),
+                    "fim": (14, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Laura Beatriz Lima",
+                    "week_offset": 3,
+                    "weekday": 3,  # Quinta
+                    "inicio": (10, 0),
+                    "fim": (10, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Isabella Duarte Nogueira",
+                    "week_offset": 3,
+                    "weekday": 3,  # Quinta
+                    "inicio": (15, 30),
+                    "fim": (16, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Manuela Costa Ribeiro",
+                    "week_offset": 3,
+                    "weekday": 4,  # Sexta
+                    "inicio": (9, 30),
+                    "fim": (10, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Arthur Vinicius Pires",
+                    "week_offset": 3,
+                    "weekday": 4,  # Sexta
+                    "inicio": (11, 0),
+                    "fim": (11, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+
+                # ==============================================================
+                # --- SEMANA +4 (EM 4 SEMANAS) ---
+                # ==============================================================
+                {
+                    "paciente": "Pedro Lucas Guimarães",
+                    "week_offset": 4,
+                    "weekday": 0,  # Segunda
+                    "inicio": (9, 0),
+                    "fim": (9, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Alice Fernandes Souza",
+                    "week_offset": 4,
+                    "weekday": 0,  # Segunda
+                    "inicio": (14, 30),
+                    "fim": (15, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Lucas Silva Mendes",
+                    "week_offset": 4,
+                    "weekday": 1,  # Terça
+                    "inicio": (10, 0),
+                    "fim": (10, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Matheus Henrique Rocha",
+                    "week_offset": 4,
+                    "weekday": 1,  # Terça
+                    "inicio": (15, 0),
+                    "fim": (15, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Sophia Carvalho Ferreira",
+                    "week_offset": 4,
+                    "weekday": 2,  # Quarta
+                    "inicio": (9, 0),
+                    "fim": (9, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Helena Ramos Vasconcelos",
+                    "week_offset": 4,
+                    "weekday": 2,  # Quarta
+                    "inicio": (14, 0),
+                    "fim": (14, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.AVALIATIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Enzo Gabriel Santos",
+                    "week_offset": 4,
+                    "weekday": 3,  # Quinta
+                    "inicio": (10, 30),
+                    "fim": (11, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Theo Albuquerque Martins",
+                    "week_offset": 4,
+                    "weekday": 3,  # Quinta
+                    "inicio": (15, 30),
+                    "fim": (16, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Isabella Duarte Nogueira",
+                    "week_offset": 4,
+                    "weekday": 4,  # Sexta
+                    "inicio": (9, 30),
+                    "fim": (10, 20),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
+                    "anotacao": None
+                },
+                {
+                    "paciente": "Laura Beatriz Lima",
+                    "week_offset": 4,
+                    "weekday": 4,  # Sexta
+                    "inicio": (11, 0),
+                    "fim": (11, 50),
+                    "status": Sessao.StatusChoices.AGENDADA,
+                    "tipo": Sessao.TipoChoices.INTERVENTIVA,
+                    "pago": False,
                     "anotacao": None
                 },
             ]
@@ -864,8 +1437,8 @@ class Command(BaseCommand):
                 if not paciente:
                     continue
 
-                inicio_dt = make_dt(s_info["day_offset"], s_info["inicio"][0], s_info["inicio"][1])
-                fim_dt = make_dt(s_info["day_offset"], s_info["fim"][0], s_info["fim"][1])
+                inicio_dt = make_dt(s_info["week_offset"], s_info["weekday"], s_info["inicio"][0], s_info["inicio"][1])
+                fim_dt = make_dt(s_info["week_offset"], s_info["weekday"], s_info["fim"][0], s_info["fim"][1])
 
                 sessao = Sessao.objects.create(
                     paciente=paciente,
@@ -874,6 +1447,7 @@ class Command(BaseCommand):
                     dataHoraFim=fim_dt,
                     status=s_info["status"],
                     tipo=s_info["tipo"],
+                    pago=s_info.get("pago", False),
                 )
                 sessoes_count += 1
 
@@ -884,7 +1458,7 @@ class Command(BaseCommand):
                     )
                     anotacoes_count += 1
 
-            self.stdout.write(self.style.SUCCESS(f"  [+] Criadas {sessoes_count} sessões na agenda do Dr. Gabriel."))
+            self.stdout.write(self.style.SUCCESS(f"  [+] Criadas {sessoes_count} sessões na agenda do Dr. Gabriel (passadas, hoje e 4 semanas futuras)."))
             self.stdout.write(self.style.SUCCESS(f"  [+] Registradas {anotacoes_count} anotações clínicas de sessão em prontuário."))
 
         self.stdout.write(self.style.SUCCESS("\n=== Banco de dados populado com sucesso! ==="))
