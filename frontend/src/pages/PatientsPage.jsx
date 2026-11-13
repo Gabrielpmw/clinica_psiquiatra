@@ -20,7 +20,7 @@ import {
 import { getPacientesApi, togglePacienteStatusApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import PatientFormModal from '../components/PatientFormModal';
-import Sidebar from '../components/Sidebar';
+import AppLayout from '../components/AppLayout';
 
 // ── Paleta de cores ──────────────────────────────────────────────────────────
 const C = {
@@ -153,60 +153,53 @@ export default function PatientsPage() {
     return age > 0 ? `${age} anos` : 'menos de 1 ano';
   };
 
+  const headerLeft = (
+    <nav className="flex items-center gap-1.5 text-xs text-ink-400">
+      <button
+        onClick={() => navigate('/dashboard')}
+        className="transition-colors text-ink-600 hover:text-leaf-700"
+      >
+        Início
+      </button>
+      <ChevronRight className="w-3 h-3" />
+      <span style={{ color: C.leaf700, fontWeight: 600 }}>Pacientes</span>
+    </nav>
+  );
+
+  const headerRight = (
+    <div className="text-xs text-ink-600 flex items-center gap-2">
+      <span className="hidden sm:inline">Logado como</span>
+      <span className="font-semibold text-ink-900 max-w-[120px] sm:max-w-none truncate">{user?.nome}</span>
+    </div>
+  );
+
   return (
-    <div className="flex h-screen bg-paper-100 font-sans text-ink-900 overflow-hidden">
-      {/* Menu Lateral Fixo */}
-      <Sidebar activePage="pacientes" />
-
-      {/* Conteúdo Principal */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Barra superior */}
-        <header
-          className="h-16 px-8 flex items-center justify-between border-b flex-shrink-0"
-          style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
+    <AppLayout
+      activePage="pacientes"
+      headerLeft={headerLeft}
+      headerRight={headerRight}
+    >
+      {/* Notificação Toast */}
+      {notification && (
+        <div
+          className="fixed top-4 right-4 z-50 px-4 py-2.5 rounded-lg text-xs font-medium shadow-md flex items-center gap-2 border"
+          style={
+            notification.type === 'success'
+              ? { backgroundColor: C.leaf700, color: C.paper50, borderColor: C.leaf800 }
+              : { backgroundColor: C.cancelled, color: '#fff', borderColor: '#8e3d35' }
+          }
         >
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-xs" style={{ color: C.ink400 }}>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="transition-colors"
-              style={{ color: C.ink600 }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = C.leaf700; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = C.ink600; }}
-            >
-              Início
-            </button>
-            <ChevronRight className="w-3 h-3" />
-            <span style={{ color: C.leaf700, fontWeight: 600 }}>Pacientes</span>
-          </nav>
+          {notification.type === 'success' ? (
+            <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+          ) : (
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+          )}
+          <span>{notification.message}</span>
+        </div>
+      )}
 
-          <div className="text-xs text-ink-600 flex items-center gap-2">
-            <span>Logado como</span>
-            <span className="font-semibold text-ink-900">{user?.nome}</span>
-          </div>
-        </header>
-
-        {/* Notificação Toast */}
-        {notification && (
-          <div
-            className="fixed top-4 right-4 z-50 px-4 py-2.5 rounded-lg text-xs font-medium shadow-md flex items-center gap-2 border"
-            style={
-              notification.type === 'success'
-                ? { backgroundColor: C.leaf700, color: C.paper50, borderColor: C.leaf800 }
-                : { backgroundColor: C.cancelled, color: '#fff', borderColor: '#8e3d35' }
-            }
-          >
-            {notification.type === 'success' ? (
-              <CheckCircle className="w-3.5 h-3.5 shrink-0" />
-            ) : (
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-            )}
-            <span>{notification.message}</span>
-          </div>
-        )}
-
-        {/* Área Central Rolável */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+      {/* Área Central Rolável */}
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
           {/* Cabeçalho de página */}
           <div>
             <h1 className="text-2xl font-bold" style={{ color: C.ink900 }}>
@@ -516,8 +509,7 @@ export default function PatientsPage() {
             </span>
           </div>
         </div>
-        </div>
-      </main>
+      </div>
 
       {/* Modal de Cadastro / Edição */}
       <PatientFormModal
@@ -539,7 +531,7 @@ export default function PatientsPage() {
       {confirmToggle && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(23,56,42,0.45)', backdropFilter: 'blur(2px)' }}>
           <div
-            className="rounded-xl shadow-lg border max-w-sm w-full p-6"
+            className="rounded-xl shadow-lg border max-w-sm w-full max-h-[90vh] overflow-y-auto p-6 mx-4 sm:mx-auto"
             style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
           >
             <div
@@ -590,6 +582,6 @@ export default function PatientsPage() {
           </div>
         </div>
       )}
-    </div>
+    </AppLayout>
   );
 }

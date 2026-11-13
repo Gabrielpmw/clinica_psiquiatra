@@ -30,7 +30,7 @@ import {
   resolverSolicitacaoResetApi,
   cancelarSolicitacaoResetApi
 } from '../services/api';
-import Sidebar from '../components/Sidebar';
+import AppLayout from '../components/AppLayout';
 
 // ── helpers de estilo ───────────────────────────────────────────────────────
 const C = {
@@ -238,57 +238,49 @@ export default function DashboardPage() {
     },
   };
 
+  const headerLeft = (
+    <nav className="flex items-center gap-1.5 text-xs text-ink-400">
+      <span className="text-ink-600">Início</span>
+      {isAdmin && (
+        <>
+          <span>›</span>
+          <span className="text-ink-900 font-semibold">Usuários</span>
+        </>
+      )}
+      {!isAdmin && (
+        <>
+          <span>›</span>
+          <span className="text-ink-900 font-semibold">Painel Principal</span>
+        </>
+      )}
+    </nav>
+  );
+
+  const headerRight = (
+    <div className="flex items-center gap-2 sm:gap-3">
+      <span className="text-xs font-semibold text-ink-900 max-w-[120px] sm:max-w-none truncate">
+        {user?.nome || 'Usuário'}
+      </span>
+      <span
+        className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
+        style={{
+          backgroundColor: isAdmin ? '#f3e8ff' : isDoutora ? C.leaf100 : '#E4EEF6',
+          color: isAdmin ? '#7e22ce' : isDoutora ? C.leaf800 : '#4A86B5',
+          borderColor: isAdmin ? '#d8b4fe' : isDoutora ? C.leaf200 : '#bfdbfe',
+        }}
+      >
+        {getRoleLabel()}
+      </span>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: C.paper100, color: C.ink900 }}>
-
-      {/* ── MENU LATERAL ─────────────────────────────────────────────────── */}
-      <Sidebar activePage="inicio" />
-
-      {/* ── ÁREA PRINCIPAL ───────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-h-screen">
-
-        {/* Barra superior */}
-        <header
-          className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 shadow-sm border-b"
-          style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
-        >
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-xs" style={{ color: C.ink400 }}>
-            <span style={{ color: C.ink600 }}>Início</span>
-            {isAdmin && (
-              <>
-                <span>›</span>
-                <span style={{ color: C.ink900, fontWeight: 600 }}>Usuários</span>
-              </>
-            )}
-            {!isAdmin && (
-              <>
-                <span>›</span>
-                <span style={{ color: C.ink900, fontWeight: 600 }}>Painel Principal</span>
-              </>
-            )}
-          </nav>
-
-          {/* Usuário logado */}
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-semibold" style={{ color: C.ink900 }}>
-              {user?.nome || 'Usuário'}
-            </span>
-            <span
-              className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
-              style={{
-                backgroundColor: isAdmin ? '#f3e8ff' : isDoutora ? C.leaf100 : '#E4EEF6',
-                color: isAdmin ? '#7e22ce' : isDoutora ? C.leaf800 : '#4A86B5',
-                borderColor: isAdmin ? '#d8b4fe' : isDoutora ? C.leaf200 : '#bfdbfe',
-              }}
-            >
-              {getRoleLabel()}
-            </span>
-          </div>
-        </header>
-
-        {/* Conteúdo */}
-        <main className="flex-1 p-6 sm:p-8">
+    <AppLayout
+      activePage="inicio"
+      headerLeft={headerLeft}
+      headerRight={headerRight}
+    >
+      <div className="p-4 sm:p-6 lg:p-8">
 
           {/* ══ VISÃO ADMIN ══════════════════════════════════════════════ */}
           {isAdmin ? (
@@ -884,13 +876,12 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
-        </main>
-      </div>
+        </div>
 
       {/* Modal de Redefinição de Senha pelo Admin */}
       {(solicitacaoModal || userResetModal) && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-paper-50 w-full max-w-md rounded-2xl border border-paper-300 shadow-2xl p-6 space-y-4 animate-scaleUp">
+          <div className="bg-paper-50 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-paper-300 shadow-2xl p-6 space-y-4 animate-scaleUp">
             <div className="flex items-center justify-between pb-3 border-b border-paper-300">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-leaf-100 text-leaf-800 rounded-xl">
@@ -971,6 +962,6 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
-    </div>
+    </AppLayout>
   );
 }

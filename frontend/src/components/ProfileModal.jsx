@@ -115,10 +115,10 @@ export default function ProfileModal({ isOpen, onClose }) {
   const roleBadge = getRoleBadge();
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-paper-50 w-full max-w-md rounded-2xl border border-paper-300 shadow-2xl overflow-hidden animate-scaleUp">
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-paper-50 w-full max-w-sm sm:max-w-md mx-auto rounded-2xl border border-paper-300 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-scaleUp">
         {/* Cabeçalho */}
-        <div className="p-6 bg-paper-100 border-b border-paper-300 flex items-center justify-between">
+        <div className="p-4 sm:p-6 bg-paper-100 border-b border-paper-300 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-leaf-700 text-paper-50 flex items-center justify-center font-bold text-base shadow-xs">
               {user?.nome?.charAt(0)?.toUpperCase() || 'U'}
@@ -141,7 +141,7 @@ export default function ProfileModal({ isOpen, onClose }) {
         </div>
 
         {/* Abas */}
-        <div className="flex border-b border-paper-300 bg-paper-50 px-6 pt-3 gap-2">
+        <div className="flex border-b border-paper-300 bg-paper-50 px-4 sm:px-6 pt-3 gap-2 flex-shrink-0">
           <button
             onClick={() => setActiveTab('perfil')}
             className={`flex items-center gap-2 pb-2.5 px-3 text-xs font-bold border-b-2 transition ${
@@ -168,7 +168,7 @@ export default function ProfileModal({ isOpen, onClose }) {
 
         {/* Conteúdo Aba Perfil */}
         {activeTab === 'perfil' && (
-          <form onSubmit={handleUpdateProfile} className="p-6 space-y-4">
+          <form onSubmit={handleUpdateProfile} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
             {profileMsg && (
               <div
                 className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
@@ -223,7 +223,7 @@ export default function ProfileModal({ isOpen, onClose }) {
 
         {/* Conteúdo Aba Senha */}
         {activeTab === 'senha' && (
-          <form onSubmit={handleChangePassword} className="p-6 space-y-4">
+          <form onSubmit={handleChangePassword} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
             {passwordMsg && (
               <div
                 className={`p-3 rounded-xl text-xs flex items-center gap-2 ${

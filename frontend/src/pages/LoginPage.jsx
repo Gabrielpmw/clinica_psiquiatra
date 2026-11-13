@@ -108,7 +108,7 @@ export default function LoginPage() {
 
         {/* Cartão de login */}
         <div
-          className="w-full max-w-md rounded-xl shadow-sm border p-8"
+          className="w-full max-w-md rounded-xl shadow-sm border px-4 sm:px-8 py-8"
           style={{ backgroundColor: '#F9FAF6', borderColor: '#D5DED0' }}
         >
           <div className="mb-6">
@@ -277,7 +277,7 @@ export default function LoginPage() {
       {/* Modal Esqueci Minha Senha */}
       {forgotModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-paper-50 w-full max-w-md rounded-2xl border border-paper-300 shadow-2xl p-6 space-y-4 animate-scaleUp">
+          <div className="bg-paper-50 w-full max-w-md mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto rounded-2xl border border-paper-300 shadow-2xl p-6 space-y-4 animate-scaleUp">
             <div className="flex items-center justify-between pb-3 border-b border-paper-300">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-leaf-100 text-leaf-800 rounded-xl">

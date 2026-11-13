@@ -271,16 +271,16 @@ export default function PatientFormModal({ isOpen, onClose, onSaved, pacienteToE
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
       style={{ backgroundColor: 'rgba(23,56,42,0.45)', backdropFilter: 'blur(2px)' }}
     >
       <div
-        className="rounded-2xl shadow-xl border w-full max-w-2xl my-8 overflow-hidden flex flex-col max-h-[90vh]"
+        className="rounded-2xl shadow-xl border w-full max-w-lg sm:max-w-2xl my-4 sm:my-8 overflow-hidden flex flex-col max-h-[90vh] mx-auto"
         style={{ backgroundColor: C.paper50, borderColor: C.paper300 }}
       >
         {/* Header do modal */}
         <div
-          className="px-6 py-4 flex items-center justify-between border-b"
+          className="px-4 sm:px-6 py-4 flex items-center justify-between border-b"
           style={{ backgroundColor: C.leaf900, borderColor: C.leaf800 }}
         >
           <div>
@@ -301,7 +301,7 @@ export default function PatientFormModal({ isOpen, onClose, onSaved, pacienteToE
 
         {/* Tabs */}
         <div
-          className="flex border-b px-6 pt-3 gap-2"
+          className="flex border-b px-4 sm:px-6 pt-3 gap-2 overflow-x-auto no-scrollbar"
           style={{ backgroundColor: C.paper100, borderColor: C.paper300 }}
         >
           {[

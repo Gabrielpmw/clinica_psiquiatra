@@ -59,11 +59,11 @@ export default function BloqueioModal({ isOpen, onClose, onSuccess, initialDate 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 backdrop-blur-xs p-4">
-      <div className="bg-paper-50 rounded-2xl border border-paper-300 shadow-xl w-full max-w-md overflow-hidden animate-fade-in">
-        <div className="flex items-center justify-between px-6 py-4 bg-paper-200 border-b border-paper-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-paper-50 rounded-2xl border border-paper-300 shadow-xl w-full max-w-md mx-auto max-h-[90vh] flex flex-col overflow-hidden animate-fade-in">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 bg-paper-200 border-b border-paper-300 flex-shrink-0">
           <div>
-            <h2 className="text-lg font-semibold text-ink-900 flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-semibold text-ink-900 flex items-center gap-2">
               <Lock className="w-5 h-5 text-amber-700" />
               Bloquear Horário na Agenda
             </h2>
@@ -76,7 +76,7 @@ export default function BloqueioModal({ isOpen, onClose, onSuccess, initialDate 
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
           {erro && (
             <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />

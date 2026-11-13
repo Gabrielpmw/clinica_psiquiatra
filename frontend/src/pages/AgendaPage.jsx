@@ -27,7 +27,7 @@ import WeekView from '../components/Agenda/WeekView';
 import PatientDayList from '../components/Agenda/PatientDayList';
 import SessionFormModal from '../components/Agenda/SessionFormModal';
 import BloqueioModal from '../components/Agenda/BloqueioModal';
-import Sidebar from '../components/Sidebar';
+import AppLayout from '../components/AppLayout';
 
 export default function AgendaPage() {
   const { user, logout, isSecretaria, isDoutora, isAdmin } = useAuth();
@@ -98,6 +98,13 @@ export default function AgendaPage() {
     carregarDados();
   }, [carregarDados]);
 
+  // No mobile (< 768px), define a visão padrão como 'dia' para melhor ergonomia
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setViewMode('dia');
+    }
+  }, []);
+
   // Navegação de datas
   const handleNavegar = (direcao) => {
     const d = new Date(`${dataSelecionada}T00:00:00`);
@@ -141,30 +148,31 @@ export default function AgendaPage() {
     }
   };
 
+  const headerLeft = (
+    <nav className="flex items-center gap-1.5 text-xs text-ink-400">
+      <span className="hover:text-ink-900 cursor-pointer text-ink-600" onClick={() => navigate('/dashboard')}>
+        Início
+      </span>
+      <span>›</span>
+      <span className="font-semibold text-leaf-700">Agenda de Atendimento</span>
+    </nav>
+  );
+
+  const headerRight = (
+    <div className="text-xs text-ink-600 flex items-center gap-2">
+      <span className="hidden sm:inline">Logado como</span>
+      <span className="font-semibold text-ink-900 max-w-[120px] sm:max-w-none truncate">{user?.nome}</span>
+    </div>
+  );
+
   return (
-    <div className="flex h-screen bg-paper-100 font-sans text-ink-900">
-      {/* Menu Lateral Fixo */}
-      <Sidebar activePage="agenda" />
-
-      {/* Conteúdo Principal */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Barra Superior / Breadcrumb */}
-        <header className="h-16 bg-paper-50 border-b border-paper-300 px-8 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs text-ink-600">
-            <span className="hover:text-ink-900 cursor-pointer" onClick={() => navigate('/dashboard')}>
-              Início
-            </span>
-            <span>›</span>
-            <span className="font-semibold text-leaf-700">Agenda de Atendimento</span>
-          </div>
-          <div className="text-xs text-ink-600 flex items-center gap-2">
-            <span>Logado como</span>
-            <span className="font-semibold text-ink-900">{user?.nome}</span>
-          </div>
-        </header>
-
-        {/* Área Central Rolável */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+    <AppLayout
+      activePage="agenda"
+      headerLeft={headerLeft}
+      headerRight={headerRight}
+    >
+      {/* Área Central Rolável */}
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
           {/* Título da Página e Descrição */}
           <div>
             <h2 className="text-2xl font-bold text-ink-900">Agenda Clínica</h2>
@@ -173,7 +181,7 @@ export default function AgendaPage() {
           {/* Barra de Ações Agrupadas (RF03, RF04, RF05) */}
           <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-paper-200 border border-paper-300">
             {/* Controles de Modo e Navegação de Data */}
-            <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {/* Toggle Dia / Semana */}
               <div className="inline-flex rounded-lg border border-paper-300 bg-paper-50 p-1 shadow-2xs">
                 <button
@@ -232,7 +240,7 @@ export default function AgendaPage() {
             </div>
 
             {/* Botões de Ação Primária e Secundária */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
               <button
                 onClick={() => setModalBloqueioOpen(true)}
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-paper-300 bg-paper-50 hover:bg-paper-100 text-ink-900 text-xs font-semibold transition shadow-2xs"
@@ -277,7 +285,7 @@ export default function AgendaPage() {
               </div>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-6 overflow-x-auto">
               <WeekView
                 sessoes={sessoes}
                 bloqueios={bloqueios}
@@ -290,7 +298,6 @@ export default function AgendaPage() {
             </div>
           )}
         </div>
-      </main>
 
       {/* Modais */}
       <SessionFormModal
@@ -306,6 +313,6 @@ export default function AgendaPage() {
         onSuccess={() => carregarDados()}
         initialDate={dataSelecionada}
       />
-    </div>
+    </AppLayout>
   );
 }
