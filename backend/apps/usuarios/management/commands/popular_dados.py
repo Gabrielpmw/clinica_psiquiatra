@@ -17,7 +17,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 from apps.usuarios.models import Usuario
-from apps.pacientes.models import Paciente, Endereco, Responsavel
+from apps.pacientes.models import Paciente, Endereco, Responsavel, ConcessaoAcessoPaciente
 from apps.agenda.models import Sessao, Disponibilidade, Bloqueio
 from apps.prontuario.models import Anamnese, AnotacaoSessao
 
@@ -48,6 +48,7 @@ class Command(BaseCommand):
                 Sessao.objects.all().delete()
                 Responsavel.objects.all().delete()
                 Endereco.objects.all().delete()
+                ConcessaoAcessoPaciente.objects.all().delete()
                 Paciente.objects.all().delete()
 
                 # Remove usuários que não sejam administradores
@@ -554,6 +555,13 @@ class Command(BaseCommand):
                     historicoFamiliar=anam_data["historicoFamiliar"],
                     adesaoRegras=anam_data["adesaoRegras"],
                     observacoesGerais=anam_data["observacoesGerais"],
+                )
+
+                # Concessão explícita de acesso ao Dr. Gabriel
+                ConcessaoAcessoPaciente.objects.create(
+                    paciente=paciente,
+                    profissional=doc_user,
+                    ativo=True
                 )
 
             self.stdout.write(self.style.SUCCESS(f"  [+] Criados {len(pacientes_map)} pacientes com endereço, responsável e anamnese completa."))

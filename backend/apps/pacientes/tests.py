@@ -183,3 +183,63 @@ class PacienteAPITestCase(APITestCase):
             'sexo': 'M'
         }, format='json')
         self.assertEqual(res_post.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_cadastro_paciente_data_nascimento_ano_1984_formatos(self):
+        """
+        Valida que pacientes com ano de nascimento histórico (ex: 1984)
+        podem ser cadastrados tanto no formato ISO (YYYY-MM-DD), formato brasileiro (DD/MM/YYYY)
+        quanto apenas pelo ano (YYYY -> YYYY-01-01).
+        """
+        self.client.force_authenticate(user=self.secretaria)
+
+        # 1. Formato ISO 1984-05-20
+        payload_iso = {
+            'nomeCompleto': 'Paciente Nascido em 1984 ISO',
+            'dataNascimento': '1984-05-20',
+            'sexo': 'M',
+            'enderecos': [{'cep': '77000-000', 'logradouro': 'Rua A', 'numero': '1', 'bairro': 'Centro', 'cidade': 'Palmas', 'estado': 'TO'}],
+            'responsaveis': [{'nomeCompleto': 'Resp 1', 'cpf': '111.111.111-11', 'contato': '63999991111', 'parentesco': 'Pai'}]
+        }
+        res_iso = self.client.post(self.list_create_url, payload_iso, format='json')
+        self.assertEqual(res_iso.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res_iso.data['dataNascimento'], '1984-05-20')
+
+        # 2. Formato Brasileiro 15/05/1984
+        payload_br = {
+            'nomeCompleto': 'Paciente Nascido em 1984 BR',
+            'dataNascimento': '15/05/1984',
+            'sexo': 'F',
+            'enderecos': [{'cep': '77000-000', 'logradouro': 'Rua B', 'numero': '2', 'bairro': 'Centro', 'cidade': 'Palmas', 'estado': 'TO'}],
+            'responsaveis': [{'nomeCompleto': 'Resp 2', 'cpf': '222.222.222-22', 'contato': '63999992222', 'parentesco': 'Mãe'}]
+        }
+        res_br = self.client.post(self.list_create_url, payload_br, format='json')
+        self.assertEqual(res_br.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res_br.data['dataNascimento'], '1984-05-15')
+
+        # 3. Formato Apenas Ano 1984
+        payload_ano = {
+            'nomeCompleto': 'Paciente Nascido em 1984 Ano',
+            'dataNascimento': '1984',
+            'sexo': 'OUTRO',
+            'enderecos': [{'cep': '77000-000', 'logradouro': 'Rua C', 'numero': '3', 'bairro': 'Centro', 'cidade': 'Palmas', 'estado': 'TO'}],
+            'responsaveis': [{'nomeCompleto': 'Resp 3', 'cpf': '333.333.333-33', 'contato': '63999993333', 'parentesco': 'Tutor'}]
+        }
+        res_ano = self.client.post(self.list_create_url, payload_ano, format='json')
+        self.assertEqual(res_ano.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res_ano.data['dataNascimento'], '1984-01-01')
+
+    def test_rejeita_data_nascimento_no_futuro(self):
+        """
+        Garante que data de nascimento no futuro seja rejeitada com 400 Bad Request.
+        """
+        self.client.force_authenticate(user=self.secretaria)
+        payload_futuro = {
+            'nomeCompleto': 'Paciente do Futuro',
+            'dataNascimento': '2099-01-01',
+            'sexo': 'M',
+            'enderecos': [{'cep': '77000-000', 'logradouro': 'Rua D', 'numero': '4', 'bairro': 'Centro', 'cidade': 'Palmas', 'estado': 'TO'}],
+            'responsaveis': [{'nomeCompleto': 'Resp 4', 'cpf': '444.444.444-44', 'contato': '63999994444', 'parentesco': 'Mãe'}]
+        }
+        response = self.client.post(self.list_create_url, payload_futuro, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('dataNascimento', response.data)

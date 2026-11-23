@@ -37,6 +37,10 @@ class PacienteSerializer(serializers.ModelSerializer):
     Serializer completo de Paciente com escrita aninhada atômica (RF02).
     Garante a criação consistente de paciente, endereço e responsável legal.
     """
+    dataNascimento = serializers.DateField(
+        input_formats=['%Y-%m-%d', '%d/%m/%Y', '%Y', 'iso-8601'],
+        required=True
+    )
     enderecos = EnderecoSerializer(many=True, required=False)
     responsaveis = ResponsavelSerializer(many=True, required=False)
 
@@ -53,6 +57,12 @@ class PacienteSerializer(serializers.ModelSerializer):
             'responsaveis'
         ]
         read_only_fields = ['id', 'dataCadastro']
+
+    def validate_dataNascimento(self, value):
+        from django.utils import timezone
+        if value > timezone.now().date():
+            raise serializers.ValidationError("A data de nascimento não pode estar no futuro.")
+        return value
 
     def validate(self, attrs):
         # Validação na criação de paciente

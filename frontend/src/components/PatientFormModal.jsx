@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, MapPin, Users, Save, AlertCircle, Loader2 } from 'lucide-react';
+import { X, User, MapPin, Users, Save, AlertCircle, Loader2, Calendar } from 'lucide-react';
 import { createPacienteApi, updatePacienteApi } from '../services/api';
 
 // ── Paleta de cores ──────────────────────────────────────────────────────────
@@ -49,10 +49,62 @@ export default function PatientFormModal({ isOpen, onClose, onSaved, pacienteToE
   const [respContato, setRespContato] = useState('');
   const [respParentesco, setRespParentesco] = useState('');
 
+  const formatIsoToBr = (isoStr) => {
+    if (!isoStr) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(isoStr)) {
+      const [y, m, d] = isoStr.split('-');
+      return `${d}/${m}/${y}`;
+    }
+    return isoStr;
+  };
+
+  const parseDateInput = (input) => {
+    if (!input) return null;
+    const clean = input.trim();
+    let y, m, d;
+
+    if (/^\d{4}$/.test(clean)) {
+      y = Number(clean);
+      m = 1;
+      d = 1;
+    } else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(clean)) {
+      const parts = clean.split('/').map(Number);
+      d = parts[0];
+      m = parts[1];
+      y = parts[2];
+    } else if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(clean)) {
+      const parts = clean.split('-').map(Number);
+      y = parts[0];
+      m = parts[1];
+      d = parts[2];
+    } else if (/^\d{8}$/.test(clean)) {
+      d = Number(clean.slice(0, 2));
+      m = Number(clean.slice(2, 4));
+      y = Number(clean.slice(4));
+    } else {
+      return null;
+    }
+
+    if (isNaN(y) || isNaN(m) || isNaN(d)) return null;
+    if (y < 1900 || y > new Date().getFullYear()) return null;
+    if (m < 1 || m > 12) return null;
+    if (d < 1 || d > 31) return null;
+
+    const dt = new Date(y, m - 1, d);
+    if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) {
+      return null;
+    }
+    if (dt > new Date()) return null;
+
+    const mStr = String(m).padStart(2, '0');
+    const dStr = String(d).padStart(2, '0');
+    return `${y}-${mStr}-${dStr}`;
+  };
+
   useEffect(() => {
     if (pacienteToEdit) {
       setNomeCompleto(pacienteToEdit.nomeCompleto || '');
-      setDataNascimento(pacienteToEdit.dataNascimento || '');
+      setDataNascimento(formatIsoToBr(pacienteToEdit.dataNascimento) || '');
       setSexo(pacienteToEdit.sexo || 'M');
 
       const end = pacienteToEdit.enderecos?.[0] || {};
@@ -156,9 +208,10 @@ export default function PatientFormModal({ isOpen, onClose, onSaved, pacienteToE
       return;
     }
 
-    if (!dataNascimento) {
+    const dataNascimentoIso = parseDateInput(dataNascimento);
+    if (!dataNascimentoIso) {
       setActiveTab('dados');
-      setErrorMessage('Por favor, selecione a Data de Nascimento do paciente.');
+      setErrorMessage('Por favor, informe uma data de nascimento válida (Ex: 15/05/1984 ou 1984).');
       return;
     }
 
@@ -189,7 +242,7 @@ export default function PatientFormModal({ isOpen, onClose, onSaved, pacienteToE
 
     const payload = {
       nomeCompleto: nomeCompleto.trim(),
-      dataNascimento,
+      dataNascimento: dataNascimentoIso,
       sexo,
       enderecos: [
         {
@@ -370,15 +423,37 @@ export default function PatientFormModal({ isOpen, onClose, onSaved, pacienteToE
                   <label className="block text-xs font-medium mb-1" style={{ color: C.ink600 }}>
                     Data de Nascimento *
                   </label>
-                  <input
-                    type="date"
-                    required
-                    value={dataNascimento}
-                    onChange={(e) => setDataNascimento(e.target.value)}
-                    className={baseInput}
-                    style={inputStyle}
-                    {...inputEvents}
-                  />
+                  <div className="relative flex items-center">
+                    <input
+                      type="text"
+                      required
+                      placeholder="DD/MM/AAAA ou AAAA"
+                      value={dataNascimento}
+                      onChange={(e) => setDataNascimento(e.target.value)}
+                      className={baseInput}
+                      style={{ ...inputStyle, paddingRight: '2.5rem' }}
+                      {...inputEvents}
+                    />
+                    <label
+                      title="Selecionar no calendário"
+                      className="absolute right-2.5 cursor-pointer text-ink-400 hover:text-leaf-700 transition-colors"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      <input
+                        type="date"
+                        max={new Date().toISOString().split('T')[0]}
+                        className="sr-only"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            setDataNascimento(formatIsoToBr(e.target.value));
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <p className="text-[10px] text-ink-400 mt-1">
+                    Ex: 15/05/1984 ou apenas o ano 1984
+                  </p>
                 </div>
 
                 <div>

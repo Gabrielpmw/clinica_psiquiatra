@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.utils import timezone
 from rest_framework import generics, viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -6,6 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, ValidationError
 
 from apps.pacientes.models import Paciente
+from apps.pacientes.permissions import check_patient_doctor_access
+from apps.agenda.models import Sessao
 from apps.usuarios.permissions import IsDoctorOrAdmin
 from .models import Anamnese, AnotacaoSessao, ResumoIa, ParecerConclusivo
 from .serializers import (
@@ -15,9 +18,19 @@ from .serializers import (
     ParecerConclusivoSerializer
 )
 from .services.prompt_catalog import list_available_prompts, get_prompt_by_id
-from .services.gemini_service import generate_clinical_summary
+from .services.clinical_context import format_clinical_context
+from .services.sanitizer import sanitize_clinical_data
 from .services.pdf_generator import generate_parecer_pdf
 from .services.email_service import send_parecer_email
+
+
+class NoStoreCacheMixin:
+    """Aplica Cache-Control: no-store a respostas clínicas do fluxo de IA."""
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+        response['Cache-Control'] = 'no-store'
+        return response
+
 
 
 class AnamneseDetailView(generics.RetrieveUpdateAPIView):
@@ -106,36 +119,42 @@ class PromptCatalogListView(APIView):
         return Response(list_available_prompts(), status=status.HTTP_200_OK)
 
 
-class GerarResumoIaView(APIView):
+class ContextoIaView(NoStoreCacheMixin, APIView):
     """
-    Aciona a sanitização dos dados clínicos e gera a prévia de resumo via Gemini 1.5 Flash (RF10, RF11, RF12).
-    A doutora pode visualizar a prévia e decidir salvar ou descartar.
-    Rota: /api/prontuario/pacientes/<paciente_id>/ia/gerar/
+    Prepara o contexto clínico minimizado/sanitizado e a instrução fixa do prompt (RF10, RF11).
+    Retorna o contexto, as referências de sessão disponíveis e a instrução fixa selecionada.
+    Rota: /api/prontuario/pacientes/<paciente_id>/ia/contexto/
     """
     permission_classes = [IsDoctorOrAdmin]
 
     def post(self, request, paciente_id):
-        try:
-            paciente = Paciente.objects.get(id=paciente_id)
-        except Paciente.DoesNotExist:
-            raise NotFound('Paciente não encontrado.')
+        paciente = check_patient_doctor_access(request.user, paciente_id)
 
-        prompt_id = request.data.get('prompt_id')
-        if not prompt_id:
+        data = request.data
+        if not isinstance(data, dict):
             return Response(
-                {'error': 'O campo prompt_id (1 a 4) é obrigatório.'},
+                {'error': 'Corpo da requisição deve ser um objeto JSON válido.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        try:
-            prompt_id_int = int(prompt_id)
-        except (ValueError, TypeError):
+        # O corpo deve aceitar exclusivamente prompt_id (sem campos extras ou instrução livre)
+        if set(data.keys()) != {'prompt_id'}:
             return Response(
-                {'error': 'O prompt_id deve ser um número inteiro entre 1 e 4.'},
+                {'error': 'O corpo da requisição deve conter exclusivamente o campo prompt_id.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if not get_prompt_by_id(prompt_id_int):
+        prompt_id = data.get('prompt_id')
+
+        # Validação estrita: deve ser número inteiro entre 1 e 4 (não bool, não float, não string)
+        if not isinstance(prompt_id, int) or isinstance(prompt_id, bool):
+            return Response(
+                {'error': 'O campo prompt_id deve ser um número inteiro entre 1 e 4.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        prompt_config = get_prompt_by_id(prompt_id)
+        if not prompt_config:
             return Response(
                 {'error': 'Identificador de prompt inválido. Escolha um valor entre 1 e 4.'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -144,26 +163,34 @@ class GerarResumoIaView(APIView):
         anamnese = getattr(paciente, 'anamnese', None)
         anotacoes = AnotacaoSessao.objects.filter(
             sessao__paciente=paciente
-        ).select_related('sessao').order_by('dataRegistro')
+        ).select_related('sessao').order_by('dataRegistro', 'sessao__dataHoraInicio')
 
-        try:
-            resultado = generate_clinical_summary(
-                paciente=paciente,
-                prompt_id=prompt_id_int,
-                anamnese=anamnese,
-                anotacoes=anotacoes
-            )
-            return Response(resultado, status=status.HTTP_200_OK)
-        except ValueError as ve:
-            return Response({'error': str(ve)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as exc:
-            return Response(
-                {'error': f'Falha ao gerar resumo clínico com IA: {str(exc)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        sanitized_data = sanitize_clinical_data(paciente, anamnese, anotacoes)
+        contexto_clinico = format_clinical_context(sanitized_data)
+
+        referencias_sessao = [
+            {
+                'id': str(sessao.id),
+                'data': timezone.localdate(sessao.dataHoraInicio).strftime('%d/%m/%Y') if sessao.dataHoraInicio else None,
+                'tipo': sessao.tipo,
+                'status': sessao.status,
+            }
+            for sessao in Sessao.objects.filter(paciente=paciente).order_by('dataHoraInicio')
+        ]
+
+        payload = {
+            'prompt_id': prompt_config['id'],
+            'prompt_titulo': prompt_config['titulo'],
+            'prompt_descricao': prompt_config.get('descricao', ''),
+            'instrucao': prompt_config['system_instruction'],
+            'contexto': contexto_clinico,
+            'referencias_sessao': referencias_sessao,
+        }
+
+        return Response(payload, status=status.HTTP_200_OK)
 
 
-class ResumoIaListCreateView(generics.ListCreateAPIView):
+class ResumoIaListCreateView(NoStoreCacheMixin, generics.ListCreateAPIView):
     """
     Lista todos os resumos de IA do paciente e permite persistir novos resumos nomeados (RF12).
     Rota: /api/prontuario/pacientes/<paciente_id>/ia/resumos/
@@ -173,18 +200,16 @@ class ResumoIaListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         paciente_id = self.kwargs.get('paciente_id')
-        return ResumoIa.objects.filter(paciente_id=paciente_id).order_by('-dataGeracao')
+        paciente = check_patient_doctor_access(self.request.user, paciente_id)
+        return ResumoIa.objects.filter(paciente=paciente).order_by('-dataGeracao')
 
     def perform_create(self, serializer):
         paciente_id = self.kwargs.get('paciente_id')
-        try:
-            paciente = Paciente.objects.get(id=paciente_id)
-        except Paciente.DoesNotExist:
-            raise NotFound('Paciente não encontrado.')
+        paciente = check_patient_doctor_access(self.request.user, paciente_id)
         serializer.save(paciente=paciente)
 
 
-class ResumoIaDetailView(generics.RetrieveDestroyAPIView):
+class ResumoIaDetailView(NoStoreCacheMixin, generics.RetrieveDestroyAPIView):
     """
     Obtém ou exclui um Resumo de IA específico pelo UUID.
     Rota: /api/prontuario/ia/resumos/<pk>/
@@ -193,10 +218,15 @@ class ResumoIaDetailView(generics.RetrieveDestroyAPIView):
     serializer_class = ResumoIaSerializer
     permission_classes = [IsDoctorOrAdmin]
 
+    def get_object(self):
+        obj = super().get_object()
+        check_patient_doctor_access(self.request.user, obj.paciente_id)
+        return obj
+
 
 # ── Módulo de Parecer Conclusivo (RF13, RF14) ──────────────────────────────
 
-class ParecerConclusivoListCreateView(generics.ListCreateAPIView):
+class ParecerConclusivoListCreateView(NoStoreCacheMixin, generics.ListCreateAPIView):
     """
     Lista e cria Pareceres Conclusivos para um paciente (RF13).
     Rota: /api/prontuario/pacientes/<paciente_id>/pareceres/
@@ -206,18 +236,16 @@ class ParecerConclusivoListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         paciente_id = self.kwargs.get('paciente_id')
-        return ParecerConclusivo.objects.filter(paciente_id=paciente_id).order_by('-dataEmissao')
+        paciente = check_patient_doctor_access(self.request.user, paciente_id)
+        return ParecerConclusivo.objects.filter(paciente=paciente).order_by('-dataEmissao')
 
     def perform_create(self, serializer):
         paciente_id = self.kwargs.get('paciente_id')
-        try:
-            paciente = Paciente.objects.get(id=paciente_id)
-        except Paciente.DoesNotExist:
-            raise NotFound('Paciente não encontrado.')
+        paciente = check_patient_doctor_access(self.request.user, paciente_id)
         serializer.save(paciente=paciente)
 
 
-class ParecerConclusivoDetailView(generics.RetrieveUpdateDestroyAPIView):
+class ParecerConclusivoDetailView(NoStoreCacheMixin, generics.RetrieveUpdateDestroyAPIView):
     """
     Detalhe, edição e exclusão de um Parecer Conclusivo (RF13).
     Rota: /api/prontuario/pareceres/<pk>/
@@ -226,8 +254,13 @@ class ParecerConclusivoDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ParecerConclusivoSerializer
     permission_classes = [IsDoctorOrAdmin]
 
+    def get_object(self):
+        obj = super().get_object()
+        check_patient_doctor_access(self.request.user, obj.paciente_id)
+        return obj
 
-class ParecerConclusivoPdfView(APIView):
+
+class ParecerConclusivoPdfView(NoStoreCacheMixin, APIView):
     """
     Gera e retorna o PDF formatado do Parecer Conclusivo para download/impressão (RF14).
     Rota: /api/prontuario/pareceres/<pk>/pdf/
@@ -237,8 +270,10 @@ class ParecerConclusivoPdfView(APIView):
     def get(self, request, pk):
         try:
             parecer = ParecerConclusivo.objects.select_related('paciente').get(id=pk)
-        except ParecerConclusivo.DoesNotExist:
+        except (ParecerConclusivo.DoesNotExist, ValueError):
             raise NotFound('Parecer Conclusivo não encontrado.')
+
+        check_patient_doctor_access(request.user, parecer.paciente_id)
 
         pdf_buffer = generate_parecer_pdf(parecer)
         filename = f"Parecer_{parecer.paciente.nomeCompleto.replace(' ', '_')}.pdf"
@@ -248,7 +283,7 @@ class ParecerConclusivoPdfView(APIView):
         return response
 
 
-class ParecerConclusivoEmailView(APIView):
+class ParecerConclusivoEmailView(NoStoreCacheMixin, APIView):
     """
     Dispara o envio do Parecer Conclusivo em PDF por e-mail (RF14).
     Rota: /api/prontuario/pareceres/<pk>/email/
@@ -258,8 +293,11 @@ class ParecerConclusivoEmailView(APIView):
     def post(self, request, pk):
         try:
             parecer = ParecerConclusivo.objects.select_related('paciente').get(id=pk)
-        except ParecerConclusivo.DoesNotExist:
+        except (ParecerConclusivo.DoesNotExist, ValueError):
             raise NotFound('Parecer Conclusivo não encontrado.')
+
+        check_patient_doctor_access(request.user, parecer.paciente_id)
+
 
         recipient_email = request.data.get('recipient_email')
         if not recipient_email:

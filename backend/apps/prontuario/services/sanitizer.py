@@ -6,6 +6,8 @@ identificáveis (PII) para provedores externos de Inteligência Artificial.
 import re
 from typing import List, Optional
 
+from django.utils import timezone
+
 # Preposições e palavras comuns que não devem ser tratadas como nomes próprios isolados
 STOP_WORDS = {
     'de', 'da', 'do', 'das', 'dos', 'e', 'em', 'para', 'com', 'por', 'que',
@@ -102,14 +104,22 @@ def sanitize_clinical_data(paciente, anamnese=None, anotacoes=None) -> dict:
     if anotacoes:
         for anotacao in anotacoes:
             sessao_tipo = ''
+            data_sessao = ''
             if hasattr(anotacao, 'sessao') and anotacao.sessao:
-                sessao_tipo = getattr(anotacao.sessao, 'tipo', 'Sessão')
-            data_reg = anotacao.dataRegistro.strftime('%d/%m/%Y %H:%M') if anotacao.dataRegistro else ''
+                sessao = anotacao.sessao
+                sessao_tipo = sessao.tipo
+                if sessao.dataHoraInicio:
+                    data_sessao = timezone.localdate(sessao.dataHoraInicio).strftime('%d/%m/%Y')
+
+            data_reg = ''
+            if anotacao.dataRegistro:
+                data_reg = timezone.localtime(anotacao.dataRegistro).strftime('%d/%m/%Y %H:%M')
 
             clean_text = sanitize_text(anotacao.textoLivre, patient_name, guardian_names)
             sanitized_anotacoes.append({
                 'id': str(anotacao.id),
                 'data': data_reg,
+                'data_sessao': data_sessao,
                 'tipo': sessao_tipo,
                 'texto': clean_text
             })

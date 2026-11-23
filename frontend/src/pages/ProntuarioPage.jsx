@@ -42,14 +42,16 @@ export default function ProntuarioPage() {
   const [abaAtiva, setAbaAtiva] = useState('prontuario'); // 'prontuario' | 'ia' | 'parecer'
   const [rascunhoIaReferencia, setRascunhoIaReferencia] = useState(null);
 
-  // Calcular idade a partir da data de nascimento
+  // Calcular idade a partir da data de nascimento sem bug de fuso horário UTC
   const calcularIdade = (dataNasc) => {
     if (!dataNasc) return '';
+    const parts = dataNasc.split('-').map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) return '';
+    const [year, month, day] = parts;
     const hoje = new Date();
-    const nasc = new Date(dataNasc);
-    let idade = hoje.getFullYear() - nasc.getFullYear();
-    const m = hoje.getMonth() - nasc.getMonth();
-    if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) {
+    let idade = hoje.getFullYear() - year;
+    const m = (hoje.getMonth() + 1) - month;
+    if (m < 0 || (m === 0 && hoje.getDate() < day)) {
       idade--;
     }
     return `${idade} anos`;
@@ -61,7 +63,7 @@ export default function ProntuarioPage() {
     if (partes.length === 3) {
       return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
-    return new Date(dataStr).toLocaleDateString('pt-BR');
+    return dataStr;
   };
 
   const carregarDadosProntuario = useCallback(async () => {

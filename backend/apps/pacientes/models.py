@@ -1,4 +1,5 @@
 import uuid
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -147,3 +148,44 @@ class Responsavel(models.Model):
 
     def __str__(self):
         return f"{self.nomeCompleto} ({self.parentesco}) - Contato: {self.contato}"
+
+
+class ConcessaoAcessoPaciente(models.Model):
+    """
+    Modelo de Concessão de Acesso a Paciente por Profissional (RBAC + permissão por paciente).
+    Garante que apenas médicos autorizados possam acessar dados clínicos e IA de pacientes atribuídos.
+    """
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='Identificador único universal (UUID v4)'
+    )
+    paciente = models.ForeignKey(
+        Paciente,
+        on_delete=models.CASCADE,
+        related_name='concessoes_acesso',
+        verbose_name='Paciente'
+    )
+    profissional = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='concessoes_pacientes',
+        verbose_name='Profissional'
+    )
+    ativo = models.BooleanField(
+        default=True,
+        verbose_name='Ativo'
+    )
+    criadoEm = models.DateTimeField(
+        default=timezone.now,
+        verbose_name='Criado em'
+    )
+
+    class Meta:
+        verbose_name = 'Concessão de Acesso a Paciente'
+        verbose_name_plural = 'Concessões de Acesso a Pacientes'
+        unique_together = ('paciente', 'profissional')
+
+    def __str__(self):
+        return f"{self.profissional} -> {self.paciente.nomeCompleto} ({'Ativo' if self.ativo else 'Inativo'})"

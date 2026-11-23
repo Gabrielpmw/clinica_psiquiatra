@@ -38,9 +38,9 @@ export const getPromptsIa = async () => {
   return response.data;
 };
 
-export const gerarResumoIa = async (pacienteId, promptId) => {
-  const response = await api.post(`/prontuario/pacientes/${pacienteId}/ia/gerar/`, {
-    prompt_id: promptId
+export const obterContextoIa = async (pacienteId, promptId) => {
+  const response = await api.post(`/prontuario/pacientes/${pacienteId}/ia/contexto/`, {
+    prompt_id: Number(promptId)
   });
   return response.data;
 };

@@ -136,18 +136,23 @@ export default function PatientsPage() {
   // Helper para formatar data (dd/mm/aaaa)
   const formatDate = (dateStr) => {
     if (!dateStr) return '-';
-    const [year, month, day] = dateStr.split('-');
-    return `${day}/${month}/${year}`;
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
   };
 
-  // Helper para calcular idade
+  // Helper para calcular idade sem bug de fuso horário UTC
   const calculateAge = (dateStr) => {
     if (!dateStr) return '';
-    const birth = new Date(dateStr);
+    const parts = dateStr.split('-').map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) return '';
+    const [year, month, day] = parts;
     const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const m = today.getMonth() - birth.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    let age = today.getFullYear() - year;
+    const m = (today.getMonth() + 1) - month;
+    if (m < 0 || (m === 0 && today.getDate() < day)) {
       age--;
     }
     return age > 0 ? `${age} anos` : 'menos de 1 ano';
