@@ -2,6 +2,15 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
+// Identificador em memória da sessão de autenticação ativa na aba
+let currentSessionId = null;
+
+export const setApiSessionId = (sessionId) => {
+  currentSessionId = sessionId;
+};
+
+export const getApiSessionId = () => currentSessionId;
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -9,23 +18,42 @@ const api = axios.create({
   },
 });
 
-// Interceptador de Requisição para injetar o Token JWT Bearer
+// Interceptador de Requisição para injetar o Token JWT Bearer e vincular a sessão de origem
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    // Vincula a requisição à sessão em memória vigente no momento do disparo
+    if (currentSessionId && config._sessionId === undefined) {
+      config._sessionId = currentSessionId;
+    }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Interceptador de Resposta para renovação de token e tratamento de 401
+// Interceptador de Resposta para renovação de token, verificação de sessão e tratamento de 401
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Se a requisição foi feita em uma sessão que já foi substituída ou encerrada, descarta a resposta
+    if (response.config._sessionId && response.config._sessionId !== currentSessionId) {
+      const staleError = new Error('Resposta descartada: a sessão autenticada de origem foi alterada.');
+      staleError.isSessionStale = true;
+      return Promise.reject(staleError);
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
+
+    // Se a sessão expirou ou mudou, rejeita imediatamente sem tentar renovação
+    if (originalRequest?._sessionId && originalRequest._sessionId !== currentSessionId) {
+      const staleError = new Error('Operação cancelada: a sessão autenticada de origem foi alterada.');
+      staleError.isSessionStale = true;
+      return Promise.reject(staleError);
+    }
 
     // Se receber 401 e não for rota de login nem tentativa repetida
     if (
@@ -46,17 +74,27 @@ api.interceptors.response.use(
           const newAccessToken = res.data.access;
           localStorage.setItem('access_token', newAccessToken);
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+          // Confere se a sessão ainda é a mesma antes de reenviar
+          if (originalRequest._sessionId && originalRequest._sessionId !== currentSessionId) {
+            const staleError = new Error('Operação descartada: a sessão autenticada de origem expirou antes do reenvio.');
+            staleError.isSessionStale = true;
+            return Promise.reject(staleError);
+          }
+
           return api(originalRequest);
         } catch (refreshErr) {
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
           localStorage.removeItem('user');
+          currentSessionId = null;
           window.location.href = '/login';
           return Promise.reject(refreshErr);
         }
       } else {
         localStorage.removeItem('access_token');
         localStorage.removeItem('user');
+        currentSessionId = null;
         window.location.href = '/login';
       }
     }

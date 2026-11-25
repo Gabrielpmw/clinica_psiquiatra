@@ -38,20 +38,62 @@ export const getPromptsIa = async () => {
   return response.data;
 };
 
-export const obterContextoIa = async (pacienteId, promptId) => {
-  const response = await api.post(`/prontuario/pacientes/${pacienteId}/ia/contexto/`, {
-    prompt_id: Number(promptId)
-  });
+export const getFontesIa = async (pacienteId, options = {}) => {
+  const response = await api.get(`/prontuario/pacientes/${pacienteId}/ia/fontes/`, options);
   return response.data;
 };
 
-export const getResumosIa = async (pacienteId) => {
-  const response = await api.get(`/prontuario/pacientes/${pacienteId}/ia/resumos/`);
+export const obterContextoIa = async (
+  pacienteId,
+  { promptId, sessaoIds = [] },
+  options = {}
+) => {
+  const response = await api.post(
+    `/prontuario/pacientes/${pacienteId}/ia/contexto/`,
+    {
+      prompt_id: Number(promptId),
+      sessao_ids: Array.isArray(sessaoIds) ? sessaoIds : [],
+      incluir_anamnese: false,
+    },
+    options
+  );
   return response.data;
 };
 
-export const salvarResumoIa = async (pacienteId, dadosResumo) => {
-  const response = await api.post(`/prontuario/pacientes/${pacienteId}/ia/resumos/`, dadosResumo);
+export const gerarResumoIa = async (
+  pacienteId,
+  {
+    promptId,
+    sessaoIds = [],
+    confirmacaoPrivacidade = false,
+    contextoHash = null,
+  },
+  options = {}
+) => {
+  const payload = {
+    prompt_id: Number(promptId),
+    sessao_ids: Array.isArray(sessaoIds) ? sessaoIds : [],
+    incluir_anamnese: false,
+    confirmacao_privacidade: confirmacaoPrivacidade === true,
+  };
+  if (contextoHash) {
+    payload.contexto_hash = contextoHash;
+  }
+  const response = await api.post(
+    `/prontuario/pacientes/${pacienteId}/ia/gerar/`,
+    payload,
+    options
+  );
+  return response.data;
+};
+
+export const getResumosIa = async (pacienteId, options = {}) => {
+  const response = await api.get(`/prontuario/pacientes/${pacienteId}/ia/resumos/`, options);
+  return response.data;
+};
+
+export const salvarResumoIa = async (pacienteId, dadosResumo, options = {}) => {
+  const response = await api.post(`/prontuario/pacientes/${pacienteId}/ia/resumos/`, dadosResumo, options);
   return response.data;
 };
 

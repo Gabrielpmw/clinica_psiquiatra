@@ -36,10 +36,6 @@ pnpm-debug.log*
 dist/
 dist-ssr/
 *.local
-frontend/public/models/
-frontend/public/wasm/
-*.wasm
-*.bin
 
 
 # Environment variables & secrets

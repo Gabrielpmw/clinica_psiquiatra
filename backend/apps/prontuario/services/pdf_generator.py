@@ -154,16 +154,17 @@ def generate_parecer_pdf(parecer) -> BytesIO:
 
     patient_info = [
         [
-            Paragraph("Paciente:", meta_label), Paragraph(paciente.nomeCompleto, meta_val),
+            Paragraph("Paciente:", meta_label), Paragraph(paciente.nomeCompleto, meta_val)
+        ],
+        [
             Paragraph("Nascimento:", meta_label), Paragraph(dt_nasc, meta_val)
         ],
         [
-            Paragraph("Emissão:", meta_label), Paragraph(dt_emissao, meta_val),
-            Paragraph("Documento:", meta_label), Paragraph(str(parecer.id)[:8] + "...", meta_val)
-        ]
+            Paragraph("Emissão:", meta_label), Paragraph(dt_emissao, meta_val)
+        ],
     ]
 
-    table = Table(patient_info, colWidths=[70, 200, 80, 180])
+    table = Table(patient_info, colWidths=[80, 450])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f0fdf4')),
         ('PADDING', (0, 0), (-1, -1), 6),

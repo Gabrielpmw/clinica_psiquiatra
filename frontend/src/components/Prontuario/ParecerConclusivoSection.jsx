@@ -25,6 +25,7 @@ import {
   salvarResumoIa
 } from '../../services/prontuarioService';
 import { useNotification } from '../../context/NotificationContext';
+import { useAiGeneration } from '../../context/AiGenerationContext';
 
 export default function ParecerConclusivoSection({
   paciente,
@@ -32,6 +33,7 @@ export default function ParecerConclusivoSection({
   onLimparRascunhoIa
 }) {
   const { notifySuccess, notifyError } = useNotification();
+  const { removerRascunhoAposSalvar } = useAiGeneration();
 
   const [pareceres, setPareceres] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -46,6 +48,9 @@ export default function ParecerConclusivoSection({
   const [tituloResumoIa, setTituloResumoIa] = useState('Rascunho de Parecer IA');
   const [salvandoResumoIa, setSalvandoResumoIa] = useState(false);
   const [copiadoIa, setCopiadoIa] = useState(false);
+
+  const textoRascunho = typeof rascunhoIa === 'object' && rascunhoIa !== null ? rascunhoIa.conteudo : rascunhoIa;
+  const draftIdRef = typeof rascunhoIa === 'object' && rascunhoIa !== null ? rascunhoIa.draftId : null;
 
   useEffect(() => {
     if (paciente?.id) {
@@ -184,14 +189,17 @@ export default function ParecerConclusivoSection({
 
   // Salvar o rascunho de IA no banco de resumos diretamente pelo painel
   const handleSalvarRascunhoIa = async () => {
-    if (!rascunhoIa || !tituloResumoIa.trim()) return;
+    if (!textoRascunho || !tituloResumoIa.trim()) return;
     try {
       setSalvandoResumoIa(true);
       await salvarResumoIa(paciente.id, {
         titulo: tituloResumoIa.trim(),
         promptTipo: 4,
-        conteudoGerado: rascunhoIa
+        conteudoGerado: textoRascunho
       });
+      if (draftIdRef) {
+        removerRascunhoAposSalvar(draftIdRef);
+      }
       notifySuccess('Rascunho de IA salvo no histórico do prontuário!');
     } catch (err) {
       console.error('Erro ao salvar rascunho:', err);
@@ -207,8 +215,8 @@ export default function ParecerConclusivoSection({
   };
 
   const handleCopiarRascunho = () => {
-    if (!rascunhoIa) return;
-    navigator.clipboard.writeText(rascunhoIa);
+    if (!textoRascunho) return;
+    navigator.clipboard.writeText(textoRascunho);
     setCopiadoIa(true);
     setTimeout(() => setCopiadoIa(false), 2000);
   };
@@ -419,7 +427,7 @@ export default function ParecerConclusivoSection({
               {/* Conteúdo rolável do rascunho de IA renderizado com Markdown */}
               <div className="mt-3 flex-1 overflow-y-auto max-h-[460px] p-3 rounded-xl bg-white/90 border border-amber-200 text-xs text-ink-900 leading-relaxed">
                 <div className="prose prose-sm max-w-none text-ink-900 font-sans [&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:mb-2 [&>strong]:font-bold [&>strong]:text-amber-950">
-                  <ReactMarkdown>{rascunhoIa}</ReactMarkdown>
+                  <ReactMarkdown>{textoRascunho}</ReactMarkdown>
                 </div>
               </div>
 

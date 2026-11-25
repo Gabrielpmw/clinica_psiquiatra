@@ -159,22 +159,22 @@ export default function PatientsPage() {
   };
 
   const headerLeft = (
-    <nav className="flex items-center gap-1.5 text-xs text-ink-400">
+    <nav className="flex items-center gap-1.5 text-xs text-ink-400 min-w-0">
       <button
         onClick={() => navigate('/dashboard')}
-        className="transition-colors text-ink-600 hover:text-leaf-700"
+        className="hidden sm:inline transition-colors text-ink-600 hover:text-leaf-700"
       >
         Início
       </button>
-      <ChevronRight className="w-3 h-3" />
-      <span style={{ color: C.leaf700, fontWeight: 600 }}>Pacientes</span>
+      <ChevronRight className="hidden sm:inline w-3 h-3" />
+      <span className="truncate" style={{ color: C.leaf700, fontWeight: 600 }}>Pacientes</span>
     </nav>
   );
 
   const headerRight = (
     <div className="text-xs text-ink-600 flex items-center gap-2">
       <span className="hidden sm:inline">Logado como</span>
-      <span className="font-semibold text-ink-900 max-w-[120px] sm:max-w-none truncate">{user?.nome}</span>
+      <span className="font-semibold text-ink-900 max-w-[90px] sm:max-w-none truncate">{user?.nome}</span>
     </div>
   );
 

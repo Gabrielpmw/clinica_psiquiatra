@@ -220,3 +220,114 @@ class AgendaAPITestCase(APITestCase):
         # Inválido
         res = self.client.patch(url_pagamento, {'pago': 'invalido'}, format='json')
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_remarcar_sessao_cancelada_para_outro_dia_muda_para_agendada(self):
+        """Remarcar sessão CANCELADA para outro dia preserva horário e muda status para AGENDADA."""
+        self.client.force_authenticate(user=self.secretaria)
+        tz = timezone.get_current_timezone()
+        inicio = timezone.localtime(self.agora + timedelta(days=1), tz).replace(hour=10, minute=0, second=0)
+        fim = inicio + timedelta(minutes=50)
+        sessao = Sessao.objects.create(
+            paciente=self.paciente,
+            usuario=self.doutora,
+            dataHoraInicio=inicio,
+            dataHoraFim=fim,
+            status=Sessao.StatusChoices.CANCELADA,
+            tipo=Sessao.TipoChoices.INTERVENTIVA,
+        )
+
+        nova_data = (inicio + timedelta(days=2)).date().isoformat()
+        url_remarcar = reverse('sessao-remarcar', kwargs={'pk': sessao.id})
+        res = self.client.patch(url_remarcar, {'nova_data': nova_data}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['status'], Sessao.StatusChoices.AGENDADA)
+
+        sessao.refresh_from_db()
+        self.assertEqual(sessao.status, Sessao.StatusChoices.AGENDADA)
+        novo_local_ini = timezone.localtime(sessao.dataHoraInicio, tz)
+        novo_local_fim = timezone.localtime(sessao.dataHoraFim, tz)
+        self.assertEqual(novo_local_ini.date().isoformat(), nova_data)
+        self.assertEqual((novo_local_ini.hour, novo_local_ini.minute), (10, 0))
+        self.assertEqual((novo_local_fim - novo_local_ini).total_seconds(), 50 * 60)
+
+    def test_remarcar_rejeita_bloqueio_conflito_e_sessao_realizada(self):
+        """Remarcar rejeita horário bloqueado, conflito com sessão do paciente e sessões realizadas."""
+        self.client.force_authenticate(user=self.doutora)
+        tz = timezone.get_current_timezone()
+        inicio = timezone.localtime(self.agora + timedelta(days=2), tz).replace(hour=14, minute=0, second=0)
+        fim = inicio + timedelta(minutes=50)
+
+        sessao_cancelada = Sessao.objects.create(
+            paciente=self.paciente,
+            usuario=self.doutora,
+            dataHoraInicio=inicio,
+            dataHoraFim=fim,
+            status=Sessao.StatusChoices.CANCELADA,
+        )
+
+        # Dia com bloqueio no mesmo horário -> 400
+        dia_bloqueado = (inicio + timedelta(days=1)).date()
+        bloq_ini = timezone.make_aware(
+            timezone.datetime.combine(dia_bloqueado, timezone.datetime.min.time().replace(hour=13, minute=30)),
+            tz,
+        )
+        Bloqueio.objects.create(
+            usuario=self.doutora,
+            dataHoraInicio=bloq_ini,
+            dataHoraFim=bloq_ini + timedelta(hours=2),
+            motivo='Reunião clínica',
+        )
+        url_remarcar = reverse('sessao-remarcar', kwargs={'pk': sessao_cancelada.id})
+        res_bloq = self.client.patch(url_remarcar, {'nova_data': dia_bloqueado.isoformat()}, format='json')
+        self.assertEqual(res_bloq.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Dia com sessão já agendada para o mesmo paciente no mesmo horário -> 400
+        dia_conflito = (inicio + timedelta(days=2)).date()
+        Sessao.objects.create(
+            paciente=self.paciente,
+            usuario=self.doutora,
+            dataHoraInicio=inicio + timedelta(days=2),
+            dataHoraFim=fim + timedelta(days=2),
+            status=Sessao.StatusChoices.AGENDADA,
+        )
+        res_conf = self.client.patch(url_remarcar, {'nova_data': dia_conflito.isoformat()}, format='json')
+        self.assertEqual(res_conf.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Sessão já realizada não pode ser remarcada -> 400
+        sessao_realizada = Sessao.objects.create(
+            paciente=self.paciente,
+            usuario=self.doutora,
+            dataHoraInicio=inicio - timedelta(days=3),
+            dataHoraFim=fim - timedelta(days=3),
+            status=Sessao.StatusChoices.REALIZADA,
+        )
+        url_realizada = reverse('sessao-remarcar', kwargs={'pk': sessao_realizada.id})
+        res_realizada = self.client.patch(url_realizada, {'nova_data': (inicio + timedelta(days=3)).date().isoformat()}, format='json')
+        self.assertEqual(res_realizada.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_alterar_horario_sessao_via_patch_parcial(self):
+        """PATCH parcial em /sessoes/<id>/ permite alterar hora mantendo status e validando bloqueios."""
+        self.client.force_authenticate(user=self.secretaria)
+        tz = timezone.get_current_timezone()
+        inicio = timezone.localtime(self.agora + timedelta(days=2), tz).replace(hour=9, minute=0, second=0)
+        fim = inicio + timedelta(minutes=50)
+        sessao = Sessao.objects.create(
+            paciente=self.paciente,
+            usuario=self.doutora,
+            dataHoraInicio=inicio,
+            dataHoraFim=fim,
+            status=Sessao.StatusChoices.AGENDADA,
+        )
+
+        novo_ini = inicio.replace(hour=15, minute=30)
+        novo_fim = novo_ini + timedelta(minutes=50)
+        url_detalhe = reverse('sessao-detail', kwargs={'pk': sessao.id})
+        res = self.client.patch(
+            url_detalhe,
+            {'dataHoraInicio': novo_ini.isoformat(), 'dataHoraFim': novo_fim.isoformat()},
+            format='json',
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        sessao.refresh_from_db()
+        self.assertEqual(sessao.status, Sessao.StatusChoices.AGENDADA)
+        self.assertEqual((timezone.localtime(sessao.dataHoraInicio, tz).hour, timezone.localtime(sessao.dataHoraInicio, tz).minute), (15, 30))

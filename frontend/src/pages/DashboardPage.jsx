@@ -239,18 +239,18 @@ export default function DashboardPage() {
   };
 
   const headerLeft = (
-    <nav className="flex items-center gap-1.5 text-xs text-ink-400">
-      <span className="text-ink-600">Início</span>
+    <nav className="flex items-center gap-1.5 text-xs text-ink-400 min-w-0">
+      <span className="hidden sm:inline text-ink-600">Início</span>
       {isAdmin && (
         <>
-          <span>›</span>
-          <span className="text-ink-900 font-semibold">Usuários</span>
+          <span className="hidden sm:inline">›</span>
+          <span className="text-ink-900 font-semibold truncate">Usuários</span>
         </>
       )}
       {!isAdmin && (
         <>
-          <span>›</span>
-          <span className="text-ink-900 font-semibold">Painel Principal</span>
+          <span className="hidden sm:inline">›</span>
+          <span className="text-ink-900 font-semibold truncate">Painel Principal</span>
         </>
       )}
     </nav>
@@ -258,11 +258,11 @@ export default function DashboardPage() {
 
   const headerRight = (
     <div className="flex items-center gap-2 sm:gap-3">
-      <span className="text-xs font-semibold text-ink-900 max-w-[120px] sm:max-w-none truncate">
+      <span className="text-xs font-semibold text-ink-900 max-w-[90px] sm:max-w-none truncate">
         {user?.nome || 'Usuário'}
       </span>
       <span
-        className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
+        className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-medium border"
         style={{
           backgroundColor: isAdmin ? '#f3e8ff' : isDoutora ? C.leaf100 : '#E4EEF6',
           color: isAdmin ? '#7e22ce' : isDoutora ? C.leaf800 : '#4A86B5',

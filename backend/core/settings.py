@@ -177,6 +177,17 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
+# Configuracoes de IA (Google Gemini)
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_MODELS = [
+    m.strip()
+    for m in os.getenv(
+        'GEMINI_MODELS',
+        'gemini-2.5-flash,gemini-3.5-flash,gemini-3.5-flash-lite,gemini-flash-lite-latest,gemini-flash-latest'
+    ).split(',')
+    if m.strip()
+]
+
 # Configuracoes de E-mail (Parecer Conclusivo)
 EMAIL_BACKEND = os.getenv(
     'DJANGO_EMAIL_BACKEND',

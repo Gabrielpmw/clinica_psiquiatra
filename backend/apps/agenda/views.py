@@ -1,3 +1,5 @@
+from datetime import date, datetime, timedelta
+from django.utils import timezone
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -112,6 +114,73 @@ class SessaoViewSet(viewsets.ModelViewSet):
         sessao.save(update_fields=['pago'])
 
         serializer = self.get_serializer(sessao)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['patch'], url_path='remarcar')
+    def remarcar(self, request, pk=None):
+        """
+        Remarca uma sessão para outro dia/horário (ex.: via arrastar e soltar na agenda),
+        preservando o horário/duração originais quando `nova_data` é informada e alterando
+        automaticamente o status para AGENDADA.
+        """
+        sessao = self.get_object()
+        if sessao.status == Sessao.StatusChoices.REALIZADA:
+            return Response(
+                {'error': 'Sessões já realizadas não podem ser remarcadas.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        nova_data = request.data.get('nova_data')
+        data_inicio = request.data.get('dataHoraInicio')
+        data_fim = request.data.get('dataHoraFim')
+
+        if nova_data:
+            if not isinstance(nova_data, str):
+                return Response(
+                    {'error': 'O campo nova_data deve estar no formato YYYY-MM-DD.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                target_date = date.fromisoformat(nova_data)
+            except ValueError:
+                return Response(
+                    {'error': 'Data inválida em nova_data. Utilize o formato YYYY-MM-DD.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            tz = timezone.get_current_timezone()
+            local_inicio = timezone.localtime(sessao.dataHoraInicio, tz)
+            local_fim = timezone.localtime(sessao.dataHoraFim, tz)
+            duracao = local_fim - local_inicio
+            if duracao.total_seconds() <= 0:
+                duracao = timedelta(minutes=50)
+
+            novo_inicio = timezone.make_aware(
+                datetime.combine(target_date, local_inicio.time()),
+                tz,
+            )
+            novo_fim = novo_inicio + duracao
+            update_payload = {
+                'dataHoraInicio': novo_inicio.isoformat(),
+                'dataHoraFim': novo_fim.isoformat(),
+                'status': Sessao.StatusChoices.AGENDADA,
+            }
+        elif data_inicio:
+            update_payload = {
+                'dataHoraInicio': data_inicio,
+                'status': Sessao.StatusChoices.AGENDADA,
+            }
+            if data_fim:
+                update_payload['dataHoraFim'] = data_fim
+        else:
+            return Response(
+                {'error': 'Informe nova_data (YYYY-MM-DD) ou dataHoraInicio para remarcar.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = self.get_serializer(sessao, data=update_payload, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

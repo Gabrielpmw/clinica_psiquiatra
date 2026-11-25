@@ -1,3 +1,4 @@
+import uuid
 from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import generics, viewsets, status
@@ -19,9 +20,23 @@ from .serializers import (
 )
 from .services.prompt_catalog import list_available_prompts, get_prompt_by_id
 from .services.clinical_context import format_clinical_context
-from .services.sanitizer import sanitize_clinical_data
+from .services.gemini_service import (
+    BlockedClinicalSourceError,
+    IncompleteGeminiResponseError,
+    InvalidClinicalSelectionError,
+    StaleReviewContextError,
+    compute_context_hash,
+    generate_clinical_summary,
+)
+from .services.sanitizer import ANAMNESE_FIELD_LABELS, sanitize_clinical_data
 from .services.pdf_generator import generate_parecer_pdf
 from .services.email_service import send_parecer_email
+
+
+def _anamnese_has_content(anamnese) -> bool:
+    if not anamnese:
+        return False
+    return any((getattr(anamnese, field, '') or '').strip() for field in ANAMNESE_FIELD_LABELS)
 
 
 class NoStoreCacheMixin:
@@ -119,64 +134,243 @@ class PromptCatalogListView(APIView):
         return Response(list_available_prompts(), status=status.HTTP_200_OK)
 
 
+class FontesIaView(NoStoreCacheMixin, APIView):
+    """
+    Lista as fontes disponíveis do paciente para seleção de resumo com IA (sem expor textos).
+    Rota: /api/prontuario/pacientes/<paciente_id>/ia/fontes/
+    """
+    permission_classes = [IsDoctorOrAdmin]
+
+    def get(self, request, paciente_id):
+        paciente = check_patient_doctor_access(request.user, paciente_id)
+        anamnese = Anamnese.objects.filter(paciente=paciente).first()
+        sessoes = (
+            Sessao.objects.filter(paciente=paciente)
+            .select_related('anotacao')
+            .order_by('dataHoraInicio')
+        )
+
+        sessoes_payload = []
+        for sessao in sessoes:
+            anotacao = getattr(sessao, 'anotacao', None)
+            tem_anotacao = bool(anotacao and (anotacao.textoLivre or '').strip())
+            sessoes_payload.append({
+                'id': str(sessao.id),
+                'data': timezone.localdate(sessao.dataHoraInicio).strftime('%d/%m/%Y') if sessao.dataHoraInicio else None,
+                'data_iso': sessao.dataHoraInicio.isoformat() if sessao.dataHoraInicio else None,
+                'tipo': sessao.tipo,
+                'tipo_label': sessao.get_tipo_display(),
+                'status': sessao.status,
+                'tem_anotacao': tem_anotacao,
+            })
+
+        return Response(
+            {
+                'anamnese': {
+                    'disponivel': _anamnese_has_content(anamnese),
+                },
+                'sessoes': sessoes_payload,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+def _validate_and_load_ai_selection(
+    request,
+    paciente_id,
+    allow_contexto_hash=False,
+    require_privacy_confirmation=False,
+):
+    """
+    Valida autorização por paciente, catálogo rígido de prompts e fontes selecionadas.
+    A anamnese nunca pode ser enviada ao Gemini (`incluir_anamnese: false` obrigatório e
+    ao menos uma sessão com anotação); ela é carregada apenas para uso interno do sanitizador.
+    Retorna `(dados_validados, None)` ou `(None, Response_erro)`.
+    """
+    paciente = check_patient_doctor_access(request.user, paciente_id)
+
+    data = request.data
+    if not isinstance(data, dict):
+        return None, Response(
+            {'error': 'Corpo da requisição deve ser um objeto JSON válido.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    required_keys = {'prompt_id', 'sessao_ids', 'incluir_anamnese'}
+    allowed_keys = (
+        required_keys
+        | ({'contexto_hash'} if allow_contexto_hash else set())
+        | ({'confirmacao_privacidade'} if require_privacy_confirmation else set())
+    )
+    keys = set(data.keys())
+    if not required_keys.issubset(keys) or not keys.issubset(allowed_keys):
+        if require_privacy_confirmation or allow_contexto_hash:
+            msg = 'O corpo da requisição contém campos ausentes ou não permitidos para a geração.'
+        else:
+            msg = 'O corpo da requisição deve conter exclusivamente prompt_id, sessao_ids e incluir_anamnese.'
+        return None, Response({'error': msg}, status=status.HTTP_400_BAD_REQUEST)
+
+    prompt_id = data.get('prompt_id')
+    sessao_ids_raw = data.get('sessao_ids')
+    incluir_anamnese = data.get('incluir_anamnese')
+    contexto_hash = data.get('contexto_hash') if allow_contexto_hash else None
+
+    if allow_contexto_hash and contexto_hash is not None and not isinstance(contexto_hash, str):
+        return None, Response(
+            {'error': 'O campo contexto_hash deve ser uma string válida.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if not isinstance(prompt_id, int) or isinstance(prompt_id, bool):
+        return None, Response(
+            {'error': 'O campo prompt_id deve ser um número inteiro entre 1 e 4.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    prompt_config = get_prompt_by_id(prompt_id)
+    if not prompt_config:
+        return None, Response(
+            {'error': 'Identificador de prompt inválido. Escolha um valor entre 1 e 4.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if not isinstance(incluir_anamnese, bool):
+        return None, Response(
+            {'error': 'O campo incluir_anamnese deve ser um booleano.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if incluir_anamnese:
+        return None, Response(
+            {'error': 'A anamnese não pode ser incluída no envio externo ao Gemini. Selecione apenas sessões com anotação.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if require_privacy_confirmation:
+        confirmacao_privacidade = data.get('confirmacao_privacidade')
+        if confirmacao_privacidade is not True:
+            return None, Response(
+                {'error': 'Confirme a orientação de privacidade antes de enviar os dados ao Gemini.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    if not isinstance(sessao_ids_raw, list):
+        return None, Response(
+            {'error': 'O campo sessao_ids deve ser uma lista de identificadores UUID.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    parsed_uuids = []
+    seen_uuids = set()
+    for raw_id in sessao_ids_raw:
+        if not isinstance(raw_id, str):
+            return None, Response(
+                {'error': 'Todos os itens de sessao_ids devem ser strings UUID válidas.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            parsed = uuid.UUID(raw_id)
+        except (ValueError, AttributeError):
+            return None, Response(
+                {'error': 'Um ou mais identificadores em sessao_ids não são UUIDs válidos.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if parsed in seen_uuids:
+            return None, Response(
+                {'error': 'A seleção não pode conter sessões repetidas.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        seen_uuids.add(parsed)
+        parsed_uuids.append(parsed)
+
+    if not parsed_uuids:
+        return None, Response(
+            {'error': 'Selecione pelo menos uma sessão com anotação.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    sessoes_encontradas = {
+        s.id: s
+        for s in Sessao.objects.filter(paciente=paciente, id__in=parsed_uuids).select_related('anotacao')
+    }
+    if len(sessoes_encontradas) != len(parsed_uuids):
+        return None, Response(
+            {'error': 'Uma ou mais sessões selecionadas não foram encontradas.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    anamnese = Anamnese.objects.filter(paciente=paciente).first()
+
+    for sid in parsed_uuids:
+        sessao = sessoes_encontradas[sid]
+        anotacao = getattr(sessao, 'anotacao', None)
+        if not anotacao or not (anotacao.textoLivre or '').strip():
+            return None, Response(
+                {'error': 'Todas as sessões selecionadas devem possuir anotação com conteúdo.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    anotacoes = list(
+        AnotacaoSessao.objects.filter(
+            sessao__paciente=paciente,
+            sessao_id__in=parsed_uuids,
+        ).select_related('sessao').order_by('dataRegistro', 'sessao__dataHoraInicio')
+    )
+
+    referencias_sessao = [
+        {
+            'id': str(anot.sessao.id),
+            'data': timezone.localdate(anot.sessao.dataHoraInicio).strftime('%d/%m/%Y') if anot.sessao.dataHoraInicio else None,
+            'tipo': anot.sessao.tipo,
+            'status': anot.sessao.status,
+        }
+        for anot in anotacoes
+    ]
+
+    return {
+        'paciente': paciente,
+        'prompt_config': prompt_config,
+        'parsed_uuids': parsed_uuids,
+        'incluir_anamnese': False,
+        'anamnese': anamnese,
+        'anotacoes': anotacoes,
+        'referencias_sessao': referencias_sessao,
+        'contexto_hash': contexto_hash,
+    }, None
+
+
 class ContextoIaView(NoStoreCacheMixin, APIView):
     """
-    Prepara o contexto clínico minimizado/sanitizado e a instrução fixa do prompt (RF10, RF11).
-    Retorna o contexto, as referências de sessão disponíveis e a instrução fixa selecionada.
+    Prepara o contexto clínico minimizado/sanitizado apenas com as sessões selecionadas (RF10, RF11).
+    A anamnese é usada apenas internamente no sanitizador e jamais incluída no contexto.
     Rota: /api/prontuario/pacientes/<paciente_id>/ia/contexto/
     """
     permission_classes = [IsDoctorOrAdmin]
 
     def post(self, request, paciente_id):
-        paciente = check_patient_doctor_access(request.user, paciente_id)
+        selection, err_response = _validate_and_load_ai_selection(request, paciente_id)
+        if err_response is not None:
+            return err_response
 
-        data = request.data
-        if not isinstance(data, dict):
-            return Response(
-                {'error': 'Corpo da requisição deve ser um objeto JSON válido.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # O corpo deve aceitar exclusivamente prompt_id (sem campos extras ou instrução livre)
-        if set(data.keys()) != {'prompt_id'}:
-            return Response(
-                {'error': 'O corpo da requisição deve conter exclusivamente o campo prompt_id.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        prompt_id = data.get('prompt_id')
-
-        # Validação estrita: deve ser número inteiro entre 1 e 4 (não bool, não float, não string)
-        if not isinstance(prompt_id, int) or isinstance(prompt_id, bool):
-            return Response(
-                {'error': 'O campo prompt_id deve ser um número inteiro entre 1 e 4.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        prompt_config = get_prompt_by_id(prompt_id)
-        if not prompt_config:
-            return Response(
-                {'error': 'Identificador de prompt inválido. Escolha um valor entre 1 e 4.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        anamnese = getattr(paciente, 'anamnese', None)
-        anotacoes = AnotacaoSessao.objects.filter(
-            sessao__paciente=paciente
-        ).select_related('sessao').order_by('dataRegistro', 'sessao__dataHoraInicio')
-
-        sanitized_data = sanitize_clinical_data(paciente, anamnese, anotacoes)
-        contexto_clinico = format_clinical_context(sanitized_data)
-
-        referencias_sessao = [
-            {
-                'id': str(sessao.id),
-                'data': timezone.localdate(sessao.dataHoraInicio).strftime('%d/%m/%Y') if sessao.dataHoraInicio else None,
-                'tipo': sessao.tipo,
-                'status': sessao.status,
-            }
-            for sessao in Sessao.objects.filter(paciente=paciente).order_by('dataHoraInicio')
-        ]
+        sanitized_data = sanitize_clinical_data(
+            selection['paciente'],
+            selection['anamnese'],
+            selection['anotacoes'],
+            incluir_anamnese=False,
+        )
+        contexto_clinico = format_clinical_context(
+            sanitized_data,
+            incluir_anamnese=False,
+            incluir_notas=True,
+        )
+        prompt_config = selection['prompt_config']
+        referencias_sessao = selection['referencias_sessao']
+        contexto_hash = compute_context_hash(
+            prompt_config,
+            contexto_clinico,
+            referencias_sessao,
+            sanitized_data['avisos'],
+        )
 
         payload = {
             'prompt_id': prompt_config['id'],
@@ -184,10 +378,97 @@ class ContextoIaView(NoStoreCacheMixin, APIView):
             'prompt_descricao': prompt_config.get('descricao', ''),
             'instrucao': prompt_config['system_instruction'],
             'contexto': contexto_clinico,
+            'contexto_hash': contexto_hash,
             'referencias_sessao': referencias_sessao,
+            'fontes_incluidas': {
+                'incluir_anamnese': False,
+                'sessao_ids': [str(anot.sessao.id) for anot in selection['anotacoes']],
+            },
+            'bloqueado': sanitized_data['bloqueado'],
+            'avisos': sanitized_data['avisos'],
         }
 
         return Response(payload, status=status.HTTP_200_OK)
+
+
+class GerarResumoIaView(NoStoreCacheMixin, APIView):
+    """
+    Gera a prévia de resumo clínico via API do Google Gemini a partir das sessões
+    previamente selecionadas, sanitizadas e não bloqueadas, mediante confirmação de privacidade (RF10, RF11).
+    Rota: /api/prontuario/pacientes/<paciente_id>/ia/gerar/
+    """
+    permission_classes = [IsDoctorOrAdmin]
+
+    def post(self, request, paciente_id):
+        selection, err_response = _validate_and_load_ai_selection(
+            request,
+            paciente_id,
+            allow_contexto_hash=True,
+            require_privacy_confirmation=True,
+        )
+        if err_response is not None:
+            return err_response
+
+        prompt_config = selection['prompt_config']
+        referencias_sessao = selection['referencias_sessao']
+        try:
+            resultado = generate_clinical_summary(
+                paciente=selection['paciente'],
+                prompt_id=prompt_config['id'],
+                anamnese=selection['anamnese'],
+                anotacoes=selection['anotacoes'],
+                incluir_anamnese=False,
+                referencias_sessao=referencias_sessao,
+                contexto_hash=selection['contexto_hash'],
+            )
+        except InvalidClinicalSelectionError as invalid_err:
+            return Response({'error': str(invalid_err)}, status=status.HTTP_400_BAD_REQUEST)
+        except BlockedClinicalSourceError as blocked_err:
+            return Response(
+                {
+                    'error': str(blocked_err),
+                    'bloqueado': True,
+                    'avisos': blocked_err.avisos,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except StaleReviewContextError as stale_err:
+            return Response(
+                {
+                    'error': str(stale_err),
+                    'revisao_desatualizada': True,
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+        except IncompleteGeminiResponseError as incomplete_err:
+            return Response(
+                {'error': str(incomplete_err)},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+        except ValueError as config_err:
+            return Response(
+                {'error': str(config_err)},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        except Exception:
+            return Response(
+                {'error': 'Não foi possível gerar o resumo com a API do Gemini no momento. Tente novamente em instantes.'},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+
+        return Response(
+            {
+                'prompt_id': resultado['prompt_id'],
+                'prompt_titulo': resultado['prompt_titulo'],
+                'conteudo': resultado['conteudo'],
+                'referencias_sessao': referencias_sessao,
+                'fontes_incluidas': {
+                    'incluir_anamnese': selection['incluir_anamnese'],
+                    'sessao_ids': [str(anot.sessao.id) for anot in selection['anotacoes']],
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class ResumoIaListCreateView(NoStoreCacheMixin, generics.ListCreateAPIView):

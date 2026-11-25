@@ -49,6 +49,23 @@ export const cancelarSessao = async (sessaoId) => {
   return atualizarStatusSessao(sessaoId, 'CANCELADA');
 };
 
+export const remarcarSessao = async (sessaoId, { novaData, dataHoraInicio, dataHoraFim } = {}) => {
+  const payload = {};
+  if (novaData) payload.nova_data = novaData;
+  if (dataHoraInicio) payload.dataHoraInicio = dataHoraInicio;
+  if (dataHoraFim) payload.dataHoraFim = dataHoraFim;
+  const response = await api.patch(`/agenda/sessoes/${sessaoId}/remarcar/`, payload);
+  return response.data;
+};
+
+export const atualizarHorarioSessao = async (sessaoId, { dataHoraInicio, dataHoraFim }) => {
+  const response = await api.patch(`/agenda/sessoes/${sessaoId}/`, {
+    dataHoraInicio,
+    dataHoraFim,
+  });
+  return response.data;
+};
+
 export const getDisponibilidades = async (usuarioId) => {
   const params = usuarioId ? { usuario: usuarioId } : {};
   const response = await api.get('/agenda/disponibilidade/', { params });

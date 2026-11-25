@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import {
   FileText,
   Calendar,
@@ -27,8 +27,10 @@ import AppLayout from '../components/AppLayout';
 
 export default function ProntuarioPage() {
   const { pacienteId } = useParams();
+  const location = useLocation();
+  const destinoIa = location.state?.destinoIa;
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, sessionId, isDoutora } = useAuth();
   const { notifyError } = useNotification();
 
   const [paciente, setPaciente] = useState(null);
@@ -40,6 +42,8 @@ export default function ProntuarioPage() {
 
   // Controle de Abas
   const [abaAtiva, setAbaAtiva] = useState('prontuario'); // 'prontuario' | 'ia' | 'parecer'
+  const [destinoIaIgnorado, setDestinoIaIgnorado] = useState(null);
+  const destinoIaAtivo = destinoIaIgnorado === location.key ? null : destinoIa;
   const [rascunhoIaReferencia, setRascunhoIaReferencia] = useState(null);
 
   // Calcular idade a partir da data de nascimento sem bug de fuso horário UTC
@@ -98,10 +102,23 @@ export default function ProntuarioPage() {
     carregarDadosProntuario();
   }, [carregarDadosProntuario]);
 
+  useEffect(() => {
+    setRascunhoIaReferencia(null);
+  }, [pacienteId]);
+
+  useEffect(() => {
+    if (destinoIa) setAbaAtiva('ia');
+  }, [destinoIa, location.key]);
+
+  const escolherAba = (aba) => {
+    if (aba !== 'ia') setDestinoIaIgnorado(location.key);
+    setAbaAtiva(aba);
+  };
+
   // Transição do prompt 4 ("Estruturação para Parecer") para o Parecer Conclusivo com referência
-  const handleIrParaParecer = (conteudoIa) => {
-    setRascunhoIaReferencia(conteudoIa);
-    setAbaAtiva('parecer');
+  const handleIrParaParecer = (conteudoIa, draftId = null) => {
+    setRascunhoIaReferencia({ conteudo: conteudoIa, draftId });
+    escolherAba('parecer');
   };
 
   const headerLeft = (
@@ -192,7 +209,7 @@ export default function ProntuarioPage() {
           {/* Barra de Navegação por Abas */}
           <div className="flex items-center gap-2 border-b border-paper-300 pb-1 overflow-x-auto">
             <button
-              onClick={() => setAbaAtiva('prontuario')}
+              onClick={() => escolherAba('prontuario')}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition ${
                 abaAtiva === 'prontuario'
                   ? 'bg-leaf-700 text-white shadow-xs'
@@ -204,7 +221,7 @@ export default function ProntuarioPage() {
             </button>
 
             <button
-              onClick={() => setAbaAtiva('ia')}
+              onClick={() => escolherAba('ia')}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition ${
                 abaAtiva === 'ia'
                   ? 'bg-leaf-700 text-white shadow-xs'
@@ -216,7 +233,7 @@ export default function ProntuarioPage() {
             </button>
 
             <button
-              onClick={() => setAbaAtiva('parecer')}
+              onClick={() => escolherAba('parecer')}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition ${
                 abaAtiva === 'parecer'
                   ? 'bg-leaf-700 text-white shadow-xs'
@@ -256,10 +273,13 @@ export default function ProntuarioPage() {
               )}
 
               {/* Aba 2: Módulo de IA (Desafios 8 e 9) */}
-              {abaAtiva === 'ia' && (
+              {abaAtiva === 'ia' && isDoutora && (
                 <AiAssistantSection
+                  key={`${pacienteId}:${sessionId}:${location.key}`}
                   pacienteId={pacienteId}
+                  destinoIa={destinoIaAtivo}
                   onIrParaParecer={handleIrParaParecer}
+                  onIrParaProntuario={() => escolherAba('prontuario')}
                 />
               )}
 

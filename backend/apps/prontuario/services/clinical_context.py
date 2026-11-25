@@ -2,13 +2,18 @@
 Composição do contexto clínico para inferência e preparação de dados.
 """
 
-def format_clinical_context(sanitized_data: dict) -> str:
-    """Formata os dados já sanitizados em texto estruturado e legível para o modelo."""
+
+def format_clinical_context(
+    sanitized_data: dict,
+    incluir_anamnese: bool = True,
+    incluir_notas: bool = True,
+) -> str:
+    """Formata os dados já sanitizados e selecionados em texto estruturado para o modelo."""
     sections = []
 
-    # 1. Anamnese
+    # 1. Anamnese (somente quando selecionada e com conteúdo)
     anamnese = sanitized_data.get('anamnese') or {}
-    if anamnese:
+    if incluir_anamnese and anamnese:
         anamnese_lines = ["[Anamnese]"]
         labels = {
             'escolaridade': 'Escolaridade',
@@ -25,9 +30,10 @@ def format_clinical_context(sanitized_data: dict) -> str:
             val = anamnese.get(key)
             if val:
                 anamnese_lines.append(f"- {label}: {val}")
-        sections.append("\n".join(anamnese_lines))
+        if len(anamnese_lines) > 1:
+            sections.append("\n".join(anamnese_lines))
 
-    # 2. Anotações cronológicas
+    # 2. Anotações cronológicas selecionadas
     anotacoes = sanitized_data.get('anotacoes') or []
     if anotacoes:
         anotacoes_lines = ["[Notas de sessão]"]
@@ -42,7 +48,7 @@ def format_clinical_context(sanitized_data: dict) -> str:
             texto = nota.get('texto') or ''
             anotacoes_lines.append(f"\n[{' | '.join(referencia)}]\n{texto}")
         sections.append("\n".join(anotacoes_lines))
-    else:
+    elif incluir_notas and not sections:
         sections.append("[Nenhuma anotação de sessão registrada até o momento.]")
 
     return "\n\n".join(sections)

@@ -1,18 +1,56 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Plus, Lock, FileText, CheckCircle2, XCircle, AlertTriangle, Calendar as CalendarIcon, Trash2, CircleDollarSign } from 'lucide-react';
+import {
+  Plus,
+  Lock,
+  FileText,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Calendar as CalendarIcon,
+  Trash2,
+  CircleDollarSign,
+  GripVertical,
+  CalendarCheck2,
+} from 'lucide-react';
+import {
+  useSessionDragAndDrop,
+  isSessaoArrastavel,
+  formatLocalDiaMes,
+} from './useSessionDragAndDrop';
 
 export default function DayView({
   sessoes = [],
   bloqueios = [],
   dataSelecionada,
+  inicioSemana,
   onOpenAgendar,
   onStatusChange,
   onPagamentoChange,
   onDeletarBloqueio,
+  onRemarcarSessao,
+  onEditHorario,
+  justDroppedId = null,
   isSecretaria = false,
 }) {
   const navigate = useNavigate();
+  const { dragState, isDragging, getCardDragProps } = useSessionDragAndDrop({
+    onRemarcarSessao,
+  });
+
+  const diasDaSemana = inicioSemana
+    ? Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(`${inicioSemana}T00:00:00`);
+        d.setDate(d.getDate() + i);
+        const pad = (n) => String(n).padStart(2, '0');
+        const dataIso = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        return {
+          data: dataIso,
+          diaMes: d.getDate(),
+          nomeDia: d.toLocaleDateString('pt-BR', { weekday: 'short' }),
+        };
+      })
+    : [];
 
   const formatHora = (dataStr) => {
     if (!dataStr) return '';
@@ -22,7 +60,6 @@ export default function DayView({
 
   /**
    * Retorna a hora de exibição de um bloqueio para o dia dataSelecionada.
-   * Se o bloqueio começa antes do dia: exibe "00:00"; se termina depois: exibe "23:59".
    */
   const getHorarioBloqueioNoDia = (b) => {
     const diaInicio = b.dataHoraInicio.substring(0, 10);
@@ -71,10 +108,15 @@ export default function DayView({
     }
   };
 
+  const destinoValidoHover =
+    dragState?.hoverDia && dragState.hoverDia !== dragState.originDia
+      ? dragState.hoverDia
+      : null;
+
   return (
     <div className="bg-paper-50 rounded-2xl border border-paper-300 shadow-xs overflow-hidden flex flex-col h-full">
       {/* Cabeçalho */}
-      <div className="px-6 py-4 bg-paper-200 border-b border-paper-300 flex items-center justify-between">
+      <div className="px-6 py-4 bg-paper-200 border-b border-paper-300 flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-base font-semibold text-ink-900">
             Agenda do Dia — {new Date(`${dataSelecionada}T00:00:00`).toLocaleDateString('pt-BR', {
@@ -84,6 +126,11 @@ export default function DayView({
               year: 'numeric',
             })}
           </h3>
+          {onRemarcarSessao && (
+            <p className="text-[11px] text-ink-600 mt-0.5">
+              Arraste sessões canceladas, com falta ou agendadas para remarcar para outro dia da semana.
+            </p>
+          )}
         </div>
         <button
           onClick={() => onOpenAgendar(dataSelecionada)}
@@ -93,6 +140,45 @@ export default function DayView({
           <span>Nova Consulta</span>
         </button>
       </div>
+
+      {/* Barra animada de dias da semana ao arrastar uma sessão na visão Diária */}
+      {isDragging && diasDaSemana.length > 0 && (
+        <div className="px-4 sm:px-6 py-3 bg-leaf-50 border-b border-leaf-300 animate-drag-dock space-y-2">
+          <div className="flex items-center justify-between text-xs font-semibold text-leaf-900">
+            <span className="flex items-center gap-1.5">
+              <CalendarCheck2 className="w-4 h-4 text-leaf-700" />
+              Solte no dia desejado para remarcar como Agendada:
+            </span>
+            {destinoValidoHover && (
+              <span className="text-leaf-700">
+                Destino: {formatLocalDiaMes(destinoValidoHover)}
+              </span>
+            )}
+          </div>
+          <div className="grid grid-cols-7 gap-1.5">
+            {diasDaSemana.map((dia) => {
+              const isAtual = dia.data === dataSelecionada;
+              const isHover = destinoValidoHover === dia.data;
+              return (
+                <div
+                  key={dia.data}
+                  data-drop-day={dia.data}
+                  className={`py-2 px-1 rounded-xl border text-center transition-all duration-150 ${
+                    isAtual
+                      ? 'bg-paper-200/70 border-paper-300 text-ink-400 opacity-60'
+                      : isHover
+                      ? 'bg-leaf-700 border-leaf-800 text-white scale-105 shadow-md ring-2 ring-leaf-400'
+                      : 'bg-paper-50 border-leaf-300 text-ink-800'
+                  }`}
+                >
+                  <span className="block text-[10px] uppercase font-semibold">{dia.nomeDia}</span>
+                  <span className="block text-sm font-bold">{dia.diaMes}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Lista de Sessões e Bloqueios */}
       <div className="p-6 overflow-y-auto space-y-4 flex-1">
@@ -156,17 +242,46 @@ export default function DayView({
         ) : (
           sessoes.map((sessao) => {
             const statusInfo = getStatusInfo(sessao.status);
+            const arrastavel = Boolean(onRemarcarSessao) && isSessaoArrastavel(sessao);
+            const isBeingDragged = dragState?.sessao?.id === sessao.id;
+            const wasJustDropped = justDroppedId === sessao.id;
+
             return (
               <div
                 key={sessao.id}
-                className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-paper-300 border-l-4 ${statusInfo.border} shadow-xs gap-3 transition hover:shadow-sm`}
+                {...getCardDragProps(sessao)}
+                title={arrastavel ? 'Arraste para outro dia para remarcar como Agendada' : undefined}
+                className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-paper-300 border-l-4 ${statusInfo.border} shadow-xs gap-3 transition-all duration-200 select-none ${
+                  arrastavel ? 'cursor-grab active:cursor-grabbing hover:shadow-sm hover:-translate-y-0.5' : ''
+                } ${
+                  isBeingDragged ? 'opacity-35 scale-[0.98] border-dashed ring-1 ring-leaf-500' : ''
+                } ${wasJustDropped ? 'animate-session-drop ring-2 ring-leaf-500' : ''}`}
+                style={arrastavel ? { touchAction: 'none' } : undefined}
               >
                 {/* Informações da Consulta */}
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-semibold text-sm text-ink-900">
-                      {formatHora(sessao.dataHoraInicio)} – {formatHora(sessao.dataHoraFim)}
-                    </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {arrastavel && (
+                      <GripVertical className="w-4 h-4 text-ink-400 shrink-0" aria-hidden="true" />
+                    )}
+                    {onEditHorario ? (
+                      <button
+                        type="button"
+                        data-no-drag="true"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditHorario(sessao);
+                        }}
+                        title="Clique para alterar o horário"
+                        className="font-mono font-semibold text-sm text-ink-900 hover:text-leaf-800 hover:bg-paper-200/90 px-1.5 -mx-1.5 py-0.5 rounded-md transition cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-leaf-500"
+                      >
+                        {formatHora(sessao.dataHoraInicio)} – {formatHora(sessao.dataHoraFim)}
+                      </button>
+                    ) : (
+                      <span className="font-mono font-semibold text-sm text-ink-900">
+                        {formatHora(sessao.dataHoraInicio)} – {formatHora(sessao.dataHoraFim)}
+                      </span>
+                    )}
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${statusInfo.badge}`}
                     >
@@ -185,7 +300,6 @@ export default function DayView({
 
                 {/* Ações e Seletor de Status */}
                 <div className="flex flex-wrap items-center gap-2.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-paper-200">
-                  {/* Indicador de Pagamento */}
                   <button
                     type="button"
                     onClick={() => onPagamentoChange && onPagamentoChange(sessao.id, !sessao.pago)}
@@ -239,6 +353,38 @@ export default function DayView({
           })
         )}
       </div>
+
+      {/* Cartão flutuante animado durante o arraste */}
+      {dragState && (
+        <div
+          aria-hidden="true"
+          className={`fixed top-0 left-0 z-50 pointer-events-none p-3 rounded-xl border border-paper-300 border-l-4 ${
+            getStatusInfo(dragState.sessao.status).border
+          } bg-paper-50 shadow-2xl ring-2 ring-leaf-600 flex flex-col gap-1`}
+          style={{
+            width: dragState.width,
+            transform: `translate3d(${dragState.x - dragState.offsetX}px, ${
+              dragState.y - dragState.offsetY
+            }px, 0) rotate(1.5deg) scale(1.03)`,
+            transition: 'transform 35ms cubic-bezier(0.22, 1, 0.36, 1)',
+          }}
+        >
+          <div className="flex items-center justify-between text-xs gap-2">
+            <span className="font-mono font-bold text-ink-900 flex items-center gap-1">
+              <GripVertical className="w-3.5 h-3.5 text-leaf-700" />
+              {formatHora(dragState.sessao.dataHoraInicio)}
+            </span>
+            <span className="text-[11px] px-2 py-0.5 rounded bg-leaf-100 text-leaf-800 font-bold">
+              {destinoValidoHover
+                ? `Soltar em ${formatLocalDiaMes(destinoValidoHover)} · Agendada`
+                : 'Arraste para um dia acima'}
+            </span>
+          </div>
+          <p className="font-semibold text-ink-900 text-sm truncate">
+            {dragState.sessao.paciente_nome}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

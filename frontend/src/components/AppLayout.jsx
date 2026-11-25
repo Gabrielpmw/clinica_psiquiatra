@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Menu } from 'lucide-react';
+import { AlertCircle, ChevronDown, Menu, Sparkles, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { useAuth } from '../context/AuthContext';
+import { useAiGeneration } from '../context/AiGenerationContext';
+import AiDraftsModal from './AiDraftsModal';
 
 export default function AppLayout({
   activePage,
@@ -11,7 +14,18 @@ export default function AppLayout({
   containerClassName = 'flex-1 flex flex-col min-w-0 overflow-hidden',
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
   const { user, isAdmin, isDoutora } = useAuth();
+  const { activeGeneration, generationError, pendingDrafts, isDraftsModalOpen, openDraftsModal, closeDraftsModal } = useAiGeneration();
+  const nextDraft = pendingDrafts.find((draft) => !draft.visto) || pendingDrafts[0];
+  const draftsLabel = nextDraft ? 'Abrir rascunho da IA pronto' : 'Acompanhar rascunhos da IA';
+
+  const abrirResumo = (pacienteId, destinoIa) => {
+    closeDraftsModal();
+    navigate(`/prontuario/${pacienteId}`, { state: { destinoIa } });
+  };
+  const abrirRascunho = (draft) => abrirResumo(draft.pacienteId, { draftId: draft.id });
+  const acompanharGeracao = (geracao) => abrirResumo(geracao.pacienteId, { generationId: geracao.id });
 
   const getRoleLabel = () => {
     if (isAdmin) return 'Administração';
@@ -45,13 +59,49 @@ export default function AppLayout({
             </button>
 
             {/* Conteúdo à esquerda do Header (Breadcrumbs, títulos, navegações) */}
-            <div className="min-w-0 flex items-center">
+            <div className="min-w-0 flex items-center truncate">
               {headerLeft}
             </div>
           </div>
 
           {/* Conteúdo à direita do Header (Status do usuário, ações secundárias) */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {isDoutora && (
+              <div className="flex rounded-xl border border-leaf-300 bg-leaf-50 text-leaf-900 shadow-xs">
+                <button
+                  type="button"
+                  onClick={nextDraft ? () => abrirRascunho(nextDraft) : openDraftsModal}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold hover:bg-leaf-100 transition"
+                  aria-label={draftsLabel}
+                  title={draftsLabel}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-leaf-700" />
+                  <span className="hidden sm:inline">Rascunhos IA</span>
+                  {nextDraft ? (
+                    <span className="px-1.5 rounded-full bg-leaf-700 text-paper-50 text-[10px] font-bold">
+                      {pendingDrafts.length}
+                    </span>
+                  ) : null}
+                  {activeGeneration ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : generationError ? (
+                    <AlertCircle className="w-3.5 h-3.5 text-amber-700" />
+                  ) : null}
+                </button>
+                {nextDraft && (pendingDrafts.length > 1 || activeGeneration || generationError) && (
+                  <button
+                    type="button"
+                    onClick={openDraftsModal}
+                    className="px-1.5 rounded-r-xl border-l border-leaf-300 hover:bg-leaf-100"
+                    aria-label="Abrir painel de rascunhos da IA"
+                    title="Abrir painel de rascunhos da IA"
+                  >
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            )}
+
             {headerRight || (
               <div className="flex items-center gap-2 text-xs text-ink-600">
                 <span className="hidden sm:inline">Logado como</span>
@@ -59,7 +109,7 @@ export default function AppLayout({
                   {user?.nome || 'Usuário'}
                 </span>
                 <span
-                  className="hidden xs:inline-block px-2 py-0.5 rounded-full text-[10px] font-medium border"
+                  className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-medium border"
                   style={{
                     backgroundColor: isAdmin ? '#f3e8ff' : isDoutora ? '#E3F0E8' : '#E4EEF6',
                     color: isAdmin ? '#7e22ce' : isDoutora ? '#1F4D3A' : '#4A86B5',
@@ -78,6 +128,13 @@ export default function AppLayout({
           {children}
         </main>
       </div>
+
+      <AiDraftsModal
+        isOpen={isDraftsModalOpen}
+        onClose={closeDraftsModal}
+        onReview={abrirRascunho}
+        onFollow={acompanharGeracao}
+      />
     </div>
   );
 }

@@ -6,7 +6,9 @@ from .views import (
     AnotacaoSessaoViewSet,
     AnotacaoSessaoDetailView,
     PromptCatalogListView,
+    FontesIaView,
     ContextoIaView,
+    GerarResumoIaView,
     ResumoIaListCreateView,
     ResumoIaDetailView,
     ParecerConclusivoListCreateView,
@@ -26,7 +28,9 @@ urlpatterns = [
 
     # Módulo de IA (Desafios 8 e 9)
     path('ia/prompts/', PromptCatalogListView.as_view(), name='prontuario-ia-prompts'),
+    path('pacientes/<uuid:paciente_id>/ia/fontes/', FontesIaView.as_view(), name='prontuario-ia-fontes'),
     path('pacientes/<uuid:paciente_id>/ia/contexto/', ContextoIaView.as_view(), name='prontuario-ia-contexto'),
+    path('pacientes/<uuid:paciente_id>/ia/gerar/', GerarResumoIaView.as_view(), name='prontuario-ia-gerar'),
     path('pacientes/<uuid:paciente_id>/ia/resumos/', ResumoIaListCreateView.as_view(), name='prontuario-ia-resumos'),
     path('ia/resumos/<uuid:pk>/', ResumoIaDetailView.as_view(), name='prontuario-ia-resumo-detalhe'),
 

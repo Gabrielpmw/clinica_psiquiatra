@@ -42,14 +42,18 @@ class SessaoSerializer(serializers.ModelSerializer):
             inicio = inicio or self.instance.dataHoraInicio
             fim = fim or self.instance.dataHoraFim
 
+        paciente = data.get('paciente') or (self.instance.paciente if self.instance else None)
+        status_alvo = data.get('status') or (
+            self.instance.status if self.instance else Sessao.StatusChoices.AGENDADA
+        )
+
         if inicio and fim and fim <= inicio:
             raise serializers.ValidationError(
                 {'dataHoraFim': 'A hora de fim deve ser posterior à hora de início.'}
             )
 
         # Detecção de sobreposição de sessões para o mesmo paciente
-        if inicio and fim and data.get('paciente'):
-            paciente = data['paciente']
+        if inicio and fim and paciente and status_alvo == Sessao.StatusChoices.AGENDADA:
             qs = Sessao.objects.filter(
                 paciente=paciente,
                 status=Sessao.StatusChoices.AGENDADA,
@@ -63,8 +67,8 @@ class SessaoSerializer(serializers.ModelSerializer):
                     'Já existe uma sessão agendada para este paciente neste intervalo de horário.'
                 )
 
-        # Verificar se o horário está bloqueado
-        if inicio and fim:
+        # Verificar se o horário está bloqueado quando o destino é AGENDADA
+        if inicio and fim and status_alvo == Sessao.StatusChoices.AGENDADA:
             bloqueios_qs = Bloqueio.objects.filter(
                 dataHoraInicio__lt=fim,
                 dataHoraFim__gt=inicio,

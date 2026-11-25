@@ -21,6 +21,8 @@ import {
   getBloqueios,
   atualizarStatusSessao,
   atualizarPagamentoSessao,
+  atualizarHorarioSessao,
+  remarcarSessao,
   deletarBloqueio,
 } from '../services/agendaService';
 import DayView from '../components/Agenda/DayView';
@@ -28,6 +30,7 @@ import WeekView from '../components/Agenda/WeekView';
 import PatientDayList from '../components/Agenda/PatientDayList';
 import SessionFormModal from '../components/Agenda/SessionFormModal';
 import BloqueioModal from '../components/Agenda/BloqueioModal';
+import EditSessionTimeModal from '../components/Agenda/EditSessionTimeModal';
 import AppLayout from '../components/AppLayout';
 
 export default function AgendaPage() {
@@ -43,11 +46,13 @@ export default function AgendaPage() {
   const [sessoes, setSessoes] = useState([]);
   const [bloqueios, setBloqueios] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [justDroppedId, setJustDroppedId] = useState(null);
 
   // Modais
   const [modalAgendarOpen, setModalAgendarOpen] = useState(false);
   const [modalBloqueioOpen, setModalBloqueioOpen] = useState(false);
   const [agendarDataInicial, setAgendarDataInicial] = useState('');
+  const [sessaoEditandoHorario, setSessaoEditandoHorario] = useState(null);
 
   // Obter início da semana (segunda-feira) para a data selecionada
   const getInicioSemana = (dateStr) => {
@@ -165,20 +170,125 @@ export default function AgendaPage() {
     }
   };
 
+  const handleRemarcarSessao = async (sessao, novaData) => {
+    if (!sessao || !novaData) return;
+    const diaOriginal = (sessao.dataHoraInicio || '').substring(0, 10);
+    if (diaOriginal === novaData) return;
+
+    const pad = (n) => String(n).padStart(2, '0');
+    const buildMovedIso = (origIso, targetDateStr) => {
+      const orig = new Date(origIso);
+      const [y, m, d] = targetDateStr.split('-').map(Number);
+      const moved = new Date(y, m - 1, d, orig.getHours(), orig.getMinutes(), orig.getSeconds());
+      const offsetMin = -moved.getTimezoneOffset();
+      const sign = offsetMin >= 0 ? '+' : '-';
+      const absMin = Math.abs(offsetMin);
+      return `${targetDateStr}T${pad(moved.getHours())}:${pad(moved.getMinutes())}:${pad(
+        moved.getSeconds()
+      )}${sign}${pad(Math.floor(absMin / 60))}:${pad(absMin % 60)}`;
+    };
+
+    const snapshotSessoes = sessoes;
+    const novoInicioIso = buildMovedIso(sessao.dataHoraInicio, novaData);
+    const novoFimIso = buildMovedIso(sessao.dataHoraFim, novaData);
+    const statusAnterior = sessao.status;
+
+    // Atualização otimista para animação imediata na interface
+    setSessoes((prev) => {
+      const updated = prev.map((s) =>
+        s.id === sessao.id
+          ? {
+              ...s,
+              dataHoraInicio: novoInicioIso,
+              dataHoraFim: novoFimIso,
+              status: 'AGENDADA',
+              status_display: 'Agendada',
+            }
+          : s
+      );
+      return viewMode === 'dia'
+        ? updated.filter((s) => (s.dataHoraInicio || '').startsWith(dataSelecionada))
+        : updated.sort((a, b) => new Date(a.dataHoraInicio) - new Date(b.dataHoraInicio));
+    });
+    setJustDroppedId(sessao.id);
+    setTimeout(() => {
+      setJustDroppedId((curr) => (curr === sessao.id ? null : curr));
+    }, 900);
+
+    try {
+      const atualizada = await remarcarSessao(sessao.id, { novaData });
+      setSessoes((prev) => {
+        if (viewMode === 'dia' && !(atualizada.dataHoraInicio || '').startsWith(dataSelecionada)) {
+          return prev.filter((s) => s.id !== sessao.id);
+        }
+        return prev
+          .map((s) => (s.id === sessao.id ? atualizada : s))
+          .sort((a, b) => new Date(a.dataHoraInicio) - new Date(b.dataHoraInicio));
+      });
+      const dataFormatada = novaData.split('-').reverse().join('/');
+      if (statusAnterior === 'CANCELADA' || statusAnterior === 'FALTA') {
+        notifySuccess(`Sessão remarcada para ${dataFormatada} com status Agendada!`);
+      } else {
+        notifySuccess(`Sessão remarcada para ${dataFormatada}!`);
+      }
+    } catch (err) {
+      setSessoes(snapshotSessoes);
+      setJustDroppedId(null);
+      const dataErr = err?.response?.data;
+      const msg =
+        dataErr?.error ||
+        dataErr?.detail ||
+        (Array.isArray(dataErr) ? dataErr[0] : null) ||
+        (Array.isArray(dataErr?.non_field_errors) ? dataErr.non_field_errors[0] : null) ||
+        'Não foi possível remarcar a sessão para este dia.';
+      notifyError(msg);
+    }
+  };
+
+  const handleSalvarNovoHorario = async (sessao, novaHoraStr, duracaoMin = 50) => {
+    const pad = (n) => String(n).padStart(2, '0');
+    const dataStr = (sessao.dataHoraInicio || '').substring(0, 10);
+    const [y, m, d] = dataStr.split('-').map(Number);
+    const [hh, mm] = novaHoraStr.split(':').map(Number);
+    const inicioLocal = new Date(y, m - 1, d, hh, mm, 0);
+    const fimLocal = new Date(inicioLocal.getTime() + duracaoMin * 60000);
+
+    const toOffsetIso = (dt) => {
+      const offsetMin = -dt.getTimezoneOffset();
+      const sign = offsetMin >= 0 ? '+' : '-';
+      const absMin = Math.abs(offsetMin);
+      return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(
+        dt.getHours()
+      )}:${pad(dt.getMinutes())}:00${sign}${pad(Math.floor(absMin / 60))}:${pad(absMin % 60)}`;
+    };
+
+    const atualizada = await atualizarHorarioSessao(sessao.id, {
+      dataHoraInicio: toOffsetIso(inicioLocal),
+      dataHoraFim: toOffsetIso(fimLocal),
+    });
+
+    setSessoes((prev) =>
+      prev
+        .map((s) => (s.id === sessao.id ? atualizada : s))
+        .sort((a, b) => new Date(a.dataHoraInicio) - new Date(b.dataHoraInicio))
+    );
+    notifySuccess(`Horário alterado para ${novaHoraStr}!`);
+  };
+
   const headerLeft = (
-    <nav className="flex items-center gap-1.5 text-xs text-ink-400">
-      <span className="hover:text-ink-900 cursor-pointer text-ink-600" onClick={() => navigate('/dashboard')}>
+    <nav className="flex items-center gap-1.5 text-xs text-ink-400 min-w-0">
+      <span className="hidden sm:inline hover:text-ink-900 cursor-pointer text-ink-600" onClick={() => navigate('/dashboard')}>
         Início
       </span>
-      <span>›</span>
-      <span className="font-semibold text-leaf-700">Agenda de Atendimento</span>
+      <span className="hidden sm:inline">›</span>
+      <span className="font-semibold text-leaf-700 truncate">Agenda de Atendimento</span>
     </nav>
   );
 
   const headerRight = (
     <div className="text-xs text-ink-600 flex items-center gap-2">
       <span className="hidden sm:inline">Logado como</span>
-      <span className="font-semibold text-ink-900 max-w-[120px] sm:max-w-none truncate">{user?.nome}</span>
+      <span className="font-semibold text-ink-900 max-w-[90px] sm:max-w-none truncate">{user?.nome}</span>
     </div>
   );
 
@@ -285,10 +395,14 @@ export default function AgendaPage() {
                   sessoes={sessoes}
                   bloqueios={bloqueios}
                   dataSelecionada={dataSelecionada}
+                  inicioSemana={inicioSemana}
                   onOpenAgendar={handleAbrirAgendar}
                   onStatusChange={handleStatusChange}
                   onPagamentoChange={handlePagamentoChange}
                   onDeletarBloqueio={handleDeletarBloqueio}
+                  onRemarcarSessao={handleRemarcarSessao}
+                  onEditHorario={setSessaoEditandoHorario}
+                  justDroppedId={justDroppedId}
                   isSecretaria={isSecretaria}
                 />
               </div>
@@ -313,6 +427,9 @@ export default function AgendaPage() {
                 onStatusChange={handleStatusChange}
                 onPagamentoChange={handlePagamentoChange}
                 onDeletarBloqueio={handleDeletarBloqueio}
+                onRemarcarSessao={handleRemarcarSessao}
+                onEditHorario={setSessaoEditandoHorario}
+                justDroppedId={justDroppedId}
                 isSecretaria={isSecretaria}
               />
             </div>
@@ -332,6 +449,13 @@ export default function AgendaPage() {
         onClose={() => setModalBloqueioOpen(false)}
         onSuccess={() => carregarDados()}
         initialDate={dataSelecionada}
+      />
+
+      <EditSessionTimeModal
+        sessao={sessaoEditandoHorario}
+        isOpen={Boolean(sessaoEditandoHorario)}
+        onClose={() => setSessaoEditandoHorario(null)}
+        onSave={handleSalvarNovoHorario}
       />
     </AppLayout>
   );
